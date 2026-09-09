@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Yucong Zhou — Portfolio (prototype v17)</title>
+<title>Yucong Zhou — Portfolio (prototype v19)</title>
 <style>
-:root{--fg:#141414}
+:root{--fg:#141414;--cw:100vw;--ch:100vh}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:auto}
 body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetica,-apple-system,"PingFang SC","Noto Sans SC",sans-serif;color:var(--fg);overflow-x:hidden}
@@ -14,7 +14,10 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
 #wipe{position:absolute;inset:0;width:100%;height:100%;display:block}
 .scene{position:absolute;inset:0;visibility:hidden;will-change:transform}
 .scene.on{visibility:visible}
-.shape{position:absolute;will-change:transform;pointer-events:auto}
+.art{position:absolute;left:0;bottom:0;width:var(--cw);height:var(--ch)}
+.shape{position:absolute;will-change:transform;pointer-events:auto;left:var(--dl);top:var(--dt);bottom:var(--db);width:var(--dw);height:var(--dh)}
+.shape.txt .fx{font-size:var(--dfs)}
+.shape.geo .fx{border-radius:var(--dr)}
 .shape .fx{width:100%;height:100%;display:block;transition:background .35s,border-color .35s}
 .shape.tri .fx{clip-path:polygon(50% 0,100% 100%,0 100%)}
 .shape.slot .fx{display:grid;place-items:center;opacity:.9}
@@ -106,7 +109,26 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
 .nav button i{position:absolute;right:28px;top:50%;transform:translateY(-50%);font:11px/1 Inter,sans-serif;font-style:normal;letter-spacing:.14em;white-space:nowrap;opacity:0;transition:opacity .3s}
 .nav button:hover i{opacity:.8}
 .foot{position:absolute;left:32px;bottom:28px;font-size:11px;letter-spacing:.1em;opacity:.6}
-@media (max-width:720px){.copy{max-width:84vw}.copy p{max-width:80vw}.brand span{display:none}.nav{right:14px}}
+@media (max-width:720px){.brand span{display:none}}
+@media (orientation:portrait){
+  .shape{left:var(--ml,var(--dl));top:var(--mt,var(--dt));bottom:var(--mb,var(--db));width:var(--mw,var(--dw));height:var(--mh,var(--dh))}
+  .shape.txt .fx{font-size:var(--mfs,var(--dfs))}
+  .shape.geo .fx{border-radius:var(--mr,var(--dr))}
+  .shape.mhide{display:none}
+  .copy{left:6vw;top:9vh;transform:none;max-width:88vw}
+  .copy .k{font-size:11px;margin-bottom:14px}
+  .copy h1{font-size:clamp(36px,11vw,58px)}
+  .copy p{max-width:88vw;font-size:14px;margin-top:16px;line-height:1.5}
+  .copy .tags{margin-top:14px;gap:8px}.copy .tags span{font-size:11px;padding:5px 10px}
+  .copy .links{margin-top:20px;gap:18px;font-size:13px;flex-wrap:wrap}
+  .nav{right:10px;gap:10px}
+  .counter{right:22px}
+  .gal{padding:3vw;border-radius:4vw}.gal img{border-radius:2.5vw}.gal figure{margin-bottom:4vw}
+  .gal figcaption{padding:2.5vw .5vw 0;gap:3vw}.gal figcaption strong{font-size:14px}.gal figcaption span{font-size:12px}.gal figcaption b{font-size:22px}
+  .car{gap:3vw}.car .frame{border-radius:4vw}.car .ctl{gap:3vw}.car .ctl button{width:36px;height:36px;font-size:14px}.car .dots{gap:6px}.car .dots i{width:6px;height:6px}
+  .car .cover b{font-size:14vw;left:5vw;top:3vw}.car .cover i{border-left-width:8vw;border-top-width:5vw;border-bottom-width:5vw}
+  .foot,.hint{display:none}
+}
 </style>
 </head>
 <body>
@@ -120,7 +142,7 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
   <div class="progress" id="progress"></div>
   <div class="counter" id="counter">01 / 06</div>
   <div class="hint" id="hint">scroll</div>
-  <div class="foot">Prototype v17 — colour-block scenes · elastic transitions</div>
+  <div class="foot">Prototype v19 — colour-block scenes · elastic transitions</div>
 </div>
 <nav class="nav" id="nav"></nav>
 
@@ -248,6 +270,20 @@ const SCENES=[
     {t:'rect',x:54,y:84,w:'42vw',h:'5vh',c:C.yellow,r:'3vh',d:.18},
     {t:'rect',x:88,y:8,w:'7vw',h:'7vw',c:C.blue,rot:30,d:.26}]},
 ];
+/* portrait (mobile) layout overrides — aligned with each scene's shapes array; null = hidden on mobile */
+const bars=(i)=>({x:9+[0,6,6,12,12,6,0,0,6,12,6,0][i]*1.1,y:53.5+i*2.35,w:([10,20,10,16,8,22,6,14,18,12,9,5][i]*2.4)+'vw',h:'1.3vh'});
+const M=[
+  [{x:14,y:36,w:'72vw',h:'72vw'},{x:-10,bottom:0,w:'36vw',h:'18vw'},{x:84,y:38,w:'7vw',h:'7vw'},{x:6,y:42,w:'5vw',h:'5vw'},null,{x:10,bottom:0,w:'80vw',h:'56vh'}],
+  [{x:82,y:44,w:'6vw',h:'6vw'},null,{x:5,y:45,w:'4vw',h:'4vw'},{x:6,y:52,w:'88vw',h:'43vh'},null,null],
+  [{x:6,y:46,w:'88vw',h:'auto'},{x:6,y:82,w:'14vw',h:'14vw'},{x:24,y:82,w:'14vw',h:'14vw'},{x:42,y:82,w:'14vw',h:'14vw'},{x:60,y:82,w:'14vw',h:'14vw'},{x:78,y:82,w:'7vw',h:'14vw'},null,null,null,null,null,{x:88,y:82,w:'6vw',h:'6vw'},null,{x:84,y:40,w:'9vw',h:'9vw'}],
+  [{x:6,y:48,w:'88vw',h:'36vh'},{x:8.5,y:49.6,w:'2.2vw',h:'2.2vw'},{x:11.8,y:49.6,w:'2.2vw',h:'2.2vw'},{x:15.1,y:49.6,w:'2.2vw',h:'2.2vw'},{x:22,y:49.4,w:'22vw',h:'1.2vh'},
+   ...Array.from({length:12},(_,i)=>bars(i)),{x:22,y:82.5,w:'3vw',h:'1.6vh'},{x:66,y:76,fs:'22vw'},{x:80,y:90,w:'14vw',h:'14vw'},null,{x:84,y:40,w:'5vw',h:'5vw'},{x:6,y:91,w:'40vw',h:'1.6vh'},{x:48,y:91,w:'12vw',h:'1.6vh'}],
+  [{x:14,bottom:'30vw',w:'72vw',h:'72vw'},{x:78,bottom:'86vw',w:'14vw',h:'14vw'},{x:8,bottom:'70vw',w:'4vw',h:'4vw'},{x:36,bottom:'26vw',w:'28vw',h:'56vw',r:'14vw 14vw 2vw 2vw'},{x:44,bottom:'60vw',w:'12vw',h:'12vw'},{x:44,bottom:'50vw',w:'12vw',h:'1.4vw'},{x:44,bottom:'46vw',w:'7vw',h:'1.4vw'},
+   {x:22,bottom:'26vw',w:'14vw',h:'20vw'},{x:64,bottom:'26vw',w:'14vw',h:'20vw'},{x:40,bottom:'9vw',w:'20vw',h:'18vw'},{x:45,bottom:'15vw',w:'10vw',h:'12vw'},{x:6,bottom:'6vw',w:'88vw',h:'2.2vw'},{x:72,bottom:'10vw',fs:'10vw'},null,{x:8,bottom:'18vw',w:'6vw',h:'6vw'}],
+  [{x:30,y:46,w:'60vw',h:'60vw'},{x:40,y:56,w:'30vw',h:'30vw'},{x:74,y:68,w:'16vw',h:'16vw'},{x:8,y:76,w:'18vw',h:'18vw'},{x:6,y:90,w:'88vw',h:'4vh'},{x:84,y:42,w:'8vw',h:'8vw'}],
+];
+SCENES.forEach((sc,i)=>sc.shapes.forEach((sh,j)=>{const mm=(M[i]||[])[j];sh.m=mm===undefined?undefined:mm}));
+// ring border width scales with canvas
 /* transition type per boundary i -> i+1 */
 const TRANS=['up','right','blob','snap','diag'];
 
@@ -256,13 +292,20 @@ const $=id=>document.getElementById(id);
 const stage=$('stage'),bg=$('bg'),wipePath=$('wipePath'),wipe=$('wipe'),scenesEl=$('scenes');
 const S=SCENES.map((sc,i)=>{
   const el=document.createElement('div');el.className='scene';scenesEl.appendChild(el);
+  const art=document.createElement('div');art.className='art';el.appendChild(art);
+  const U=v=>typeof v==='string'?v.replace(/(-?\d*\.?\d+)vw/g,'calc(var(--cw)*$1/100)').replace(/(-?\d*\.?\d+)vh/g,'calc(var(--ch)*$1/100)'):v;
   const shapes=sc.shapes.map(s=>{const d=document.createElement('div');d.className='shape '+s.t;
-    d.style.left=s.x+'vw';if(s.bottom!=null)d.style.bottom=s.bottom+'vh';else d.style.top=s.y+'vh';
-    d.style.width=s.w||'auto';d.style.height=s.h||'auto';
+    const un=(v,u)=>typeof v==='string'?U(v):U(v+u);
+    const geo=(pre,g)=>{d.style.setProperty(pre+'l',un(g.x,'vw'));
+      if(g.bottom!=null){d.style.setProperty(pre+'b',un(g.bottom,'vh'));d.style.setProperty(pre+'t','auto')}else{d.style.setProperty(pre+'t',un(g.y,'vh'));d.style.setProperty(pre+'b','auto')}
+      d.style.setProperty(pre+'w',U(g.w||'auto'));d.style.setProperty(pre+'h',U(g.h||'auto'));if(g.fs)d.style.setProperty(pre+'fs',U(g.fs));
+      if(g.t==='rect'||g.t==='circle'||g.t==='tri'){d.classList.add('geo');d.style.setProperty(pre+'r',g.t==='circle'?'50%':U(g.r||'0'))}};
+    geo('--d',s);
+    if(s.m===null)d.classList.add('mhide');else if(s.m){geo('--m',Object.assign({},s,s.m))}
     const f=document.createElement('div');f.className='fx';d.appendChild(f);
-    if(s.t==='txt'){f.textContent=s.txt;f.style.color=s.c;f.style.fontSize=s.fs;d.classList.add('txt')}
+    if(s.t==='txt'){f.textContent=s.txt;f.style.color=s.c;d.classList.add('txt')}
     else if(s.t==='img'){f.innerHTML=`<img src="${s.src}" alt="" draggable="false">`}
-    else if(s.t==='ring'){f.style.borderRadius='50%';f.style.border=`${s.bw} solid ${s.c}`}
+    else if(s.t==='ring'){f.style.borderRadius='50%';f.style.border=`${U(s.bw)} solid ${s.c}`}
     else if(s.t==='gallery'){f.classList.add('gal');
       f.innerHTML=`<div class="galhead"><span>Selected work</span><span>scroll ↓</span></div>`+s.items.map((it,i)=>`<figure><img src="${it.src}" alt="${it.title}" loading="lazy" draggable="false"><figcaption><b>0${i+1}</b><div><strong>${it.title}</strong><span>${it.meta}</span></div></figcaption></figure>`).join('');
       f.addEventListener('wheel',e=>{const atTop=f.scrollTop<=0&&e.deltaY<0,atEnd=f.scrollTop+f.clientHeight>=f.scrollHeight-1&&e.deltaY>0;if(!atTop&&!atEnd)e.stopPropagation()},{passive:true});}
@@ -277,10 +320,10 @@ const S=SCENES.map((sc,i)=>{
         fr.src=`https://player.vimeo.com/video/${v.id}?h=${v.h}&autoplay=1&title=0&byline=0&portrait=0&dnt=1`;fr.allow='autoplay; fullscreen; picture-in-picture';fr.setAttribute('allowfullscreen','');fr.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
         sl.appendChild(fr);sl.querySelector('.cover').style.display='none'});
       d._stop=stop;}
-    else if(s.t==='slot'){f.style.borderRadius=s.r||'1vw';f.style.border=`2px dashed ${s.c}`;f.style.color=s.c;f.innerHTML=`<span>${s.label}</span>`}
-    else{f.style.background=s.c;if(s.t==='circle')f.style.borderRadius='50%';else if(s.r)f.style.borderRadius=s.r}
+    else if(s.t==='slot'){f.style.borderRadius=U(s.r||'1vw');f.style.border=`2px dashed ${s.c}`;f.style.color=s.c;f.innerHTML=`<span>${s.label}</span>`}
+    else{f.style.background=s.c}
     if(s.t==='rect'||s.t==='circle'||s.t==='tri'||s.t==='ring'||s.t==='txt'){f.classList.add(['idle-a','idle-b','idle-c','idle-d'][Math.floor(Math.random()*4)]);f.style.setProperty('--dur',(6+Math.random()*6).toFixed(1)+'s');f.style.setProperty('--del',(-Math.random()*8).toFixed(1)+'s')}
-    el.appendChild(d);
+    art.appendChild(d);
     /* hover fun */
     const FX=['fx-jelly','fx-spin','fx-wobble','fx-jump','fx-morph','fx-shake','fx-flip','fx-squish'];
     const pal=[C.coral,C.yellow,C.blue,C.ink,C.cream,C.mint,C.pink];
