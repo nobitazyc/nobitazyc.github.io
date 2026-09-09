@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Yucong Zhou — Portfolio (prototype v19)</title>
+<title>Yucong Zhou — Portfolio (prototype v20)</title>
 <style>
 :root{--fg:#141414;--cw:100vw;--ch:100vh}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -41,6 +41,30 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
 .gal figcaption b{font-size:1.6vw;font-weight:800;letter-spacing:-.05em;line-height:1;color:#ffc93c}
 .gal figcaption strong{display:block;font-size:.95vw;font-weight:600;letter-spacing:-.01em}
 .gal figcaption span{display:block;font-size:.75vw;opacity:.6;margin-top:.25vw;letter-spacing:.02em}
+.tl{height:100%;overflow-y:auto;overscroll-behavior:contain;border-radius:1.5vw;background:#141414;color:#f4efe6;padding:1.4vw 1.6vw;scrollbar-width:thin;scrollbar-color:#f4efe6 transparent}
+.tl::-webkit-scrollbar{width:6px}.tl::-webkit-scrollbar-thumb{background:#f4efe6;border-radius:3px}
+.tli{display:grid;grid-template-columns:7.5vw 1.4vw 1fr;gap:0 1vw;position:relative;padding:0 0 1.8vw}
+.tli .when{font-size:.75vw;letter-spacing:.14em;text-transform:uppercase;color:#ffc93c;padding-top:.35vw;font-variant-numeric:tabular-nums}
+.tli .dot{width:1vw;height:1vw;border-radius:50%;background:#f4efe6;margin-top:.3vw;position:relative;z-index:1;transition:transform .4s cubic-bezier(.34,1.56,.64,1),background .3s}
+.tli:hover .dot{transform:scale(1.5);background:#ffc93c}
+.tli::before{content:"";position:absolute;left:calc(7.5vw + 1vw + .5vw - 1px);top:1.2vw;bottom:0;width:2px;background:#f4efe6;opacity:.25}
+.tli:last-child::before{display:none}
+.tli{cursor:pointer;outline:none;border-radius:.6vw;margin:0 -.6vw;padding-left:.6vw;padding-right:.6vw;transition:background .3s}
+.tli:hover,.tli:focus-visible{background:rgba(244,239,230,.06)}
+.tli .hd{display:flex;align-items:flex-start;justify-content:space-between;gap:1vw}
+.tli .chev{font-style:normal;font-weight:600;font-size:1.2vw;line-height:1;opacity:.5;transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .3s}
+.tli.open .chev{transform:rotate(45deg);opacity:1;color:#ffc93c}
+.tli .more{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s cubic-bezier(.4,0,.2,1)}
+.tli .more>div{overflow:hidden}
+.tli.open .more{grid-template-rows:1fr}
+.tli.open .dot{background:#ffc93c;transform:scale(1.5)}
+.tli ul{margin:.7vw 0 0 1vw;padding:0;font-size:.8vw;line-height:1.55;opacity:.85}
+.tli ul li{margin-bottom:.25vw}
+.tli .stack{display:flex;gap:.5vw;flex-wrap:wrap;margin-top:.9vw;padding-bottom:.3vw}
+.tli .stack em{font-style:normal;font-size:.7vw;letter-spacing:.06em;border:1px solid rgba(244,239,230,.35);border-radius:999px;padding:.25vw .7vw}
+.tli strong{display:block;font-size:1.05vw;font-weight:600;letter-spacing:-.01em;line-height:1.2}
+.tli span{display:block;font-size:.8vw;opacity:.65;margin-top:.25vw}
+.tli p{font-size:.8vw;line-height:1.5;opacity:.8;margin-top:.5vw;max-width:26vw}
 .car{display:flex;flex-direction:column;gap:1.2vw}
 .car .frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:1.5vw;overflow:hidden;background:#141414}
 .car .track{display:flex;height:100%;transition:transform .75s cubic-bezier(.34,1.25,.64,1)}
@@ -84,7 +108,7 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
 .copy .tags span{cursor:default}
 
 .shape.txt{font-weight:800;letter-spacing:-.06em;line-height:.85;white-space:nowrap}
-.copy{position:absolute;left:8vw;top:50%;transform:translateY(-50%);max-width:44vw;will-change:transform}
+.copy{position:absolute;left:8vw;top:var(--ct,50%);transform:translateY(-50%);max-width:44vw;will-change:transform}
 .copy .k{font-size:12px;letter-spacing:.24em;text-transform:uppercase;opacity:.7;margin-bottom:22px}
 .copy h1{font-size:clamp(56px,10.5vw,176px);font-weight:800;letter-spacing:-.05em;line-height:.88}
 .copy h1 .l{display:block;overflow:visible;padding-bottom:.06em}
@@ -127,6 +151,12 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
   .gal figcaption{padding:2.5vw .5vw 0;gap:3vw}.gal figcaption strong{font-size:14px}.gal figcaption span{font-size:12px}.gal figcaption b{font-size:22px}
   .car{gap:3vw}.car .frame{border-radius:4vw}.car .ctl{gap:3vw}.car .ctl button{width:36px;height:36px;font-size:14px}.car .dots{gap:6px}.car .dots i{width:6px;height:6px}
   .car .cover b{font-size:14vw;left:5vw;top:3vw}.car .cover i{border-left-width:8vw;border-top-width:5vw;border-bottom-width:5vw}
+  .tl{padding:4vw;border-radius:4vw}
+  .tli{grid-template-columns:20vw 4vw 1fr;gap:0 2vw;padding-bottom:5vw}
+  .tli .when{font-size:10px;padding-top:2px}.tli .dot{width:3vw;height:3vw;margin-top:1vw}
+  .tli::before{left:calc(20vw + 2vw + 1.5vw - 1px);top:4vw}
+  .tli strong{font-size:14px}.tli span,.tli p{font-size:12px;max-width:none}.tli ul{font-size:12px;margin-left:12px}.tli .stack em{font-size:10px;padding:2px 8px}.tli .chev{font-size:16px}.tli{border-radius:2vw;margin:0 -2vw;padding-left:2vw;padding-right:2vw}
+  .copy .tags span{font-size:10px;padding:4px 8px}
   .foot,.hint{display:none}
 }
 </style>
@@ -135,7 +165,7 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
 <body>
 <div id="stage">
   <div id="bg"></div>
-  <svg id="wipe" xmlns="http://www.w3.org/2000/svg"><path id="wipePath" d=""/></svg>
+  <svg id="wipe" xmlns="http://www.w3.org/2000/svg"><path id="wipeRest" d=""/><path id="wipePath" d=""/></svg>
   <div id="scenes"></div>
 </div>
 <div class="ui">
@@ -143,7 +173,7 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
   <div class="progress" id="progress"></div>
   <div class="counter" id="counter">01 / 06</div>
   <div class="hint" id="hint">scroll</div>
-  <div class="foot">Prototype v19 — colour-block scenes · elastic transitions</div>
+  <div class="foot">Prototype v20 — colour-block scenes · elastic transitions</div>
 </div>
 <nav class="nav" id="nav"></nav>
 
@@ -163,7 +193,7 @@ const easeOutBounce=t=>{const n=7.5625,d=2.75;if(t<1/d)return n*t*t;if(t<2/d)ret
 const easeOutExpo=t=>t>=1?1:1-Math.pow(2,-10*t);
 
 /* ---------- palette ---------- */
-const C={coral:'#ff5a3c',yellow:'#ffc93c',blue:'#2f4bff',ink:'#141414',cream:'#f4efe6',mint:'#19c37d',pink:'#ff8fb1'};
+const C={coral:'#ff5a3c',yellow:'#ffc93c',blue:'#2f4bff',ink:'#141414',cream:'#f4efe6',mint:'#19c37d',pink:'#ff8fb1',lilac:'#d9d3ff'};
 
 /* ---------- scenes ---------- */
 /* shape: {t:'rect'|'circle'|'tri'|'txt', x,y (vw/vh %), w,h (strings with units), c color, r border-radius, rot, d delay(0-.5), txt, fs} */
@@ -230,7 +260,7 @@ const SCENES=[
     {t:'ring',x:88,y:78,w:'7vw',h:'7vw',c:C.cream,bw:'1vw',d:.4},
     {t:'rect',x:47,y:74,w:'5vw',h:'5vw',c:C.coral,rot:30,d:.42},
     {t:'rect',x:88,y:3,w:'8vw',h:'8vw',c:C.ink,r:'60% 40% 30% 70% / 60% 30% 70% 40%',d:.44}]},
-  {bg:C.cream,fg:C.ink,k:'03 / Development',title:['Then build','it myself'],p:'React, Next.js and TypeScript. Design tokens become components; motion specs become real interactions.',tags:['React / Next.js','TypeScript','GSAP / Framer Motion'],
+  {bg:C.cream,fg:C.ink,k:'03 / Development & Ship',title:['Build it','and ship it'],p:'React, Next.js and TypeScript. Design tokens become components, motion specs become real interactions — then it goes live. Release, measure, iterate.',tags:['React / Next.js','TypeScript','GSAP / Framer Motion','Release & iterate'],
    shapes:[
     {t:'rect',x:54,y:12,w:'40vw',h:'58vh',c:C.ink,r:'1.5vw',d:0},
     {t:'circle',x:55.4,y:13.6,w:'1vw',h:'1vw',c:C.coral,d:.04},
@@ -244,24 +274,22 @@ const SCENES=[
     {t:'ring',x:47,y:64,w:'7vw',h:'7vw',c:C.ink,bw:'1.2vw',d:.38},
     {t:'rect',x:48,y:20,w:'5vw',h:'5vw',c:C.blue,rot:45,d:.4},
     {t:'rect',x:56,y:78,w:'20vw',h:'2.2vh',c:C.ink,r:'2vh',d:.44},
-    {t:'rect',x:78,y:78,w:'6vw',h:'2.2vh',c:C.yellow,r:'2vh',d:.46}]},
-  {bg:C.mint,fg:C.ink,k:'04 / Ship',title:['Launch and','keep listening'],p:'Release, measure, iterate. Products are not deliverables — they keep growing after day one.',
+    {t:'rect',x:78,y:78,w:'6vw',h:'2.2vh',c:C.yellow,r:'2vh',d:.46},
+    {t:'txt',x:86,y:76.6,txt:'LIVE',c:C.ink,fs:'2.4vw',d:.48}]},
+  {bg:C.lilac,fg:C.ink,k:'About',title:['Bit more','about me'],p:'I started out as an engineer and picked up UX and motion design along the way — so I can design what I build, and build what I design. Today I\'m a Senior Frontend Engineer at MacroHealth (Vancouver), working remotely from Ottawa.',
    shapes:[
-    {t:'ring',x:52,y:6,w:'40vw',h:'40vw',c:C.ink,bw:'.5vw',d:.02},
-    {t:'circle',x:86,y:10,w:'9vw',h:'9vw',c:C.yellow,d:.08},
-    {t:'circle',x:50,y:56,w:'3vw',h:'3vw',c:C.ink,d:.12},
-    {t:'rect',x:66,y:20,w:'12vw',h:'24vw',c:C.cream,r:'6vw 6vw 1vw 1vw',d:.1},
-    {t:'circle',x:69.5,y:28,w:'5vw',h:'5vw',c:C.blue,d:.16},
-    {t:'rect',x:69.5,y:38,w:'5vw',h:'1.2vh',c:C.ink,r:'1vh',d:.18},
-    {t:'rect',x:69.5,y:41,w:'3vw',h:'1.2vh',c:C.ink,r:'1vh',d:.2},
-    {t:'rect',x:60,y:44,w:'6vw',h:'9vw',c:C.coral,r:'100% 0 0 0',d:.22},
-    {t:'rect',x:78,y:44,w:'6vw',h:'9vw',c:C.coral,r:'0 100% 0 0',d:.24},
-    {t:'tri',x:68,y:60,w:'8vw',h:'9vw',c:C.yellow,rot:180,d:.28},
-    {t:'tri',x:70,y:60,w:'4vw',h:'6vw',c:C.coral,rot:180,d:.3},
-    {t:'rect',x:54,y:82,w:'40vw',h:'2.2vh',c:C.ink,r:'2vh',d:.34},
-    {t:'txt',x:82,y:66,txt:'LIVE',c:C.ink,fs:'6vw',d:.36},
-    {t:'rect',x:88,y:52,w:'6vw',h:'6vw',c:C.cream,r:'60% 40% 30% 70% / 60% 30% 70% 40%',d:.4},
-    {t:'rect',x:47,y:74,w:'5vw',h:'5vw',c:C.cream,rot:45,d:.42}]},
+    {t:'timeline',x:54,y:10,w:'40vw',h:'78vh',d:0,items:[
+      {when:'2021 — Now',role:'Senior Frontend Engineer',org:'MacroHealth · Vancouver (remote from Ottawa)',desc:'Front-end for a healthcare marketplace platform — from design system to shipped product.',bullets:['Build and maintain the shared UI component library used across the platform','Own front-end architecture and performance for the marketplace web apps','Bridge design and engineering: prototype interactions in code before they ship'],stack:['React','TypeScript','Figma','Design Systems']},
+      {when:'2016 — 2021',role:'UX Developer',org:'Bell · Ottawa',desc:'Blueprint Infinite — Bell\'s large-scale agent web app.',bullets:['Led the end-to-end redesign: research, wireframes, UI mockups and prototypes','Designed and built the design system with Sketch, Angular and Storybook','Implemented core UI functionality in an Agile team with code reviews','Created new app branding and promotional videos'],stack:['Angular','Storybook','Sketch','After Effects']},
+      {when:'2015 — 2016',role:'Designer & Front-end Developer',org:'Fullscript · Ottawa',desc:'HealthWave — practitioner e-commerce platform.',bullets:['Designed the UI for the HealthWave iPad app','Created and implemented the UI kit for the web app','Built the public catalog and category pages','Designed and developed the marketing landing page'],stack:['UI Kit','HTML / CSS','JavaScript']},
+      {when:'2014 — 2015',role:'Designer & Front-end Developer',org:'LiveQoS · Ottawa',desc:'LiveInsight network analytics dashboard and SuperTCP.',bullets:['Built the LiveInsight dashboard with Angular.js and D3.js on Rails / PostgreSQL','UI/UX and mobile-first design for SuperTCP (Bootstrap, Less, CoffeeScript)','Produced promo videos with Cinema 4D, After Effects, Illustrator and Photoshop'],stack:['Angular.js','D3.js','Cinema 4D','After Effects']},
+      {when:'2013 — 2014',role:'Web Application Developer',org:'inVUze · Kitchener',desc:'Web apps, games and presentation tools.',bullets:['WebSocket presentation app: control slides from a phone while the audience comments live','"Dye Dash" — a four-player online game using phones as controllers','Designed and developed the company website'],stack:['ASP.NET','SQL Server','jQuery','HTML5']},
+      {when:'2011 — 2014',role:'Diploma, Computer Software Technology',org:'Conestoga College',desc:'',bullets:[],stack:[]}]},
+    {t:'ring',x:46,y:12,w:'6vw',h:'6vw',c:C.ink,bw:'1.1vw',d:.14},
+    {t:'rect',x:47,y:30,w:'6vw',h:'12vw',c:C.yellow,r:'3vw 3vw 0 0',d:.2},
+    {t:'rect',x:47.5,y:66,w:'5vw',h:'5vw',c:C.blue,rot:45,d:.26},
+    {t:'rect',x:90,y:84,w:'8vw',h:'8vw',c:C.cream,r:'50% 0 50% 0',d:.3},
+    {t:'rect',x:58,y:92,w:'12vw',h:'2.2vh',c:C.ink,r:'2vh',d:.36}]},
   {bg:C.ink,fg:C.cream,k:'Contact',title:["Let's make",'something real.'],p:'nobitanobi920219@gmail.com',links:['Email','Dribbble','Vimeo','Resume'],
    shapes:[
     {t:'circle',x:60,y:18,w:'32vw',h:'32vw',c:C.coral,d:0},
@@ -278,9 +306,8 @@ const M=[
   [{x:82,y:44,w:'6vw',h:'6vw'},null,{x:5,y:45,w:'4vw',h:'4vw'},{x:6,y:52,w:'88vw',h:'43vh'},null,null],
   [{x:6,y:46,w:'88vw',h:'auto'},{x:6,y:82,w:'14vw',h:'14vw'},{x:24,y:82,w:'14vw',h:'14vw'},{x:42,y:82,w:'14vw',h:'14vw'},{x:60,y:82,w:'14vw',h:'14vw'},{x:78,y:82,w:'7vw',h:'14vw'},null,null,null,null,null,{x:88,y:82,w:'6vw',h:'6vw'},null,{x:84,y:40,w:'9vw',h:'9vw'}],
   [{x:6,y:48,w:'88vw',h:'36vh'},{x:8.5,y:49.6,w:'2.2vw',h:'2.2vw'},{x:11.8,y:49.6,w:'2.2vw',h:'2.2vw'},{x:15.1,y:49.6,w:'2.2vw',h:'2.2vw'},{x:22,y:49.4,w:'22vw',h:'1.2vh'},
-   ...Array.from({length:12},(_,i)=>bars(i)),{x:22,y:82.5,w:'3vw',h:'1.6vh'},{x:66,y:76,fs:'22vw'},{x:80,y:90,w:'14vw',h:'14vw'},null,{x:84,y:40,w:'5vw',h:'5vw'},{x:6,y:91,w:'40vw',h:'1.6vh'},{x:48,y:91,w:'12vw',h:'1.6vh'}],
-  [{x:14,bottom:'30vw',w:'72vw',h:'72vw'},{x:78,bottom:'86vw',w:'14vw',h:'14vw'},{x:8,bottom:'70vw',w:'4vw',h:'4vw'},{x:36,bottom:'26vw',w:'28vw',h:'56vw',r:'14vw 14vw 2vw 2vw'},{x:44,bottom:'60vw',w:'12vw',h:'12vw'},{x:44,bottom:'50vw',w:'12vw',h:'1.4vw'},{x:44,bottom:'46vw',w:'7vw',h:'1.4vw'},
-   {x:22,bottom:'26vw',w:'14vw',h:'20vw'},{x:64,bottom:'26vw',w:'14vw',h:'20vw'},{x:40,bottom:'9vw',w:'20vw',h:'18vw'},{x:45,bottom:'15vw',w:'10vw',h:'12vw'},{x:6,bottom:'6vw',w:'88vw',h:'2.2vw'},{x:72,bottom:'10vw',fs:'10vw'},null,{x:8,bottom:'18vw',w:'6vw',h:'6vw'}],
+   ...Array.from({length:12},(_,i)=>bars(i)),{x:22,y:82.5,w:'3vw',h:'1.6vh'},{x:66,y:76,fs:'22vw'},{x:80,y:90,w:'14vw',h:'14vw'},null,{x:84,y:40,w:'5vw',h:'5vw'},{x:6,y:91,w:'40vw',h:'1.6vh'},{x:48,y:91,w:'12vw',h:'1.6vh'},{x:64,y:90.2,fs:'3.8vw'}],
+  [{x:6,y:50,w:'88vw',h:'46vh'},null,null,null,null,null],
   [{x:30,y:46,w:'60vw',h:'60vw'},{x:40,y:56,w:'30vw',h:'30vw'},{x:74,y:68,w:'16vw',h:'16vw'},{x:8,y:76,w:'18vw',h:'18vw'},{x:6,y:90,w:'88vw',h:'4vh'},{x:84,y:42,w:'8vw',h:'8vw'}],
 ];
 SCENES.forEach((sc,i)=>sc.shapes.forEach((sh,j)=>{const mm=(M[i]||[])[j];sh.m=mm===undefined?undefined:mm}));
@@ -290,7 +317,14 @@ const TRANS=['up','right','blob','snap','diag'];
 
 /* ---------- build DOM ---------- */
 const $=id=>document.getElementById(id);
-const stage=$('stage'),bg=$('bg'),wipePath=$('wipePath'),wipe=$('wipe'),scenesEl=$('scenes');
+const stage=$('stage'),bg=$('bg'),wipePath=$('wipePath'),wipeRest=$('wipeRest'),wipe=$('wipe'),scenesEl=$('scenes');
+/* how far each wipe settles — <1 leaves a sliver of the previous page's colour */
+const REST={up:.955,snap:.955,right:.965,diag:1,blob:.9};
+/* resting wave of each settled edge (slowly breathing) */
+const restBulge=(t,k,W,H,now)=>{const base=(t==='up'||t==='snap')?H*.05:W*.045;return base*(1+.25*Math.sin(now/1800+k*1.7))};
+/* one settled wipe per boundary so slivers from earlier pages keep stacking */
+const restPaths=[];
+const blobCenter=(sc)=>{const el=sc.shapes[0].el,op=el.offsetParent;return[el.offsetLeft+el.offsetWidth/2+(op?op.offsetLeft:0),el.offsetTop+el.offsetHeight/2+(op?op.offsetTop:0)]};
 const S=SCENES.map((sc,i)=>{
   const el=document.createElement('div');el.className='scene';scenesEl.appendChild(el);
   const art=document.createElement('div');art.className='art';el.appendChild(art);
@@ -310,6 +344,11 @@ const S=SCENES.map((sc,i)=>{
     else if(s.t==='gallery'){f.classList.add('gal');
       f.innerHTML=`<div class="galhead"><span>Selected work</span><span>scroll ↓</span></div>`+s.items.map((it,i)=>`<figure><img src="${it.src}" alt="${it.title}" loading="lazy" draggable="false"><figcaption><b>0${i+1}</b><div><strong>${it.title}</strong><span>${it.meta}</span></div></figcaption></figure>`).join('');
       f.addEventListener('wheel',e=>{const atTop=f.scrollTop<=0&&e.deltaY<0,atEnd=f.scrollTop+f.clientHeight>=f.scrollHeight-1&&e.deltaY>0;if(!atTop&&!atEnd)e.stopPropagation()},{passive:true});}
+    else if(s.t==='timeline'){f.classList.add('tl');
+      f.innerHTML=`<div class="galhead"><span>Experience</span><span>click a role to expand</span></div>`+s.items.map((it,i)=>`<div class="tli${i===0?' open':''}" tabindex="0"><div class="when">${it.when}</div><div class="dot"></div><div class="body"><div class="hd"><strong>${it.role}</strong><i class="chev">+</i></div><span>${it.org}</span><div class="more"><div><p>${it.desc}</p>${it.bullets&&it.bullets.length?`<ul>${it.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>`:''}${it.stack&&it.stack.length?`<div class="stack">${it.stack.map(t=>`<em>${t}</em>`).join('')}</div>`:''}</div></div></div></div>`).join('');
+      const rows=[...f.querySelectorAll('.tli')];
+      rows.forEach(r=>{const tog=()=>{const was=r.classList.contains('open');rows.forEach(x=>x.classList.remove('open'));if(!was)r.classList.add('open')};
+        r.addEventListener('click',tog);r.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog()}})});}
     else if(s.t==='video'){f.classList.add('car');const covers=[C.coral,C.yellow,C.cream,C.ink];
       f.innerHTML=`<div class="frame"><div class="track">${s.videos.map((v,i)=>`<div class="slide"><div class="cover" style="background:${covers[i%4]};color:${covers[i%4]===C.ink?C.cream:C.ink}"><b>0${i+1}</b><i></i><span>Reel 0${i+1} · click to play</span></div></div>`).join('')}</div></div>
         <div class="ctl"><button class="pv" aria-label="previous">←</button><span class="cnt">01 / 0${s.videos.length}</span><div class="dots">${s.videos.map((v,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div><button class="nx" aria-label="next">→</button></div>`;
@@ -329,7 +368,7 @@ const S=SCENES.map((sc,i)=>{
     const FX=['fx-jelly','fx-spin','fx-wobble','fx-jump','fx-morph','fx-shake','fx-flip','fx-squish'];
     const pal=[C.coral,C.yellow,C.blue,C.ink,C.cream,C.mint,C.pink];
     let busy=false;
-    if(s.t!=='img'&&s.t!=='slot'&&s.t!=='video'&&s.t!=='gallery')d.addEventListener('pointerenter',()=>{if(busy)return;busy=true;
+    if(s.t!=='img'&&s.t!=='slot'&&s.t!=='video'&&s.t!=='gallery'&&s.t!=='timeline')d.addEventListener('pointerenter',()=>{if(busy)return;busy=true;
       const fx=FX[Math.floor(Math.random()*FX.length)];f.classList.add(fx);
       let orig=null;
       if(Math.random()<.5&&(s.t==='rect'||s.t==='circle'||s.t==='tri'||s.t==='ring')){const nc=pal.filter(c=>c!==s.c&&c!==sc.bg)[Math.floor(Math.random()*5)];
@@ -337,7 +376,7 @@ const S=SCENES.map((sc,i)=>{
       f.addEventListener('animationend',()=>{f.classList.remove(fx);busy=false;
         if(orig!=null)setTimeout(()=>{if(s.t==='ring')f.style.borderColor=s.c;else f.style.background=s.c},250)},{once:true})});
     return{el:d,rot:s.rot||0,d:s.d||0,seed:Math.random()*10}});
-  const copy=document.createElement('div');copy.className='copy';copy.style.color=sc.fg;
+  const copy=document.createElement('div');copy.className='copy';copy.style.color=sc.fg;if(sc.copyTop)copy.style.setProperty('--ct',sc.copyTop);
   const letters=l=>l.split(' ').map(wd=>`<span class="w">${[...wd].map(ch=>`<span class="ch">${ch}</span>`).join('')}</span>`).join(' ');
   copy.innerHTML=`<div class="k">${sc.k}</div><h1>${sc.title.map(l=>`<span class="l"><span>${letters(l)}</span></span>`).join('')}</h1><p>${sc.p}</p>`+
     (sc.tags?`<div class="tags">${sc.tags.map(t=>`<span>${t}</span>`).join('')}</div>`:'')+
@@ -360,6 +399,8 @@ const N=SCENES.length;
 const nav=$('nav');
 SCENES.forEach((sc,i)=>{const b=document.createElement('button');b.innerHTML=`<i>${sc.k}</i>`;b.onclick=()=>scrollTo({top:(i/(N-1))*(document.body.scrollHeight-innerHeight),behavior:'smooth'});nav.appendChild(b)});
 const navBtns=[...nav.children];
+for(let k=0;k<N-1;k++){const pth=document.createElementNS('http://www.w3.org/2000/svg','path');wipe.insertBefore(pth,wipePath);restPaths.push(pth)}
+wipeRest.remove();
 const progress=$('progress'),counter=$('counter'),hint=$('hint');
 
 /* ---------- scroll state ---------- */
@@ -378,10 +419,10 @@ const T0=.5,T1=.86;
 
 function wipeD(type,p,b,W,H,cx,cy,sqz){
   switch(type){
-    case 'up':{const y=H*(1-p);return `M0 ${y} Q${W/2} ${y-b} ${W} ${y} L${W} ${H+400} L0 ${H+400} Z`}
-    case 'snap':{const y=H*p;return `M0 -400 L${W} -400 L${W} ${y} Q${W/2} ${y+b} 0 ${y} Z`}
-    case 'right':{const x=W*(1-p);return `M${x} -400 Q${x-b} ${H/2} ${x} ${H+400} L${W+400} ${H+400} L${W+400} -400 Z`}
-    case 'diag':{const k=.32,x=W*(1-p)*(1+k)+k*H*.5;return `M${x} -400 Q${x-k*H*.5-b} ${H/2} ${x-k*H} ${H+400} L${W+600} ${H+400} L${W+600} -400 Z`}
+    case 'up':{const y=H*(1-p);return `M0 ${y} C${W*.28} ${y-b*1.5} ${W*.62} ${y+b*.7} ${W} ${y-b*.4} L${W} ${H+400} L0 ${H+400} Z`}
+    case 'snap':{const y=H*p;return `M0 -400 L${W} -400 L${W} ${y+b*.4} C${W*.62} ${y-b*.7} ${W*.28} ${y+b*1.5} 0 ${y} Z`}
+    case 'right':{const x=W*(1-p);return `M${x+b*.3} -400 C${x-b*1.5} ${H*.3} ${x+b*.8} ${H*.62} ${x-b*.5} ${H+400} L${W+400} ${H+400} L${W+400} -400 Z`}
+    case 'diag':{const k=.32,x=W*(1-p)*(1+k)+k*H*.5;return `M${x} -400 C${x-k*H*.3-b*1.3} ${H*.3} ${x-k*H*.7+b*.6} ${H*.7} ${x-k*H} ${H+400} L${W+600} ${H+400} L${W+600} -400 Z`}
     case 'blob':{const R=Math.hypot(Math.max(cx,W-cx),Math.max(cy,H-cy))*1.05*p;const rx=R*(1+sqz),ry=R*(1-sqz);
       return `M${cx-rx} ${cy} a${rx} ${ry} 0 1 0 ${rx*2} 0 a${rx} ${ry} 0 1 0 ${-rx*2} 0 Z`}
   }
@@ -406,17 +447,23 @@ function frame(){
   bulgeV+=(tb-bulge)*.09-bulgeV*.16;bulge+=bulgeV;
   sq=0;
 
-  /* background */
-  bg.style.background=SCENES[base].bg;
+  /* background: colour of the page before the current one, plus a settled wipe of the current page (leaves a sliver) */
+  const bIdx=inTrans?i:base;                       // page whose colour is fully "on"
+  bg.style.background=SCENES[0].bg;
   document.documentElement.style.setProperty('--fg',SCENES[base].fg);
+  wipe.style.display='block';wipe.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  restPaths.forEach((pth,k)=>{if(k+1<=bIdx){const rt=TRANS[k];let cx=W*.5,cy=H*.5;if(rt==='blob'){[cx,cy]=blobCenter(S[k])}
+      pth.setAttribute('d',wipeD(rt,REST[rt],restBulge(rt,k,W,H,performance.now()),W,H,cx,cy,.06*Math.sin(performance.now()/2200+k)));pth.setAttribute('fill',SCENES[k+1].bg);pth.style.display='block'}
+    else pth.style.display='none'});
   if(inTrans){
-    const p=type==='snap'?easeOutBounce(tt):type==='blob'?easeOutExpo(tt):easeOutBack(tt,1.2);
-    let cx=W*.5,cy=H*.5;
-    if(type==='blob'){const rc=A.shapes[0].el.getBoundingClientRect();cx=rc.left+rc.width/2;cy=rc.top+rc.height/2}
-    wipePath.setAttribute('d',wipeD(type,clamp(p,0,1.3),bulge,W,H,cx,cy,clamp(vel*1.5,-.35,.35)));
-    wipePath.setAttribute('fill',B.sc.bg);wipe.style.display='block';
-  }else{wipe.style.display='none'}
-  wipe.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    const p=(type==='snap'?easeOutBounce(tt):type==='blob'?easeOutExpo(tt):easeOutBack(tt,1.2))*REST[type];
+    let cx=W*.5,cy=H*.5;if(type==='blob'){[cx,cy]=blobCenter(A)}
+    /* blend the live bulge/squash into the resting wave near the end so the hand-off to the settled layer is seamless */
+    const wEnd=smooth(.78,1,tt),now=performance.now();
+    const bl=lerp(bulge,restBulge(type,i,W,H,now),wEnd),sqz=lerp(clamp(vel*1.5,-.35,.35),.06*Math.sin(now/2200+i),wEnd);
+    wipePath.setAttribute('d',wipeD(type,clamp(p,0,1.3),bl,W,H,cx,cy,sqz));
+    wipePath.setAttribute('fill',B.sc.bg);wipePath.style.display='block';
+  }else wipePath.style.display='none';
 
   /* scenes */
   S.forEach((sc,j)=>{const on=j===i||(j===i+1);if(!on||(j===i&&f>T0)){sc.shapes.forEach(sh=>sh.el._stop&&sh.el._stop())}sc.el.classList.toggle('on',on&&(j===i?f<T0+(T1-T0)*AOUT:f>T0));});
