@@ -406,7 +406,7 @@ function frame(){
         case 'blob':tr=`scale(${easeOutBack(q,2.2)})`;break;
       }
       sh.el.style.transform=tr+` rotate(${sh.rot}deg)`;
-      sh.el.style.opacity=q>0?1:0});
+      sh.el.style.opacity=smooth(0,.45,q)});
     B.copyParts.forEach(c=>{const q=clamp((pi*1.6-c.d-.25),0,1);const e=easeOutBack(q,1.1);
       c.el.style.transform=`translateY(${(1-e)*60}px)`;c.el.style.opacity=q});
   }
