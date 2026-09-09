@@ -421,7 +421,7 @@ function frame(){
 requestAnimationFrame(frame);
 /* random letter pops on the current scene */
 let curBase=0;
-(function tick(){const sc=S[curBase];if(sc&&sc.el.classList.contains('on')&&sc.el._playRandomLetter)sc.el._playRandomLetter();setTimeout(tick,1400+Math.random()*1400)})();
+(function tick(){const sc=S[curBase];if(sc&&sc.el.classList.contains('on')&&sc.el._playRandomLetter)sc.el._playRandomLetter();setTimeout(tick,3200+Math.random()*1600)})();
 </script>
 </body>
 </html>
