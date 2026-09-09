@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Yucong Zhou — Portfolio (prototype v14)</title>
+<title>Yucong Zhou — Portfolio (prototype v17)</title>
 <style>
 :root{--fg:#141414}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -28,6 +28,16 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
 @keyframes idleB{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.04) rotate(-2deg)}}
 @keyframes idleC{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
 @keyframes idleD{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(2deg) scale(1.02)}75%{transform:rotate(-2deg) scale(.98)}}
+.gal{height:100%;overflow-y:auto;overscroll-behavior:contain;border-radius:1.5vw;background:#141414;color:#f4efe6;padding:1.4vw;scrollbar-width:thin;scrollbar-color:#f4efe6 transparent}
+.gal::-webkit-scrollbar{width:6px}.gal::-webkit-scrollbar-thumb{background:#f4efe6;border-radius:3px}.gal::-webkit-scrollbar-track{background:transparent}
+.galhead{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6;padding:.2vw .2vw 1.2vw}
+.gal figure{margin:0 0 1.6vw}
+.gal img{width:100%;display:block;border-radius:.9vw;background:#f4efe6;transition:transform .5s cubic-bezier(.34,1.3,.64,1)}
+.gal figure:hover img{transform:scale(1.015)}
+.gal figcaption{display:flex;gap:1vw;align-items:flex-start;padding:.9vw .2vw 0}
+.gal figcaption b{font-size:1.6vw;font-weight:800;letter-spacing:-.05em;line-height:1;color:#ffc93c}
+.gal figcaption strong{display:block;font-size:.95vw;font-weight:600;letter-spacing:-.01em}
+.gal figcaption span{display:block;font-size:.75vw;opacity:.6;margin-top:.25vw;letter-spacing:.02em}
 .car{display:flex;flex-direction:column;gap:1.2vw}
 .car .frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:1.5vw;overflow:hidden;background:#141414}
 .car .track{display:flex;height:100%;transition:transform .75s cubic-bezier(.34,1.25,.64,1)}
@@ -63,8 +73,10 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
 @keyframes fxFlip{to{transform:perspective(600px) rotateY(360deg)}}
 @keyframes fxSquish{0%{transform:scaleY(1)}35%{transform:scaleY(.55) translateY(40%)}70%{transform:scaleY(1.12) translateY(-6%)}100%{transform:scaleY(1)}}
 .copy{pointer-events:auto}
+.copy h1 .l{white-space:normal}
+.copy h1 .l>span{display:inline-block;max-width:100%}
+.copy h1 .w{display:inline-block;white-space:nowrap}
 .copy h1 .ch{display:inline-block;transition:color .3s;cursor:default}
-.copy h1 .ch.sp{width:.25em}
 .copy p,.copy .k,.copy .tags span{transition:transform .35s cubic-bezier(.34,1.56,.64,1),color .3s}
 .copy .tags span{cursor:default}
 
@@ -108,7 +120,7 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
   <div class="progress" id="progress"></div>
   <div class="counter" id="counter">01 / 06</div>
   <div class="hint" id="hint">scroll</div>
-  <div class="foot">Prototype v14 — colour-block scenes · elastic transitions</div>
+  <div class="foot">Prototype v17 — colour-block scenes · elastic transitions</div>
 </div>
 <nav class="nav" id="nav"></nav>
 
@@ -169,14 +181,16 @@ const SCENES=[
     {t:'img',x:56,bottom:0,w:'40vw',h:'86vh',src:HERO,d:.08}]},
   {bg:C.yellow,fg:C.ink,k:'01 / UX & UI Design',title:['Design that','ships'],p:'Research, flows, design systems and pixel-perfect interfaces — built to be implemented, not just presented.',tags:['Figma','Design Systems','Prototyping'],
    shapes:[
-    {t:'rect',x:52,y:14,w:'16vw',h:'16vw',c:C.ink,r:'0 100% 0 0',d:.1},
-    {t:'slot',x:64,y:11,w:'22vw',h:'78vh',c:C.ink,r:'3vw',label:'Case study 01 · UI screens',d:0},
-    {t:'rect',x:52,y:36,w:'10vw',h:'20vw',c:C.coral,r:'5vw 5vw 0 0',d:.16},
-    {t:'ring',x:87,y:14,w:'10vw',h:'10vw',c:C.ink,bw:'1.6vw',d:.2},
-    {t:'rect',x:88,y:40,w:'8vw',h:'8vw',c:C.blue,rot:45,d:.26},
-    {t:'rect',x:86,y:60,w:'12vw',h:'6vw',c:C.cream,r:'0 0 6vw 6vw',d:.3},
-    {t:'rect',x:52,y:78,w:'10vw',h:'10vw',c:C.cream,r:'50% 0 50% 0',d:.34},
-    {t:'rect',x:86,y:76,w:'12vw',h:'2.2vh',c:C.ink,r:'2vh',d:.38}]},
+    {t:'ring',x:46,y:12,w:'6vw',h:'6vw',c:C.ink,bw:'1.1vw',d:.14},
+    {t:'rect',x:47,y:30,w:'6vw',h:'12vw',c:C.coral,r:'3vw 3vw 0 0',d:.2},
+    {t:'rect',x:47.5,y:66,w:'5vw',h:'5vw',c:C.blue,rot:45,d:.26},
+    {t:'gallery',x:54,y:11,w:'40vw',h:'78vh',d:0,items:[
+      {src:'assets/ux-01.webp',title:'HealthWave',meta:'Practitioner e-commerce platform · Web'},
+      {src:'assets/ux-02.webp',title:'Homemade Food Marketplace',meta:'Ordering & chat flows · Mobile UI'},
+      {src:'assets/ux-03.webp',title:'BluePrint Infinite',meta:'Customer-service dashboard · Enterprise'},
+      {src:'assets/ux-04.webp',title:'Network Analytics Dashboard',meta:'Throughput & app usage monitoring · Data viz'}]},
+    {t:'rect',x:90,y:84,w:'8vw',h:'8vw',c:C.cream,r:'50% 0 50% 0',d:.3},
+    {t:'rect',x:58,y:92,w:'12vw',h:'2.2vh',c:C.ink,r:'2vh',d:.36}]},
   {bg:C.blue,fg:C.cream,k:'02 / Motion Design',title:['Make it','move'],p:'Micro-interactions, UI motion and motion graphics — from storyboards in After Effects to easing curves in code.',tags:['After Effects','Lottie / Rive','UI Motion'],
    shapes:[
     {t:'video',x:54,y:10,w:'40vw',h:'auto',c:C.cream,d:0,videos:[{id:'286234223',h:'f9b25af99f'},{id:'120609540',h:'7818cb482d'},{id:'121668116',h:'7551d8d867'},{id:'73495035',h:'95e8ff8ee7'}]},
@@ -195,29 +209,37 @@ const SCENES=[
     {t:'rect',x:88,y:3,w:'8vw',h:'8vw',c:C.ink,r:'60% 40% 30% 70% / 60% 30% 70% 40%',d:.44}]},
   {bg:C.cream,fg:C.ink,k:'03 / Development',title:['Then build','it myself'],p:'React, Next.js and TypeScript. Design tokens become components; motion specs become real interactions.',tags:['React / Next.js','TypeScript','GSAP / Framer Motion'],
    shapes:[
-    {t:'slot',x:54,y:10,w:'40vw',h:'32vh',c:C.ink,r:'1.5vw',label:'Live demo / component playground',d:0},
-    ...[[0,10,C.ink],[8,20,C.blue],[8,10,C.coral],[16,16,C.ink],[16,8,C.yellow],[8,22,C.ink],[0,6,C.ink],[0,14,C.blue],[8,18,C.coral],[0,8,C.ink]].map((b,i)=>({t:'rect',x:54+b[0]*.45,y:50+i*4.2,w:(b[1]*.9)+'vw',h:'2.2vh',c:b[2],r:'1.1vh',d:.08+i*.03})),
-    {t:'rect',x:80,y:50,w:'14vw',h:'14vw',c:C.blue,r:'100% 0 0 0',d:.2},
-    {t:'rect',x:80,y:50,w:'7vw',h:'7vw',c:C.coral,r:'0 0 100% 0',d:.26},
-    {t:'ring',x:84,y:76,w:'9vw',h:'9vw',c:C.ink,bw:'1.4vw',d:.32},
-    {t:'rect',x:42,y:84,w:'12vw',h:'3vh',c:C.yellow,r:'2vh',rot:-20,d:.36},
-    {t:'tri',x:94,y:50,w:'4vw',h:'14vw',c:C.yellow,d:.4}]},
+    {t:'rect',x:54,y:12,w:'40vw',h:'58vh',c:C.ink,r:'1.5vw',d:0},
+    {t:'circle',x:55.4,y:13.6,w:'1vw',h:'1vw',c:C.coral,d:.04},
+    {t:'circle',x:57,y:13.6,w:'1vw',h:'1vw',c:C.yellow,d:.06},
+    {t:'circle',x:58.6,y:13.6,w:'1vw',h:'1vw',c:C.mint,d:.08},
+    {t:'rect',x:64,y:13.4,w:'10vw',h:'1.4vh',c:C.cream,r:'1vh',d:.1},
+    ...[[0,10,C.cream],[6,20,C.blue],[6,10,C.coral],[12,16,C.cream],[12,8,C.yellow],[6,22,C.cream],[0,6,C.cream],[0,14,C.blue],[6,18,C.coral],[12,12,C.cream],[6,9,C.yellow],[0,5,C.cream]].map((b,i)=>({t:'rect',x:56.5+b[0]*.5,y:20+i*3.9,w:(b[1]*1.1)+'vw',h:'2vh',c:b[2],r:'1vh',d:.1+i*.025})),
+    {t:'rect',x:63,y:63,w:'1.4vw',h:'2.6vh',c:C.yellow,d:.42},
+    {t:'txt',x:80,y:44,txt:'{ }',c:C.cream,fs:'11vw',d:.3},
+    {t:'rect',x:86,y:74,w:'12vw',h:'12vw',c:C.coral,r:'100% 0 0 0',d:.34},
+    {t:'ring',x:47,y:64,w:'7vw',h:'7vw',c:C.ink,bw:'1.2vw',d:.38},
+    {t:'rect',x:48,y:20,w:'5vw',h:'5vw',c:C.blue,rot:45,d:.4},
+    {t:'rect',x:56,y:78,w:'20vw',h:'2.2vh',c:C.ink,r:'2vh',d:.44},
+    {t:'rect',x:78,y:78,w:'6vw',h:'2.2vh',c:C.yellow,r:'2vh',d:.46}]},
   {bg:C.mint,fg:C.ink,k:'04 / Ship',title:['Launch and','keep listening'],p:'Release, measure, iterate. Products are not deliverables — they keep growing after day one.',
    shapes:[
-    {t:'slot',x:54,y:10,w:'40vw',h:'24vw',c:C.ink,r:'1.5vw',label:'Launched product · live site',d:0},
-    {t:'rect',x:54,y:10,w:'40vw',h:'4vh',c:C.ink,r:'1.5vw 1.5vw 0 0',d:.02},
-    {t:'circle',x:55.2,y:11.2,w:'1.2vw',h:'1.2vw',c:C.coral,d:.06},
-    {t:'circle',x:57,y:11.2,w:'1.2vw',h:'1.2vw',c:C.yellow,d:.08},
-    {t:'circle',x:58.8,y:11.2,w:'1.2vw',h:'1.2vw',c:C.cream,d:.1},
-    {t:'rect',x:54,y:62,w:'14vw',h:'14vw',c:C.ink,r:'50% 50% 0 0',d:.14},
-    {t:'tri',x:57.5,y:52,w:'7vw',h:'9vw',c:C.coral,d:.18},
-    {t:'rect',x:70,y:62,w:'12vw',h:'12vw',c:C.cream,r:'0 100% 100% 0',d:.22},
-    {t:'rect',x:84,y:62,w:'10vw',h:'10vw',c:C.yellow,r:'50%',d:.26},
-    {t:'ring',x:86,y:74,w:'8vw',h:'8vw',c:C.ink,bw:'1.2vw',d:.3},
-    {t:'rect',x:46,y:20,w:'5vw',h:'5vw',c:C.ink,rot:45,d:.34},
-    {t:'rect',x:70,y:78,w:'12vw',h:'2.2vh',c:C.coral,r:'2vh',d:.36},
-    {t:'rect',x:90,y:44,w:'6vw',h:'6vw',c:C.cream,r:'60% 40% 30% 70% / 60% 30% 70% 40%',d:.4}]},
-  {bg:C.ink,fg:C.cream,k:'Contact',title:["Let's make",'something real.'],p:'yucong.zhou@macrohealth.com',links:['Email','Dribbble','Vimeo','Resume'],
+    {t:'ring',x:52,y:6,w:'40vw',h:'40vw',c:C.ink,bw:'.5vw',d:.02},
+    {t:'circle',x:86,y:10,w:'9vw',h:'9vw',c:C.yellow,d:.08},
+    {t:'circle',x:50,y:56,w:'3vw',h:'3vw',c:C.ink,d:.12},
+    {t:'rect',x:66,y:20,w:'12vw',h:'24vw',c:C.cream,r:'6vw 6vw 1vw 1vw',d:.1},
+    {t:'circle',x:69.5,y:28,w:'5vw',h:'5vw',c:C.blue,d:.16},
+    {t:'rect',x:69.5,y:38,w:'5vw',h:'1.2vh',c:C.ink,r:'1vh',d:.18},
+    {t:'rect',x:69.5,y:41,w:'3vw',h:'1.2vh',c:C.ink,r:'1vh',d:.2},
+    {t:'rect',x:60,y:44,w:'6vw',h:'9vw',c:C.coral,r:'100% 0 0 0',d:.22},
+    {t:'rect',x:78,y:44,w:'6vw',h:'9vw',c:C.coral,r:'0 100% 0 0',d:.24},
+    {t:'tri',x:68,y:60,w:'8vw',h:'9vw',c:C.yellow,rot:180,d:.28},
+    {t:'tri',x:70,y:60,w:'4vw',h:'6vw',c:C.coral,rot:180,d:.3},
+    {t:'rect',x:54,y:82,w:'40vw',h:'2.2vh',c:C.ink,r:'2vh',d:.34},
+    {t:'txt',x:82,y:66,txt:'LIVE',c:C.ink,fs:'6vw',d:.36},
+    {t:'rect',x:88,y:52,w:'6vw',h:'6vw',c:C.cream,r:'60% 40% 30% 70% / 60% 30% 70% 40%',d:.4},
+    {t:'rect',x:47,y:74,w:'5vw',h:'5vw',c:C.cream,rot:45,d:.42}]},
+  {bg:C.ink,fg:C.cream,k:'Contact',title:["Let's make",'something real.'],p:'nobitanobi920219@gmail.com',links:['Email','Dribbble','Vimeo','Resume'],
    shapes:[
     {t:'circle',x:60,y:18,w:'32vw',h:'32vw',c:C.coral,d:0},
     {t:'rect',x:66,y:28,w:'16vw',h:'16vw',c:C.ink,r:'50% 0 50% 0',d:.08},
@@ -241,6 +263,9 @@ const S=SCENES.map((sc,i)=>{
     if(s.t==='txt'){f.textContent=s.txt;f.style.color=s.c;f.style.fontSize=s.fs;d.classList.add('txt')}
     else if(s.t==='img'){f.innerHTML=`<img src="${s.src}" alt="" draggable="false">`}
     else if(s.t==='ring'){f.style.borderRadius='50%';f.style.border=`${s.bw} solid ${s.c}`}
+    else if(s.t==='gallery'){f.classList.add('gal');
+      f.innerHTML=`<div class="galhead"><span>Selected work</span><span>scroll ↓</span></div>`+s.items.map((it,i)=>`<figure><img src="${it.src}" alt="${it.title}" loading="lazy" draggable="false"><figcaption><b>0${i+1}</b><div><strong>${it.title}</strong><span>${it.meta}</span></div></figcaption></figure>`).join('');
+      f.addEventListener('wheel',e=>{const atTop=f.scrollTop<=0&&e.deltaY<0,atEnd=f.scrollTop+f.clientHeight>=f.scrollHeight-1&&e.deltaY>0;if(!atTop&&!atEnd)e.stopPropagation()},{passive:true});}
     else if(s.t==='video'){f.classList.add('car');const covers=[C.coral,C.yellow,C.cream,C.ink];
       f.innerHTML=`<div class="frame"><div class="track">${s.videos.map((v,i)=>`<div class="slide"><div class="cover" style="background:${covers[i%4]};color:${covers[i%4]===C.ink?C.cream:C.ink}"><b>0${i+1}</b><i></i><span>Reel 0${i+1} · click to play</span></div></div>`).join('')}</div></div>
         <div class="ctl"><button class="pv" aria-label="previous">←</button><span class="cnt">01 / 0${s.videos.length}</span><div class="dots">${s.videos.map((v,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div><button class="nx" aria-label="next">→</button></div>`;
@@ -260,7 +285,7 @@ const S=SCENES.map((sc,i)=>{
     const FX=['fx-jelly','fx-spin','fx-wobble','fx-jump','fx-morph','fx-shake','fx-flip','fx-squish'];
     const pal=[C.coral,C.yellow,C.blue,C.ink,C.cream,C.mint,C.pink];
     let busy=false;
-    if(s.t!=='img'&&s.t!=='slot'&&s.t!=='video')d.addEventListener('pointerenter',()=>{if(busy)return;busy=true;
+    if(s.t!=='img'&&s.t!=='slot'&&s.t!=='video'&&s.t!=='gallery')d.addEventListener('pointerenter',()=>{if(busy)return;busy=true;
       const fx=FX[Math.floor(Math.random()*FX.length)];f.classList.add(fx);
       let orig=null;
       if(Math.random()<.5&&(s.t==='rect'||s.t==='circle'||s.t==='tri'||s.t==='ring')){const nc=pal.filter(c=>c!==s.c&&c!==sc.bg)[Math.floor(Math.random()*5)];
@@ -269,17 +294,20 @@ const S=SCENES.map((sc,i)=>{
         if(orig!=null)setTimeout(()=>{if(s.t==='ring')f.style.borderColor=s.c;else f.style.background=s.c},250)},{once:true})});
     return{el:d,rot:s.rot||0,d:s.d||0,seed:Math.random()*10}});
   const copy=document.createElement('div');copy.className='copy';copy.style.color=sc.fg;
-  const letters=l=>[...l].map(ch=>ch===' '?`<span class="ch sp">&nbsp;</span>`:`<span class="ch">${ch}</span>`).join('');
+  const letters=l=>l.split(' ').map(wd=>`<span class="w">${[...wd].map(ch=>`<span class="ch">${ch}</span>`).join('')}</span>`).join(' ');
   copy.innerHTML=`<div class="k">${sc.k}</div><h1>${sc.title.map(l=>`<span class="l"><span>${letters(l)}</span></span>`).join('')}</h1><p>${sc.p}</p>`+
     (sc.tags?`<div class="tags">${sc.tags.map(t=>`<span>${t}</span>`).join('')}</div>`:'')+
-    (sc.links?`<div class="links">${sc.links.map(t=>`<a href="#">${t}</a>`).join('')}</div>`:'');
+    (sc.links?`<div class="links">${sc.links.map(t=>`<a href="${({Email:'mailto:nobitanobi920219@gmail.com',Dribbble:'https://dribbble.com/nobitanobi',Vimeo:'https://vimeo.com/user20148085'})[t]||'#'}" ${t==='Email'?'':'target="_blank" rel="noopener"'}>${t}</a>`).join('')}</div>`:'');
   el.appendChild(copy);
   const copyParts=[...copy.querySelectorAll('.k,h1 .l > span,p,.tags,.links')].map((e,j)=>({el:e,d:j*.06}));
   const LFX=['fx-jelly','fx-jump','fx-wobble','fx-shake','fx-squish','fx-flip'];
   const lpal=[C.coral,C.yellow,C.blue,C.mint,C.pink,C.ink,C.cream].filter(c=>c!==sc.bg&&c!==sc.fg);
-  copy.querySelectorAll('h1 .ch:not(.sp)').forEach(ch=>{let busy=false;ch.addEventListener('pointerenter',()=>{if(busy)return;busy=true;
+  const chars=[...copy.querySelectorAll('h1 .ch')];
+  const playLetter=ch=>{if(ch._busy)return;ch._busy=true;
     const fx=LFX[Math.floor(Math.random()*LFX.length)];ch.classList.add(fx);ch.style.color=lpal[Math.floor(Math.random()*lpal.length)];
-    ch.addEventListener('animationend',()=>{ch.classList.remove(fx);busy=false;setTimeout(()=>ch.style.color='',400)},{once:true})})});
+    ch.addEventListener('animationend',()=>{ch.classList.remove(fx);ch._busy=false;setTimeout(()=>ch.style.color='',400)},{once:true})};
+  chars.forEach(ch=>ch.addEventListener('pointerenter',()=>playLetter(ch)));
+  el._playRandomLetter=()=>{const free=chars.filter(c=>!c._busy);if(free.length)playLetter(free[Math.floor(Math.random()*free.length)])};
   copy.querySelectorAll('.tags span').forEach(tg=>{tg.addEventListener('pointerenter',()=>{const c=lpal[Math.floor(Math.random()*lpal.length)];tg.style.background=c;tg.style.borderColor=c;tg.style.color=(c===C.ink||c===C.blue)?C.cream:C.ink;tg.style.transform=`rotate(${(Math.random()-.5)*10}deg) scale(1.08)`});
     tg.addEventListener('pointerleave',()=>{tg.style.background='';tg.style.borderColor='';tg.style.color='';tg.style.transform=''})});
   return{el,shapes,copy,copyParts,sc};
@@ -324,7 +352,7 @@ function frame(){
   const tt=clamp((f-T0)/(T1-T0),0,1);          // 0..1 transition progress
   const inTrans=f>T0&&f<T1;
   const type=TRANS[i];
-  const base=f<T0?i:(f>=T1?i+1:i);
+  const base=f<T0?i:(f>=T1?i+1:i);curBase=base;
   const A=S[i],B=S[i+1];
 
   /* springs */
@@ -391,6 +419,9 @@ function frame(){
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+/* random letter pops on the current scene */
+let curBase=0;
+(function tick(){const sc=S[curBase];if(sc&&sc.el.classList.contains('on')&&sc.el._playRandomLetter)sc.el._playRandomLetter();setTimeout(tick,1400+Math.random()*1400)})();
 </script>
 </body>
 </html>
