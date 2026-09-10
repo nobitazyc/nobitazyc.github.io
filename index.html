@@ -663,8 +663,9 @@ function frame(){
 }
 requestAnimationFrame(frame);
 /* ---------- easter egg: poke 20 different letters ---------- */
-const egg={count:0,fired:0,poke(ch){if(ch._busy)return; /* counts each real pop, not re-entries mid-animation */
-    if(++this.count>=30){this.count=0;this.fired++;this.party()}},
+const egg={count:0,fired:0,need:()=>matchMedia('(pointer: coarse)').matches?8:30, /* touch screens: fewer pokes */
+  poke(ch){if(ch._busy)return; /* counts each real pop, not re-entries mid-animation */
+    if(++this.count>=this.need()){this.count=0;this.fired++;this.party()}},
   party(){const pal=[C.coral,C.yellow,C.blue,C.mint,C.pink,C.lilac,C.cream];
     const box=document.createElement('div');box.className='party';document.body.appendChild(box);
     for(let k=0;k<90;k++){const i=document.createElement('i');const sz=8+Math.random()*22;
@@ -672,7 +673,7 @@ const egg={count:0,fired:0,poke(ch){if(ch._busy)return; /* counts each real pop,
     setTimeout(()=>box.remove(),5500);
     /* ripple every headline letter on screen */
     const sc=S[curBase];if(sc){[...sc.copy.querySelectorAll('h1 .ch')].forEach((ch,j)=>setTimeout(()=>{ch.classList.remove('fx-wave');void ch.offsetWidth;ch.classList.add('fx-wave');ch.style.color=pal[j%pal.length];setTimeout(()=>ch.style.color='',900)},j*45))}
-    const msgs=['You poked 30 letters. They liked it.','Still here? The letters appreciate the attention.','Okay, you really like these letters.','At this point we should just be friends.'];
+    const msgs=[`You poked ${this.need()} letters. They liked it.`,'Still here? The letters appreciate the attention.','Okay, you really like these letters.','At this point we should just be friends.'];
     let t=document.querySelector('.toast');if(!t){t=document.createElement('div');t.className='toast';document.body.appendChild(t)}
     t.textContent=msgs[Math.min(this.fired-1,msgs.length-1)];t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),3800)}};
 /* random letter pops on the current scene */
