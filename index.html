@@ -6,6 +6,7 @@
 <title>Yucong Zhou — Portfolio (prototype v20)</title>
 <style>
 :root{--fg:#141414;--cw:100vw;--ch:100vh}
+@supports (height:100svh){:root{--ch:100svh}} /* mobile: size the stage to the small viewport so nothing hides behind the browser toolbar */
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:auto}
 body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetica,-apple-system,"PingFang SC","Noto Sans SC",sans-serif;color:var(--fg);overflow-x:hidden}
@@ -170,7 +171,7 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
   .shape.txt .fx{font-size:var(--mfs,var(--dfs))}
   .shape.geo .fx{border-radius:var(--mr,var(--dr))}
   .shape.mhide{display:none}
-  .copy{left:6vw;top:9vh;transform:none;max-width:88vw}
+  .copy{left:6vw;top:calc(var(--ch)*.09);transform:none;max-width:88vw}
   .copy .k{font-size:11px;margin-bottom:14px}
   .copy h1{font-size:clamp(36px,11vw,58px)}
   .copy p{max-width:88vw;font-size:14px;margin-top:16px;line-height:1.5}
@@ -195,6 +196,12 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
   .xp .ctl{margin-top:0;padding-top:3vw;gap:3vw;flex-wrap:nowrap;border-top:1px solid rgba(244,239,230,.15)}.xp .ctl button{width:34px;height:34px;font-size:14px}.xp .cnt{flex-basis:auto;margin:0 0 0 auto}
   .copy .tags span{font-size:10px;padding:4px 8px}
   .foot,.hint{display:none}
+  /* short phones (toolbar showing): drop the tags, tighten the copy, give the experience card more room */
+  .short .copy .tags{display:none}
+  .short .copy h1{font-size:clamp(32px,10vw,50px)}
+  .short .copy .k{margin-bottom:10px}
+  .short .copy p{font-size:13px;line-height:1.45;margin-top:12px}
+  .short .shape.timeline{--mt:calc(var(--ch)*.45)!important;--mh:calc(var(--ch)*.51)!important}
   .bubble{left:56%;top:-4%;max-width:40vw;font-size:12px;padding:8px 12px;border-radius:12px 12px 12px 0}
 }
 </style>
@@ -547,6 +554,10 @@ const progress=$('progress'),counter=$('counter'),hint=$('hint');
 let target=0,cur=0,prev=0,vel=0;
 const maxScroll=()=>document.body.scrollHeight-innerHeight;
 addEventListener('scroll',()=>{target=clamp(scrollY/maxScroll(),0,1)},{passive:true});
+/* portrait phones with little height (browser toolbar showing) get a compact layout; use the smallest height seen so the toolbar hiding on scroll doesn't flip it back */
+let minH=innerHeight,lastW=innerWidth;
+const fit=()=>{if(innerWidth!==lastW){lastW=innerWidth;minH=innerHeight}minH=Math.min(minH,innerHeight);document.documentElement.classList.toggle('short',matchMedia('(orientation: portrait)').matches&&minH<700)};
+fit();addEventListener('resize',fit);
 const mouse={x:0,y:0,tx:0,ty:0};
 addEventListener('pointermove',e=>{mouse.tx=(e.clientX/innerWidth-.5)*2;mouse.ty=(e.clientY/innerHeight-.5)*2});
 /* elastic bulge spring */
