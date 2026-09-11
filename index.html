@@ -15,6 +15,7 @@ body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetic
 #stage{position:fixed;inset:0;overflow:hidden}
 #bg{position:absolute;inset:0}
 #wipe{position:absolute;inset:0;width:100%;height:100%;display:block}
+#wipe2{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;pointer-events:none}
 .scene{position:absolute;inset:0;visibility:hidden;will-change:transform}
 .scene.on{visibility:visible}
 .art{position:absolute;left:0;bottom:0;width:var(--cw);height:var(--ch)}
@@ -247,8 +248,9 @@ body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetic
 <body>
 <div id="stage">
   <div id="bg"></div>
-  <svg id="wipe" xmlns="http://www.w3.org/2000/svg"><path id="wipeRest" d=""/><path id="wipePath" d=""/></svg>
+  <svg id="wipe" xmlns="http://www.w3.org/2000/svg"><path id="wipeRest" d=""/></svg>
   <div id="scenes"></div>
+  <svg id="wipe2" xmlns="http://www.w3.org/2000/svg"><path id="wipePath" d=""/></svg> <!-- the live wipe: above the page it covers, below the page it reveals -->
 </div>
 <div class="ui">
   <div class="brand">Yucong Zhou <span>Design · Motion · Code</span></div>
@@ -323,7 +325,7 @@ const lerp=(a,b,t)=>a+(b-a)*t;
 const smooth=(a,b,v)=>{const t=clamp((v-a)/(b-a),0,1);return t*t*(3-2*t)};
 const easeInCubic=t=>t*t*t;
 const easeOutQuad=t=>1-(1-t)*(1-t);
-const AOUT=.5; // outgoing scene is gone by this fraction of the transition
+const AOUT=1; // the outgoing scene stays for the whole transition: the rising wipe covers it, it doesn't vanish ahead of the colour
 const easeOutBack=(t,s=1.7)=>{const c3=s+1;return 1+c3*Math.pow(t-1,3)+s*Math.pow(t-1,2)};
 const easeOutElastic=t=>t<=0?0:t>=1?1:Math.pow(2,-10*t)*Math.sin((t*10-.75)*(2*Math.PI/3))+1;
 const easeOutBounce=t=>{const n=7.5625,d=2.75;if(t<1/d)return n*t*t;if(t<2/d)return n*(t-=1.5/d)*t+.75;if(t<2.5/d)return n*(t-=2.25/d)*t+.9375;return n*(t-=2.625/d)*t+.984375};
@@ -496,7 +498,7 @@ function initRig(rig,s){
 
 /* ---------- build DOM ---------- */
 const $=id=>document.getElementById(id);
-const stage=$('stage'),bg=$('bg'),wipePath=$('wipePath'),wipeRest=$('wipeRest'),wipe=$('wipe'),scenesEl=$('scenes');
+const stage=$('stage'),bg=$('bg'),wipePath=$('wipePath'),wipeRest=$('wipeRest'),wipe=$('wipe'),wipe2=$('wipe2'),scenesEl=$('scenes');
 /* how far each wipe settles — <1 leaves a sliver of the previous page's colour */
 const REST={up:.955,snap:.955,right:.965,diag:1,blob:.9};
 /* resting wave of each settled edge (slowly breathing) */
@@ -584,7 +586,7 @@ const N=SCENES.length;
 const nav=$('nav');
 SCENES.forEach((sc,i)=>{const b=document.createElement('button');b.innerHTML=`<i>${sc.k}</i>`;b.onclick=()=>{const from=Math.round(cur*(N-1));if(Math.abs(i-from)>1&&!matchMedia('(prefers-reduced-motion: reduce)').matches)startJump(from,i);else scrollTo({top:(i/(N-1))*maxScroll(),behavior:'smooth'})};nav.appendChild(b)});
 const navBtns=[...nav.children];
-for(let k=0;k<N-1;k++){const pth=document.createElementNS('http://www.w3.org/2000/svg','path');wipe.insertBefore(pth,wipePath);restPaths.push(pth)}
+for(let k=0;k<N-1;k++){const pth=document.createElementNS('http://www.w3.org/2000/svg','path');wipe.appendChild(pth);restPaths.push(pth)}
 wipeRest.remove();
 const progress=$('progress'),counter=$('counter'),hint=$('hint');
 
@@ -599,41 +601,72 @@ const IDS=['home','work','motion','dev','about','contact'];let lastHash=-1;
 const SNAP_AT=.35,SNAP_MS=650;let snapTimer=0,snapAnim=0,lastY=scrollY,dir=1;
 const segPx=()=>maxScroll()/(N-1);
 const cancelSnap=()=>{if(snapAnim){cancelAnimationFrame(snapAnim);snapAnim=0}};
-const animateTo=y=>{cancelSnap();const y0=scrollY,d=y-y0;if(Math.abs(d)<1)return;
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches){scrollTo(0,y);return}
-  const t0=performance.now();const step=now=>{const k=Math.min(1,(now-t0)/SNAP_MS),e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;scrollTo(0,y0+d*e);snapAnim=k<1?requestAnimationFrame(step):0};
+const animateTo=(y,out,done)=>{cancelSnap();const y0=scrollY,d=y-y0;if(Math.abs(d)<1){done&&done();return}
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){scrollTo(0,y);done&&done();return}
+  const ms=out?RELEASE_MS:SNAP_MS,t0=performance.now();
+  const step=now=>{const k=Math.min(1,(now-t0)/ms),e=out?1-Math.pow(1-k,3):(k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2);scrollTo(0,y0+d*e);if(k<1)snapAnim=requestAnimationFrame(step);else{snapAnim=0;done&&done()}};
   snapAnim=requestAnimationFrame(step)};
 const snap=()=>{const sp=segPx();if(!sp)return;const s=scrollY/sp,i=Math.floor(s),f=s-i;if(f<.01||f>.99)return;
   const to=dir>0?(f>SNAP_AT?i+1:i):(f<1-SNAP_AT?i:i+1);animateTo(clamp(to,0,N-1)*sp)};
-addEventListener('scroll',()=>{const y=scrollY;if(y!==lastY)dir=y>lastY?1:-1;lastY=y;if(snapAnim)return;clearTimeout(snapTimer);snapTimer=setTimeout(snap,180)},{passive:true});
-addEventListener('keydown',cancelSnap);
-/* wheel = one scene per gesture, the fullPage.js model: native wheel scrolling is cancelled, so a notch or a trackpad swipe moves exactly one
-   scene and nothing more is accepted until that move has landed plus a cooldown. Trackpad inertia is filtered the way fullPage does it: keep the
-   recent |deltaY| values and only act while they are still accelerating (a decaying tail never fires). Inner lists (gallery, experience) stop
-   propagation while they still have room, so the wheel scrolls them natively and only reaches the stage at their edge. */
-const WHEEL_COOL=150,WHEEL_GAP=200,WHEEL_MIN=4;let wl=[],wlast=0,wheelLock=0;
-addEventListener('wheel',e=>{if(Math.abs(e.deltaX)>Math.abs(e.deltaY))return;if(e.cancelable)e.preventDefault();
-  const now=performance.now(),d=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?innerHeight:1);
-  if(now-wlast>WHEEL_GAP)wl=[];wlast=now;wl.push(Math.abs(d));if(wl.length>150)wl.shift();
-  if(now<wheelLock||snapAnim||jump||Math.abs(d)<WHEEL_MIN)return;
-  const avg=n=>{const a=wl.slice(-n);return a.reduce((x,y)=>x+y,0)/a.length};if(avg(10)<avg(70))return;   // decaying = inertia, not intent
-  const sp=segPx();if(!sp)return;const i=Math.round(scrollY/sp),to=clamp(i+(d>0?1:-1),0,N-1);
-  if(to!==i){wheelLock=now+SNAP_MS+WHEEL_COOL;animateTo(to*sp)}},{passive:false});
-/* touch = one scene per swipe, the fullPage.js model: the finger owns the gesture and native momentum never runs. A swipe past TOUCH_AT of the
-   viewport height moves one scene; nothing else is accepted until that move has landed plus a short cooldown (fullPage's canScroll gate).
-   Inside the gallery / experience list the swipe scrolls the list natively and only hands over to the stage at the list's edge. Sideways swipes are ignored. */
-const TOUCH_AT=.05,TOUCH_COOL=150;let touch=null,touchLock=0;
-const innerList=el=>el&&el.closest?el.closest('.gscroll,.xp .body'):null;
-addEventListener('touchstart',e=>{if(e.touches.length!==1){touch=null;return}const t=e.touches[0];touch={x:t.clientX,y:t.clientY,el:innerList(e.target),fired:false,horiz:null}},{passive:true});
-addEventListener('touchmove',e=>{if(!touch||e.touches.length!==1)return;const t=e.touches[0],dx=t.clientX-touch.x,dy=t.clientY-touch.y;
+addEventListener('scroll',()=>{const y=scrollY;if(y!==lastY)dir=y>lastY?1:-1;lastY=y;if(snapAnim||(ges&&!ges.released))return;clearTimeout(snapTimer);snapTimer=setTimeout(snap,180)},{passive:true});
+addEventListener('keydown',()=>{cancelSnap();follow=false});
+/* gestures: one page per swipe, but the page follows the finger / trackpad for as long as the gesture lasts, then eases out to the nearest
+   page from where it was left (a fast flick past FLICK_AT counts as the next page). A gesture can never travel
+   more than one page. Mouse-wheel notches can't be dragged, so a notch simply completes one move (fullPage behaviour). Trackpad inertia: the
+   moment the deltas start decaying the fingers have lifted, so the release runs then and the tail is ignored until the next pause.
+   Inner lists (gallery, experience) scroll natively and only hand over to the stage at their edge. */
+const DRAG_PAGE=.5,GO_AT=.3,FLICK_AT=.15,FLICK_V=.9,RELEASE_MS=520,WHEEL_GAP=500;   /* GO_AT: how far a released page must have travelled to carry on to the next one */   /* WHEEL_GAP: wheel events can't report a finger lift, so a pause this long stands in for one */
+let ges=null,follow=false;   /* follow: the stage tracks the scroll position tightly while a gesture or its release animation runs */
+const gesStart=()=>{const sp=segPx();if(!sp)return null;cancelSnap();const base=clamp(Math.round(scrollY/sp),0,N-1);follow=true;
+  return ges={sp,base,y0:scrollY,pos:scrollY,lo:Math.max(0,base-1)*sp,hi:Math.min(N-1,base+1)*sp,v:0,t:performance.now(),released:false}};
+const gesMove=px=>{if(!ges||ges.released)return;const now=performance.now(),next=clamp(ges.y0+px,ges.lo,ges.hi);   /* px: content travel since the start, forward positive */
+  ges.v=lerp(ges.v,(next-ges.pos)/Math.max(1,now-ges.t),.5);ges.pos=next;ges.t=now;scrollTo(0,next)};
+/* release: a critically damped spring from the current velocity, so the motion is continuous whatever state the page is in — a moving finger
+   hands over its speed, a page that has sat still (trackpad pause) sets off gently instead of lurching, and it always settles without overshoot */
+const REL_W=7;
+const springTo=(y,v0,done)=>{cancelSnap();let x=scrollY,v=clamp(v0||0,-REL_W*Math.abs(y-x),REL_W*Math.abs(y-x)),last=performance.now();
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){scrollTo(0,y);done&&done();return}
+  const step=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;const d=y-x;v+=(d*REL_W*REL_W-2*REL_W*v)*dt;x+=v*dt;
+    if(Math.abs(y-x)<.5&&Math.abs(v)<15){scrollTo(0,y);snapAnim=0;done&&done();return}scrollTo(0,x);snapAnim=requestAnimationFrame(step)};
+  snapAnim=requestAnimationFrame(step)};
+const gesGo=to=>{const g=ges,v=performance.now()-g.t>120?0:g.v*1000;g.released=true;follow=true;springTo(clamp(to,0,N-1)*g.sp,v,()=>{follow=false})};   /* a page that has sat still starts from rest, not from its last remembered speed */
+const gesEnd=()=>{if(!ges||ges.released)return;const g=ges,p=(g.pos-g.base*g.sp)/g.sp;   /* -1..1: how far from the base page */
+  const dir=Math.sign(p)||1,flick=Math.abs(g.v)>=FLICK_V&&Math.sign(g.v)===dir&&Math.abs(p)>=FLICK_AT;
+  gesGo((Math.abs(p)>=GO_AT||flick)?g.base+dir:g.base)};   /* past GO_AT of the way (or a fast flick) carries on; less settles back */
+/* touch */
+const innerList=el=>el&&el.closest?el.closest('.gscroll,.xp .body'):null;let touch=null;
+addEventListener('touchstart',e=>{if(e.touches.length!==1){touch=null;return}const t=e.touches[0];touch={x:t.clientX,y:t.clientY,el:innerList(e.target),horiz:null,on:false,native:false}},{passive:true});
+addEventListener('touchmove',e=>{if(!touch||touch.native||e.touches.length!==1)return;const t=e.touches[0],dx=t.clientX-touch.x,dy=t.clientY-touch.y;
   if(touch.horiz===null&&(Math.abs(dx)>8||Math.abs(dy)>8))touch.horiz=Math.abs(dx)>Math.abs(dy);
   if(touch.horiz)return;
-  if(touch.el){const el=touch.el,atTop=el.scrollTop<=0&&dy>0,atEnd=el.scrollTop+el.clientHeight>=el.scrollHeight-1&&dy<0;if(!atTop&&!atEnd)return}
+  if(!touch.on){if(touch.el){const el=touch.el,atTop=el.scrollTop<=0&&dy>0,atEnd=el.scrollTop+el.clientHeight>=el.scrollHeight-1&&dy<0;if(!atTop&&!atEnd){touch.native=true;return}}   /* the list has room: this touch is the list's */
+    if(!gesStart())return;touch.on=true;touch.y=t.clientY}
   if(e.cancelable)e.preventDefault();
-  if(touch.fired||performance.now()<touchLock)return;
-  if(Math.abs(dy)>=innerHeight*TOUCH_AT){touch.fired=true;const sp=segPx();if(!sp)return;const i=Math.round(scrollY/sp),to=clamp(i+(dy<0?1:-1),0,N-1);
-    if(to!==i){touchLock=performance.now()+SNAP_MS+TOUCH_COOL;animateTo(to*sp)}}},{passive:false});
-addEventListener('touchend',()=>{touch=null},{passive:true});addEventListener('touchcancel',()=>{touch=null},{passive:true});
+  gesMove(-(t.clientY-touch.y)*ges.sp/(innerHeight*DRAG_PAGE))},{passive:false});
+const touchDone=()=>{if(touch&&touch.on)gesEnd();touch=null};
+addEventListener('touchend',touchDone,{passive:true});addEventListener('touchcancel',touchDone,{passive:true});
+/* wheel / trackpad. Wheel events don't say when the fingers lift, so nothing is inferred: the page tracks the accumulated deltas (inertia
+   included) and only a pause of WHEEL_GAP ends the gesture and eases the page to the nearest one. Fresh movement after that grabs the page again
+   from wherever it is. A mouse notch can't be dragged, so a notch completes one move and further notches wait for that move to land. */
+let wtimer=0,wsum=0,wl=[],wlast=0;
+addEventListener('wheel',e=>{if(Math.abs(e.deltaX)>Math.abs(e.deltaY))return;if(e.cancelable)e.preventDefault();if(jump)return;
+  const now=performance.now(),gap=now-wlast;wlast=now;
+  const d=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?innerHeight:1),ad=Math.abs(d);
+  clearTimeout(wtimer);wtimer=setTimeout(()=>{gesEnd();ges=null;wl=[]},WHEEL_GAP);
+  if(ad<1)return;
+  wl.push(ad);if(wl.length>8)wl.shift();
+  if(ges&&!ges.released){
+    /* a second push inside the pause window: the page is parked at the far end of this gesture's one-page range, the deltas had already died
+       down (finger slowed or lifted; a tail only decays) and are now clearly rising again. One long fast swipe never dips, so it stays one page. */
+    ges.peak=Math.max(ges.peak||0,ad);if(ad<ges.peak*.35)ges.dipped=true;
+    const parked=(ges.pos===ges.hi&&d>0)||(ges.pos===ges.lo&&d<0),n=wl.length,rising=n>=3&&wl[n-1]>wl[n-2]*1.2&&wl[n-2]>wl[n-3]*1.2;
+    if(parked&&ges.dipped&&rising){gesEnd();ges=null;wl=[ad]}}
+  if(ges&&ges.released){if(ges.notch&&snapAnim)return;ges=null}   /* a notch move still landing blocks; anything else is free for a new gesture */
+  if(!ges){wsum=0;if(!gesStart())return;
+    /* a mouse notch: a big integer delta arriving cold (no wheel event in the last 80ms). Trackpads ramp up from small values and never arrive
+       cold at that size, and a gesture re-based mid-stream is by definition not cold. One notch, one page. */
+    if(gap>80&&e.deltaMode===0&&Number.isInteger(d)&&ad>=80){ges.notch=true;gesGo(ges.base+Math.sign(d));return}}
+  wsum+=d;gesMove(wsum*ges.sp/(innerHeight*DRAG_PAGE))},{passive:false});
 /* portrait phones with little height (browser toolbar showing) get a compact layout; use the smallest height seen so the toolbar hiding on scroll doesn't flip it back */
 let minH=innerHeight,lastW=innerWidth;
 /* portrait: the scene-2 gallery and the About experience panel hang a fixed 28px under their copy (tags) and run down to 24px above the stage bottom (height in % of the art, so it stretches live as the browser toolbar hides); on scene 2 the ring and diamond above the gallery ride along */
@@ -648,19 +681,22 @@ fit();addEventListener('resize',fit);addEventListener('load',fit);
 const mouse={x:0,y:0,tx:0,ty:0};
 addEventListener('pointermove',e=>{mouse.tx=(e.clientX/innerWidth-.5)*2;mouse.ty=(e.clientY/innerHeight-.5)*2});
 /* elastic bulge spring */
-let bulge=0,bulgeV=0;
+let bulge=0,bulgeV=0,pLag=0,pLagV=0;   /* pLag: the wipe's flat baseline (the band's anchored edge), see 'elastic band' in frame */
+const EL_W=11,EL_Z=.45;   /* the band's snap when let go: stiffness and damping ratio (under-damped: one visible rebound) */
 /* squash spring for whole stage (drag feel) */
 let sq=0,sqV=0;
 
 /* transition window inside each segment */
-const T0=.35,T1=.95; /* transition occupies 60% of each segment, so it has room to ease in and out */
+const T0=.04,T1=.95; /* the transition starts almost as soon as the page moves, so a gesture gets visible feedback from its first pixels; the release animation supplies the ease-out */
 
-function wipeD(type,p,b,W,H,cx,cy,sqz){
+/* dm 0..1 blends the edge from the usual asymmetric wave (0) to a symmetric dome (1): the dome is what a slow scroll shows first — the next page's colour
+   peeking in with its middle higher than its sides — before the wave personality takes over as the wipe progresses */
+function wipeD(type,p,b,W,H,cx,cy,sqz,dm=0){
   switch(type){
-    case 'up':{const y=H*(1-p);return `M0 ${y} C${W*.28} ${y-b*1.5} ${W*.62} ${y+b*.7} ${W} ${y-b*.4} L${W} ${H+400} L0 ${H+400} Z`}
-    case 'snap':{const y=H*p;return `M0 -400 L${W} -400 L${W} ${y+b*.4} C${W*.62} ${y-b*.7} ${W*.28} ${y+b*1.5} 0 ${y} Z`}
-    case 'right':{const x=W*(1-p);return `M${x+b*.3} -400 C${x-b*1.5} ${H*.3} ${x+b*.8} ${H*.62} ${x-b*.5} ${H+400} L${W+400} ${H+400} L${W+400} -400 Z`}
-    case 'diag':{const k=.32,x=W*(1-p)*(1+k)+k*H*.5;return `M${x} -400 C${x-k*H*.3-b*1.3} ${H*.3} ${x-k*H*.7+b*.6} ${H*.7} ${x-k*H} ${H+400} L${W+600} ${H+400} L${W+600} -400 Z`}
+    case 'up':{const y=H*(1-p);return `M0 ${y} C${W*lerp(.28,.38,dm)} ${y-b*lerp(1.5,1.75,dm)} ${W*lerp(.62,.62,dm)} ${y+b*lerp(.7,-1.75,dm)} ${W} ${y-b*.4*(1-dm)} L${W} ${H+400} L0 ${H+400} Z`}
+    case 'snap':{const y=H*p;return `M0 -400 L${W} -400 L${W} ${y+b*.4*(1-dm)} C${W*lerp(.62,.62,dm)} ${y+b*lerp(-.7,1.75,dm)} ${W*lerp(.28,.38,dm)} ${y+b*lerp(1.5,1.75,dm)} 0 ${y} Z`}
+    case 'right':{const x=W*(1-p);return `M${x+b*.3*(1-dm)} -400 C${x-b*lerp(1.5,1.75,dm)} ${H*lerp(.3,.38,dm)} ${x+b*lerp(.8,-1.75,dm)} ${H*.62} ${x-b*.5*(1-dm)} ${H+400} L${W+400} ${H+400} L${W+400} -400 Z`}
+    case 'diag':{const k=.32,x=W*(1-p)*(1+k)+k*H*.5;return `M${x} -400 C${x-k*H*.3-b*lerp(1.3,1.75,dm)} ${H*.3} ${x-k*H*.7+b*lerp(.6,-1.75,dm)} ${H*.7} ${x-k*H} ${H+400} L${W+600} ${H+400} L${W+600} -400 Z`}
     case 'blob':{const R=Math.hypot(Math.max(cx,W-cx),Math.max(cy,H-cy))*1.05*p;const rx=R*(1+sqz),ry=R*(1-sqz);
       return `M${cx-rx} ${cy} a${rx} ${ry} 0 1 0 ${rx*2} 0 a${rx} ${ry} 0 1 0 ${-rx*2} 0 Z`}
   }
@@ -674,13 +710,12 @@ const MAX_SCENES_PER_S=.9,SPRING_W=5;let vcur=0,lastFrame=0;
    progress bar follow), and the stage draws ONE direct transition from the page we left to the target page, using the target's own wipe:
    quick start, long ease-out, no crawling through the pages in between. A real scroll during the jump hands back to the normal path. */
 const JUMP_MS=850;let jump=null;
-const startJump=(from,to)=>{cancelSnap();scrollTo(0,(to/(N-1))*maxScroll());target=cur=prev=to/(N-1);vcur=0;vel=0;jump={from,to,t0:performance.now()}};
+const startJump=(from,to)=>{cancelSnap();follow=false;scrollTo(0,(to/(N-1))*maxScroll());target=cur=prev=to/(N-1);vcur=0;vel=0;jump={from,to,t0:performance.now()}};
 function frame(now){
   const dt=lastFrame?Math.min(.05,(now-lastFrame)/1000):1/60;lastFrame=now||performance.now();
   const d=target-cur,remaining=Math.abs(d)*(N-1);
   const vmax=MAX_SCENES_PER_S*Math.max(1,remaining/1.2)/(N-1);
-  vcur+=(d*SPRING_W*SPRING_W-2*SPRING_W*vcur)*dt;vcur=clamp(vcur,-vmax,vmax);
-  cur+=vcur*dt;if(Math.abs(target-cur)<1e-5){cur=target;vcur=0}
+  if(follow){cur+=d*Math.min(1,dt*22);vcur=0}else{vcur+=(d*SPRING_W*SPRING_W-2*SPRING_W*vcur)*dt;vcur=clamp(vcur,-vmax,vmax);cur+=vcur*dt}if(Math.abs(target-cur)<1e-5){cur=target;vcur=0}
   const r=cur;
   const dv=(r-prev)*(N-1);prev=r;vel=lerp(vel,dv,.2);            // scenes per frame
   mouse.x=lerp(mouse.x,mouse.tx,.06);mouse.y=lerp(mouse.y,mouse.ty,.06);
@@ -691,15 +726,25 @@ function frame(now){
     else{const k=Math.min(1,((now||performance.now())-jump.t0)/JUMP_MS),p=1-Math.pow(1-k,3);   // quick start, long ease-out
       if(k>=1)jump=null;else{const fwd=jump.to>jump.from;jdir=fwd?1:-1;i=fwd?jump.from:jump.to;bi=fwd?jump.to:jump.from;f=fwd?T0+(T1-T0)*p:T1-(T1-T0)*p}}}
   const tt=clamp((f-T0)/(T1-T0),0,1);          // 0..1 transition progress
-  const te=tt*tt*(3-2*tt);                      // eased progress for the wipe and the incoming scene: gentle start, gentle landing
+  const te=Math.pow(tt,1.3);                    // progress for the wipe and the incoming scene: stiff at first (the band is hard to get moving), then follows the drag
   const inTrans=f>T0&&f<T1;
   const type=TRANS[bi-1];
   if(base!==lastHash){lastHash=base;try{history.replaceState(null,'',base?'#'+IDS[base]:location.pathname+location.search)}catch(e){}}
   const A=S[i],B=S[bi];
 
   /* springs */
+  /* elastic band: the finger pulls the middle of the next page's edge (pt, the apex follows the finger), while the flat edge — the band's anchored
+     sides — resists: while the finger is down it gives only slowly and sub-linearly, so the band visibly stretches. The moment the finger lets
+     go, the edge snaps with an under-damped spring: it rushes to where it should be, overshoots a little and settles. Slack between apex and
+     edge is drawn as the dome's height. Everything converges before the hand-off to the settled layer. */
+  const pt=te*REST[type],pulling=!!(ges&&!ges.released);
+  const pWant=inTrans?(pulling?pt*(.04+.96*smooth(0,.85,tt)):pt):(f>=T1?pt:0);   /* while held, the edge barely moves early on */
+  if(!inTrans){pLag=pWant;pLagV=0}
+  else if(pulling){pLag+=(pWant-pLag)*Math.min(1,dt*1.2);pLagV=0}                       /* stretching: the edge gives slowly */
+  else{pLagV+=((pWant-pLag)*EL_W*EL_W-2*EL_Z*EL_W*pLagV)*dt;pLag+=pLagV*dt}             /* let go: snap, rebound, settle */
+  const cu=smooth(.85,.95,tt);pLag=lerp(pLag,pWant,cu);if(cu>=1)pLagV=0;
   const dir=jdir||Math.sign(vel)||1;
-  const natural=Math.sin(Math.PI*tt)*H*.10*dir;
+  const natural=Math.sin(Math.PI*Math.pow(tt,.45))*H*.16*dir+(pt-pLag)*H*1.1;   /* base dome (inverts when retreating) + the stretch from the lead */
   const tb=inTrans?natural+clamp(vel*H*4,-H*.25,H*.25):0;
   bulgeV+=(tb-bulge)*.09-bulgeV*.16;bulge+=bulgeV;
   sq=0;
@@ -708,19 +753,21 @@ function frame(now){
   const bIdx=inTrans?i:base;                       // page whose colour is fully "on"
   bg.style.background=SCENES[0].bg;
   document.documentElement.style.setProperty('--fg',SCENES[base].fg);
-  wipe.style.display='block';wipe.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  wipe.style.display='block';wipe.setAttribute('viewBox',`0 0 ${W} ${H}`);wipe2.setAttribute('viewBox',`0 0 ${W} ${H}`);
   restPaths.forEach((pth,k)=>{if(k+1<=bIdx){const rt=TRANS[k];let cx=W*.5,cy=H*.5;if(rt==='blob'){[cx,cy]=blobCenter(S[k])}
       pth.setAttribute('d',wipeD(rt,REST[rt],restBulge(rt,k,W,H,performance.now()),W,H,cx,cy,.06*Math.sin(performance.now()/2200+k)));pth.setAttribute('fill',SCENES[k+1].bg);pth.style.display='block'}
     else pth.style.display='none'});
   if(inTrans){
-    const p=(type==='snap'?easeOutBounce(te):type==='blob'?easeOutExpo(te):easeOutBack(te,1.2))*REST[type];
+    const p=pLag;                                /* the baseline extent: trails the finger, see 'heavy pull' above */
     let cx=W*.5,cy=H*.5;if(type==='blob'){[cx,cy]=blobCenter(A)}
     /* blend the live bulge/squash into the resting wave near the end so the hand-off to the settled layer is seamless */
     const wEnd=smooth(.78,1,tt),now=performance.now();
     const bl=lerp(bulge,restBulge(type,i,W,H,now),wEnd),sqz=lerp(clamp(vel*1.5,-.35,.35),.06*Math.sin(now/2200+i),wEnd);
-    wipePath.setAttribute('d',wipeD(type,clamp(p,0,1.3),bl,W,H,cx,cy,sqz));
-    wipePath.setAttribute('fill',B.sc.bg);wipePath.style.display='block';
-  }else wipePath.style.display='none';
+    const wd=wipeD(type,clamp(p,0,1.3),bl,W,H,cx,cy,sqz,1-smooth(.25,.65,tt));   /* dome first, wave later */
+    wipePath.setAttribute('d',wd);wipePath.setAttribute('fill',B.sc.bg);wipePath.style.display='block';
+    st(B.el,'clipPath',`path('${wd}')`);   /* the incoming page only exists inside its colour */
+  }else{wipePath.style.display='none';st(B.el,'clipPath','none')}
+  st(A.el,'clipPath','none');st(A.el,'zIndex',inTrans?0:2);st(B.el,'zIndex',2);   /* stacking: outgoing page < live wipe (z 1) < incoming page */
 
   /* scenes */
   S.forEach((sc,j)=>{const on=j===i||(j===bi);if(!on||(j===i&&f>T0)){sc.shapes.forEach(sh=>sh.el._stop&&sh.el._stop())}sc.el.classList.toggle('on',on&&(j===i?f<T0+(T1-T0)*AOUT:f>T0));});
@@ -730,13 +777,13 @@ function frame(now){
     const po=f<T0?0:easeOutQuad(clamp(tt/AOUT,0,1));
     let tr='';
     switch(type){
-      case 'up':tr=`translateY(${-po*H*.5}px) scaleY(${1+po*.6})`;st(A.el,'transformOrigin','50% 100%');break;
-      case 'snap':tr=`translateY(${po*H*.7}px) scaleY(${1+po*.9})`;st(A.el,'transformOrigin','50% 0%');break;
-      case 'right':tr=`translateX(${-po*W*.55}px) skewX(${-po*10}deg)`;st(A.el,'transformOrigin','0% 50%');break;
-      case 'diag':tr=`translateX(${-po*W*.5}px) rotate(${-po*9}deg)`;st(A.el,'transformOrigin','0% 100%');break;
+      case 'up':tr=`translateY(${-Math.min(po*H*.5,Math.max(0,pLag)*H)}px) scaleY(${1+po*.3})`;st(A.el,'transformOrigin','50% 100%');break;   /* lift no further than the wipe has risen: cut-off bottoms stay covered */
+      case 'snap':tr=`translateY(${Math.min(po*H*.7,Math.max(0,pLag)*H)}px) scaleY(${1+po*.45})`;st(A.el,'transformOrigin','50% 0%');break;
+      case 'right':tr=`translateX(${-Math.min(po*W*.55,Math.max(0,pLag)*W)}px) skewX(${-po*10}deg)`;st(A.el,'transformOrigin','0% 50%');break;
+      case 'diag':tr=`translateX(${-Math.min(po*W*.5,Math.max(0,pLag)*W)}px) rotate(${-po*9}deg)`;st(A.el,'transformOrigin','0% 100%');break;
       case 'blob':tr=`scale(${1+po*.35})`;st(A.el,'transformOrigin','50% 50%');st(A.el,'opacity',1-po);break;
     }
-    if(type!=='blob')st(A.el,'opacity',1-smooth(.55,1,po));
+    if(type!=='blob')st(A.el,'opacity',1-tt);   /* fades steadily from the first pixel of the transition, gone by the end */
     st(A.el,'transform',tr+` scaleY(${1+sq*(type==='right'||type==='diag'?0:1)}) scaleX(${1+sq*(type==='right'||type==='diag'?1:0)})`);
     A.shapes.forEach(sh=>{st(sh.el,'transform',`rotate(${sh.rot}deg)`);st(sh.el,'opacity',1)});
     A.copyParts.forEach(c=>{st(c.el,'transform','none');st(c.el,'opacity',1)});
