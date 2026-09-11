@@ -11,6 +11,7 @@
 @supports (height:100svh){:root{--ch:100svh}} /* mobile: size the stage to the small viewport so nothing hides behind the browser toolbar */
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:auto}
+html,body{touch-action:manipulation} /* no double-tap zoom on touch screens; pan and pinch still work */
 body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetica,-apple-system,"PingFang SC","Noto Sans SC",sans-serif;color:var(--fg);overflow-x:hidden}
 #stage{position:fixed;inset:0;overflow:hidden}
 #bg{position:absolute;inset:0}

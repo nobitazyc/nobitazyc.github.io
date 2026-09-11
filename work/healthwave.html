@@ -16,6 +16,7 @@
 :root{--ink:#141414;--cream:#f4efe6;--yellow:#ffc93c;--lilac:#d9d3ff;--max:1180px;--ease:cubic-bezier(.34,1.56,.64,1);--r:clamp(12px,1.5vw,24px)}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
+html,body{touch-action:manipulation} /* no double-tap zoom on touch screens; pan and pinch still work */
 html{overflow-x:clip} /* iOS ignores overflow-x on body alone; clip doesn't create a scroll container */
 body{background:#fff;color:var(--ink);font-family:Inter,"Helvetica Neue",Helvetica,-apple-system,"PingFang SC","Noto Sans SC",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 img{display:block;max-width:100%;height:auto}
