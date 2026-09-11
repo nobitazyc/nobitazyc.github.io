@@ -203,7 +203,7 @@ body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetic
   .shape.txt .fx{font-size:var(--mfs,var(--dfs))}
   .shape.geo .fx{border-radius:var(--mr,var(--dr))}
   .shape.mhide{display:none}
-  .copy{left:6vw;top:calc(var(--ch)*.09);transform:none;max-width:88vw}
+  .copy{left:6vw;top:calc(100% - var(--ch)*.91);transform:none;max-width:88vw} /* anchored to the same small-viewport box as the art, so the toolbar hiding doesn't open a gap */
   .copy .k{font-size:11px;margin-bottom:14px}
   .copy h1{font-size:clamp(36px,11vw,58px)}
   .copy p{max-width:88vw;font-size:14px;margin-top:16px;line-height:1.5}
@@ -212,7 +212,6 @@ body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetic
   .nav{right:10px;gap:10px}
   .counter{right:22px}
   .gal{padding:3vw;border-radius:4vw}.gal img{border-radius:2.5vw}.gal figure{margin-bottom:4vw}.galhead .gcount{display:none}
-  .short .shape.gallery{--mt:calc(var(--ch)*.5)!important;--mh:calc(var(--ch)*.46)!important}
   .gal figcaption{padding:2.5vw .5vw 0;gap:3vw}.gal figcaption strong{font-size:14px}.gal figcaption span{font-size:12px}.gal figcaption b{font-size:22px}
   .gal .more{font-size:11px;margin-top:6px}
   .tcar .ctl{gap:3vw}.tcar .ctl button{width:36px;height:36px;font-size:14px}
@@ -237,7 +236,6 @@ body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetic
   .short .copy h1{font-size:clamp(32px,10vw,50px)}
   .short .copy .k{margin-bottom:10px}
   .short .copy p{font-size:13px;line-height:1.45;margin-top:12px}
-  .short .shape.timeline{--mt:calc(var(--ch)*.45)!important;--mh:calc(var(--ch)*.51)!important}
   .bubble{left:56%;top:-4%;max-width:40vw;font-size:12px;padding:8px 12px;border-radius:12px 12px 12px 0}
 }
 </style>
@@ -595,7 +593,7 @@ addEventListener('scroll',()=>{target=clamp(scrollY/maxScroll(),0,1)},{passive:t
 const IDS=['home','work','motion','dev','about','contact'];let lastHash=-1;
 {const gi=IDS.indexOf(location.hash.slice(1));if(gi>0)scrollTo(0,(gi/(N-1))*maxScroll());target=cur=prev=clamp(scrollY/maxScroll(),0,1)}
 /* snap: when scrolling stops between two scenes, finish the move. Past SNAP_AT of a segment in the direction of travel it completes to the next scene, otherwise it settles back. A new wheel/touch input cancels the animation. */
-const SNAP_AT=.22,SNAP_MS=650;let snapTimer=0,snapAnim=0,lastY=scrollY,dir=1;
+const SNAP_AT=.35,SNAP_MS=650;let snapTimer=0,snapAnim=0,lastY=scrollY,dir=1;
 const segPx=()=>maxScroll()/(N-1);
 const cancelSnap=()=>{if(snapAnim){cancelAnimationFrame(snapAnim);snapAnim=0}};
 const animateTo=y=>{cancelSnap();const y0=scrollY,d=y-y0;if(Math.abs(d)<1)return;
@@ -608,8 +606,15 @@ addEventListener('scroll',()=>{const y=scrollY;if(y!==lastY)dir=y>lastY?1:-1;las
 addEventListener('wheel',cancelSnap,{passive:true});addEventListener('touchstart',cancelSnap,{passive:true});addEventListener('keydown',cancelSnap);
 /* portrait phones with little height (browser toolbar showing) get a compact layout; use the smallest height seen so the toolbar hiding on scroll doesn't flip it back */
 let minH=innerHeight,lastW=innerWidth;
-const fit=()=>{if(innerWidth!==lastW){lastW=innerWidth;minH=innerHeight}minH=Math.min(minH,innerHeight);document.documentElement.classList.toggle('short',matchMedia('(orientation: portrait)').matches&&minH<700)};
-fit();addEventListener('resize',fit);
+/* portrait: the scene-2 gallery and the About experience panel hang a fixed 28px under their copy (tags) and run down to 24px above the stage bottom, so the gap never depends on the viewport and a taller phone simply shows more of the list; on scene 2 the ring and diamond above the gallery ride along */
+const placePanel=(sc,panel,riders)=>{const art=sc.el.querySelector('.art'),vw=innerWidth/100,top=Math.round(sc.copy.offsetTop+sc.copy.offsetHeight-art.offsetTop+28);
+  const g=sc.shapes[panel].el.style;g.setProperty('--mt',top+'px');g.setProperty('--mh',Math.max(160,art.offsetHeight-top-24)+'px');
+  (riders||[]).forEach(([j,lift])=>sc.shapes[j].el.style.setProperty('--mt',Math.round(top-lift*vw)+'px'))};
+const placeGallery=()=>{if(!matchMedia('(orientation: portrait)').matches)return;
+  if(S[1])placePanel(S[1],3,[[0,7],[2,6.5]]); /* work: gallery, with the ring and diamond above it */
+  if(S[4])placePanel(S[4],0)};                 /* about: experience panel */
+const fit=()=>{if(innerWidth!==lastW){lastW=innerWidth;minH=innerHeight}minH=Math.min(minH,innerHeight);document.documentElement.classList.toggle('short',matchMedia('(orientation: portrait)').matches&&minH<700);placeGallery()};
+fit();addEventListener('resize',fit);addEventListener('load',fit);
 const mouse={x:0,y:0,tx:0,ty:0};
 addEventListener('pointermove',e=>{mouse.tx=(e.clientX/innerWidth-.5)*2;mouse.ty=(e.clientY/innerHeight-.5)*2});
 /* elastic bulge spring */
