@@ -744,8 +744,9 @@ function frame(now){
   else{pLagV+=((pWant-pLag)*EL_W*EL_W-2*EL_Z*EL_W*pLagV)*dt;pLag+=pLagV*dt}             /* let go: snap, rebound, settle */
   const cu=smooth(.85,.95,tt);pLag=lerp(pLag,pWant,cu);if(cu>=1)pLagV=0;
   const dir=jdir||Math.sign(vel)||1;
-  const natural=Math.sin(Math.PI*Math.pow(tt,.45))*H*.16*dir+(pt-pLag)*H*1.1;   /* base dome (inverts when retreating) + the stretch from the lead */
-  const tb=inTrans?natural+clamp(vel*H*4,-H*.25,H*.25):0;
+  const BH=Math.min(H,W*.5);   /* the dome scales with the viewport height on desktop, but is held to the width on tall phones, where a height-based bump gets far too big */
+  const natural=Math.sin(Math.PI*Math.pow(tt,.45))*BH*.16*dir+(pt-pLag)*BH*1.1;   /* base dome (inverts when retreating) + the stretch from the lead */
+  const tb=inTrans?natural+clamp(vel*BH*4,-BH*.25,BH*.25):0;
   bulgeV+=(tb-bulge)*.09-bulgeV*.16;bulge+=bulgeV;
   sq=0;
 
