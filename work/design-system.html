@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A design system AI can read — case study · Yucong Zhou</title>
+<meta name="description" content="How I made the MacroHealth design system machine-readable: Figma variants mapped to React props as data, shipped inside the package, served over MCP, guarded by audits. Senior Frontend Engineer case study.">
+<meta property="og:title" content="A design system AI can read — case study">
+<meta property="og:description" content="Figma variants mapped to React props as data, shipped inside the npm package, served to coding agents over MCP, and guarded by audits and review gates.">
+<meta property="og:image" content="../assets/work/design-system/og.jpg">
+<meta property="og:type" content="article">
+<link rel="preload" as="image" href="../assets/ds-01.webp">
+<link rel="expect" href="#booted" blocking="render">
+<script>document.documentElement.classList.add('js');addEventListener('pagereveal',e=>{if(e.viewTransition)document.documentElement.classList.add('vt')})</script>
+<style>
+:root{--ink:#141414;--cream:#f4efe6;--yellow:#ffc93c;--blue:#2f4bff;--coral:#ff5a3c;--lilac:#d9d3ff;--mint:#19c37d;--max:1180px;--ease:cubic-bezier(.34,1.56,.64,1);--r:clamp(12px,1.5vw,24px);--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#fff;color:var(--ink);font-family:Inter,"Helvetica Neue",Helvetica,-apple-system,"PingFang SC","Noto Sans SC",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,svg{display:block;max-width:100%;height:auto}
+a{color:inherit}
+::selection{background:var(--yellow);color:var(--ink)}
+
+/* cross-document view transition from the index: the gallery thumbnail morphs into the hero while the page wipes up */
+@view-transition{navigation:auto}
+::view-transition-image-pair(root){isolation:auto}
+::view-transition-old(root){animation:none;mix-blend-mode:normal}
+::view-transition-new(root){animation:vtUp .7s cubic-bezier(.22,1,.36,1) both;mix-blend-mode:normal}
+@keyframes vtUp{from{clip-path:polygon(0 100%,100% 100%,100% 100%,0 100%)}to{clip-path:polygon(0 -30%,100% 0,100% 100%,0 100%)}}
+::view-transition-group(ds-hero){animation-duration:.7s;animation-timing-function:cubic-bezier(.34,1.25,.64,1)}
+.heroimg .frame{view-transition-name:ds-hero}
+@media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}
+
+/* fixed ui, same language as the index */
+.progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--ink);box-shadow:0 0 0 1px rgba(244,239,230,.35);z-index:10}
+.back{position:fixed;top:22px;left:24px;z-index:10;display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--cream);border:1.5px solid rgba(244,239,230,.35);text-decoration:none;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;padding:12px 18px;border-radius:999px;box-shadow:0 10px 24px rgba(20,20,20,.15);transition:transform .5s var(--ease),background .3s,color .3s}
+.back:hover{background:var(--yellow);color:var(--ink);transform:scale(1.06) rotate(-2deg)}
+.back:focus-visible{outline:2px solid var(--yellow);outline-offset:3px}
+
+/* hero */
+.hero{background:var(--cream);padding:clamp(92px,13vh,124px) 6vw clamp(96px,10vw,140px);position:relative}
+.hero .brand{position:absolute;top:28px;right:32px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;text-decoration:none}
+.hero .brand span{opacity:.6;margin-left:14px;letter-spacing:.06em;text-transform:none;font-weight:400}
+.k{font-size:12px;letter-spacing:.24em;text-transform:uppercase;opacity:.7;margin-bottom:22px}
+h1{font-size:clamp(44px,7.2vw,112px);font-weight:800;letter-spacing:-.05em;line-height:.9}
+h1 .w{display:inline-block;white-space:nowrap}
+h1 .ch{display:inline-block}
+.lede{margin-top:24px;max-width:62ch;font-size:clamp(16px,1.25vw,19px);line-height:1.5}
+.metawrap{max-width:var(--max);margin:clamp(36px,4vw,56px) auto 0;padding:0 6vw;color:var(--ink)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:22px 32px;border-top:2px solid var(--ink);padding-top:22px}
+.meta dt{font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+.meta dd{margin-top:6px;font-weight:600;font-size:15px;letter-spacing:-.01em}
+.heroimg{max-width:calc(var(--max) + 12vw);margin:clamp(-64px,-6vw,-44px) auto 0;padding:0 6vw;position:relative;z-index:1}
+
+/* hero illustration: one Figma instance resolved to one line of code */
+.pipe{background:var(--ink);color:var(--cream);padding:clamp(22px,3vw,44px);display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:clamp(10px,1.4vw,22px);align-items:center}
+.pipe .step{background:rgba(244,239,230,.06);border:1px solid rgba(244,239,230,.14);border-radius:calc(var(--r) * .7);padding:clamp(14px,1.6vw,24px);min-width:0}
+.pipe .lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.55;margin-bottom:14px;display:flex;justify-content:space-between;gap:8px}
+.pipe .lbl b{color:var(--yellow);font-weight:700;letter-spacing:.1em}
+.pipe code,.pipe pre{font-family:var(--mono);font-size:clamp(10.5px,.95vw,13.5px);line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.pipe .s{color:var(--yellow)}.pipe .p{color:#8fd3ff}.pipe .c{opacity:.5}
+.pipe .arrow{color:var(--yellow);font-size:clamp(20px,2.4vw,34px);font-weight:800;line-height:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+.pipe .arrow small{font-family:var(--mono);font-size:10px;letter-spacing:.06em;opacity:.55;color:var(--cream);white-space:nowrap}
+.pipe .figchip{display:inline-flex;align-items:center;gap:8px;background:#1e1e1e;border:1px solid rgba(244,239,230,.18);border-radius:8px;padding:8px 10px;font-size:12.5px;font-weight:600;letter-spacing:-.01em;margin-bottom:12px}
+.pipe .figchip i{width:12px;height:12px;border:2px solid #a259ff;border-radius:2px;display:inline-block}
+.pipe .var{display:flex;flex-wrap:wrap;gap:6px}
+.pipe .var span{font-family:var(--mono);font-size:11px;background:rgba(244,239,230,.1);border-radius:6px;padding:4px 8px}
+.pipe .var span b{color:var(--yellow);font-weight:600}
+.pipe .render{margin-top:14px;display:flex;align-items:center;gap:12px}
+.dsbtn{display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 16px;border-radius:8px;font:600 14px/1 Inter,sans-serif;letter-spacing:-.01em;background:#b7380b;color:#fff;white-space:nowrap}
+.dsbtn.dis{opacity:.5}
+.pipe .note{font-size:11px;opacity:.55;letter-spacing:.02em}
+
+/* frames + figures */
+.frame{border-radius:var(--r);overflow:hidden;background:var(--ink);box-shadow:0 30px 60px rgba(20,20,20,.16)}
+.frame img{width:100%}
+.frame.light{background:#fff;outline:1px solid rgba(20,20,20,.08)}
+figure{margin:0}
+figcaption{margin-top:14px;display:flex;gap:12px;align-items:baseline;font-size:12.5px;letter-spacing:.03em;line-height:1.5;opacity:.65}
+figcaption b{font-weight:800;letter-spacing:-.04em;font-size:15px;color:var(--ink);opacity:1;flex:0 0 auto}
+.dark figcaption b{color:var(--yellow)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:32px 28px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.stack>*+*{margin-top:clamp(28px,3vw,44px)}
+
+/* sections */
+section{padding:clamp(80px,11vw,150px) 6vw}
+.wrap{max-width:var(--max);margin:0 auto}
+.row{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,9fr);gap:40px 6vw;align-items:start}
+.row .side{position:sticky;top:110px}
+.num{font-size:clamp(44px,5.2vw,76px);font-weight:800;letter-spacing:-.05em;line-height:1}
+h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-height:1.02;margin-top:16px}
+h3{font-size:clamp(19px,1.5vw,22px);font-weight:700;letter-spacing:-.02em;line-height:1.2}
+.side .k{margin:22px 0 0;opacity:.55}
+.prose p{font-size:clamp(16px,1.2vw,19px);line-height:1.62;max-width:62ch;opacity:.88}
+.prose p+p,.prose ul+p,.prose p+ul{margin-top:1.15em}
+.prose p b{font-weight:600;opacity:1}
+.prose ul{padding-left:1.1em;font-size:clamp(15px,1.1vw,17.5px);line-height:1.6;opacity:.88;max-width:62ch}
+.prose li+li{margin-top:.5em}
+.prose code,.inline{font-family:var(--mono);font-size:.88em;background:rgba(20,20,20,.07);border-radius:5px;padding:.1em .4em}
+.dark .prose code{background:rgba(244,239,230,.12)}
+.media{margin-top:clamp(44px,5vw,72px)}
+.tag{display:inline-block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;border:1.5px solid currentColor;border-radius:999px;padding:6px 12px;font-weight:600}
+
+/* code blocks */
+pre.code{background:var(--ink);color:var(--cream);border-radius:var(--r);padding:clamp(18px,2.2vw,32px);font-family:var(--mono);font-size:clamp(12px,.95vw,14px);line-height:1.6;overflow-x:auto;box-shadow:0 30px 60px rgba(20,20,20,.16)}
+pre.code .s{color:var(--yellow)}pre.code .p{color:#8fd3ff}pre.code .c{opacity:.5}pre.code .ok{color:var(--mint)}pre.code .warn{color:var(--coral)}
+.dark pre.code{background:#0d0d0d;outline:1px solid rgba(244,239,230,.1)}
+.codehead{display:flex;justify-content:space-between;gap:12px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.55;margin-bottom:12px}
+
+/* dark blocks */
+.dark{background:var(--ink);color:var(--cream)}
+.dark .num,.dark .tag{color:var(--yellow)}
+.dark .tag{border-color:var(--yellow)}
+.dark .frame{box-shadow:0 30px 60px rgba(0,0,0,.45);outline:1px solid rgba(244,239,230,.08)}
+.cream{background:var(--cream)}
+
+/* problem / principle cards */
+.cards{margin-top:clamp(44px,5vw,72px);display:grid;grid-template-columns:repeat(2,1fr);gap:2px;background:rgba(244,239,230,.14);border-radius:var(--r);overflow:hidden}
+.cards.three{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--ink);padding:clamp(26px,3vw,40px)}
+.card b{display:block;font-size:clamp(36px,4vw,54px);font-weight:800;letter-spacing:-.05em;line-height:1;color:var(--yellow)}
+.card h3{margin-top:20px}
+.card p{margin-top:10px;opacity:.72;font-size:15px;line-height:1.55}
+.light .cards{background:rgba(20,20,20,.12)}.light .card{background:#fff}.light .card b{color:var(--ink)}
+
+/* workflow diagram */
+.diagram{background:#fff;border-radius:var(--r);padding:clamp(10px,1.4vw,20px);outline:1px solid rgba(20,20,20,.08)}
+.diagram svg{width:100%;height:auto;font-family:Inter,"Helvetica Neue",sans-serif}
+.diagram .lane{fill-opacity:.55}
+.diagram .lanet{font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;fill:var(--ink);opacity:.7}
+.diagram .node{fill:#fff;stroke:var(--ink);stroke-width:2}
+.diagram .node.db{fill:var(--ink)}
+.diagram .node.bad{fill:#ffd9cf;stroke:var(--coral)}
+.diagram .node.tool{fill:#fff}
+.diagram .t{font-size:15px;font-weight:600;fill:var(--ink);text-anchor:middle;letter-spacing:-.01em}
+.diagram .t.inv{fill:var(--cream)}
+.diagram .l{font-size:11.5px;font-weight:600;fill:var(--ink);opacity:.72;text-anchor:middle;letter-spacing:.02em}
+.diagram .e{fill:none;stroke:var(--ink);stroke-width:2;marker-end:url(#arr)}
+.diagram .e.dash{stroke-dasharray:6 6}
+.diagram .e.bad{stroke:var(--coral);marker-end:url(#arrbad)}
+
+/* token trio */
+.trio{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:stretch}
+.tok{background:var(--ink);color:var(--cream);border-radius:calc(var(--r) * .8);padding:20px;font-family:var(--mono);font-size:12.5px;line-height:1.6;display:flex;flex-direction:column;gap:12px;min-width:0;word-break:break-word}
+.tok .lbl{font-family:Inter,sans-serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.55}
+.tok .sw{width:100%;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff}
+.tok .s{color:var(--yellow)}.tok .p{color:#8fd3ff}.tok .c{opacity:.5}
+.tok .mid{flex:1}
+.tok .btnrow{display:flex;gap:8px;align-items:center}
+.tok .bp{display:inline-flex;align-items:center;height:32px;padding:0 14px;border-radius:8px;background:#215cd3;color:#fff;font:600 13px/1 Inter,sans-serif}
+.tok .bp.dk{background:#5b8cf0;color:#0d1626}
+
+/* facts */
+.facts{margin-top:clamp(44px,5vw,72px);display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:rgba(244,239,230,.14);border-radius:var(--r);overflow:hidden}
+.fact{background:var(--ink);padding:clamp(22px,2.6vw,34px)}
+.fact b{display:block;font-size:clamp(40px,4.6vw,64px);font-weight:800;letter-spacing:-.05em;line-height:1;color:var(--yellow)}
+.fact span{display:block;margin-top:10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;opacity:.65}
+
+/* ci table */
+.tbl{margin-top:clamp(28px,3vw,44px);border-top:2px solid currentColor;font-size:14.5px}
+.tbl div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr);gap:16px;padding:14px 0;border-bottom:1px solid rgba(20,20,20,.12)}
+.tbl div b{font-weight:600}
+.tbl div em{font-style:normal;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.65;align-self:center}
+.tbl div em.block{color:var(--coral);opacity:1;font-weight:700}
+
+/* next / footer */
+.next{background:var(--yellow);padding:clamp(80px,11vw,150px) 6vw clamp(60px,7vw,90px)}
+.next .k{opacity:.6}
+.next h2{font-size:clamp(44px,8vw,128px);letter-spacing:-.05em;margin-top:8px}
+.next p{margin-top:18px;font-size:clamp(15px,1.2vw,18px);opacity:.75}
+.links{margin-top:40px;display:flex;gap:26px;flex-wrap:wrap;font-size:14px;letter-spacing:.06em}
+.links a{color:inherit;text-decoration:none;border-bottom:2px solid currentColor;padding-bottom:3px;transition:transform .4s var(--ease)}
+.links a:hover{transform:translateY(-3px) rotate(-1.5deg)}
+.foot{margin-top:70px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:11px;letter-spacing:.1em;opacity:.6}
+
+/* motion */
+.js .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .9s var(--ease)}
+.js .reveal.in{opacity:1;transform:none}
+.js .rise{animation:rise .9s var(--ease) both}
+.vt .rise{animation:none}
+@keyframes rise{from{opacity:0;transform:translateY(.55em)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .js .reveal,.js .rise{opacity:1;transform:none;transition:none;animation:none}
+}
+
+/* small screens */
+@media (max-width:860px){
+  .row{grid-template-columns:1fr;gap:28px}
+  .row .side{position:static}
+  .grid2,.grid3,.cards,.cards.three,.trio{grid-template-columns:1fr}
+  .facts{grid-template-columns:1fr 1fr}
+  .hero{padding-top:110px}
+  .hero .brand{display:none}
+  .back{top:14px;left:14px;padding:10px 14px;font-size:11px}
+  .meta{grid-template-columns:repeat(2,1fr)}
+  .metawrap{padding:0 5vw}
+  .heroimg{padding:0 4vw}
+  section,.next{padding-left:5vw;padding-right:5vw}
+  figcaption{font-size:12px}
+  .pipe{grid-template-columns:1fr;gap:12px}
+  .pipe .arrow{transform:rotate(90deg);padding:4px 0}
+  .pipe .arrow small{transform:rotate(-90deg)}
+  .tbl div{grid-template-columns:1fr;gap:4px}
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<a class="back" href="../index.html#work">← Work</a>
+
+<header class="hero">
+  <a class="brand" href="../index.html">Yucong Zhou <span>Design · Motion · Code</span></a>
+  <div class="k rise" style="animation-delay:.05s">Case study · Design system · Developer tooling · MacroHealth</div>
+  <h1 id="title">A design system AI can read</h1>
+  <p class="lede rise" style="animation-delay:.55s">MacroHealth's product team designs in Figma and increasingly builds with coding agents. The agents kept guessing which component a mockup meant, and the official Figma tooling for telling them wasn't available on our plan. So I made the design system machine-readable: every Figma variant is mapped to a React prop as data next to the component, the map ships inside the package, and a small MCP server hands it to any agent that asks. Designers keep Figma. Engineers keep git. The agent stops guessing.</p>
+</header>
+<div class="heroimg rise" style="animation-delay:.85s">
+  <div class="frame">
+    <img src="../assets/ds-01.webp" width="1600" height="900" alt="MacroHealth Design System cover: the MacroHealth logo and the words Design System in white on navy" fetchpriority="high">
+  </div>
+</div>
+<div class="metawrap rise" style="animation-delay:1s">
+  <dl class="meta">
+    <div><dt>Role</dt><dd>Senior Frontend Engineer · design-system owner</dd></div>
+    <div><dt>With</dt><dd>UX designer on the system · PM on the product</dd></div>
+    <div><dt>Timeline</dt><dd>2026 · ongoing</dd></div>
+    <div><dt>Stack</dt><dd>React · TypeScript · Tailwind v4 · Radix · Storybook · Vitest · GitLab CI · MCP · Claude Code</dd></div>
+    <div><dt>Scale</dt><dd>55 components · 179 tokens · 58 bindings</dd></div>
+  </dl>
+</div>
+
+<!-- 01 context -->
+<section>
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">01</div>
+      <h2>A system that has to be read twice</h2>
+      <div class="k">Context</div>
+    </div>
+    <div class="prose">
+      <p>MacroHealth's marketplace is a React product with a small team: a UX designer, a PM, and frontend engineers who now do a lot of their building through coding agents. The design system is a shadcn-based React library with a matching Figma library, adapted from the shadcn kit and extended with our own patterns. I own the code side; the UX designer owns the Figma side.</p>
+      <p>A design system used to have one reader: a person opening Storybook or Figma. Ours had two. A designer reads Figma. An agent reads whatever it can find in the repo and the mockup, then writes code. If those two readers see different things, the product drifts, one component at a time.</p>
+      <p>The question this project answers is simple to state. <b>What does a design system need to look like so that a machine building from a Figma mockup lands on the same component, with the same props, that a human would?</b></p>
+    </div>
+  </div>
+</section>
+
+<!-- 02 problem -->
+<section class="dark">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">02</div>
+      <h2>Two drifts and a wall</h2>
+      <div class="k">Problem</div>
+    </div>
+    <div class="prose">
+      <p>We were drifting in two directions at once. Designers changed tokens and variants in Figma and the code found out weeks later. Agents building pages from mockups got the visual right and the component wrong: hand-rolled markup that looked like a Card instead of the Card, a hex value instead of a token. Every one of those is a future bug and a maintenance cost nobody chose.</p>
+      <p>The standard answer was behind a paywall. Figma Code Connect, which binds Figma components to code so Dev Mode and agents see real snippets, needs an Organization or Enterprise plan. We're on Professional. The usual plugin route for syncing tokens wanted a paid tier as well, and would have added a second tool to keep in step. Waiting for a plan upgrade wasn't a plan.</p>
+    </div>
+  </div>
+  <div class="wrap cards reveal">
+    <div class="card"><b>01</b><h3>Design drift</h3><p>Figma variables and variants change; the code library hears about it late, or never.</p></div>
+    <div class="card"><b>02</b><h3>Agent drift</h3><p>An agent building from a mockup guesses the component, reinvents it, and hardcodes the mockup's colours.</p></div>
+    <div class="card"><b>03</b><h3>The wall</h3><p>Code Connect needs a plan tier we don't have, and token-sync plugins would add a second tool to keep in step.</p></div>
+    <div class="card"><b>04</b><h3>The rule worth keeping</h3><p>Every element on a product page should be a 1:1 instance of a design-system component. No custom code creep.</p></div>
+  </div>
+</section>
+
+<!-- 03 principle -->
+<section class="cream">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">03</div>
+      <h2>Bindings are data</h2>
+      <div class="k">Principle</div>
+    </div>
+    <div class="prose">
+      <p>The insight that unlocked it: a Figma-to-code binding is not a feature of Figma. It is a small amount of data. "This Figma component set, with this variant axis set to this value, means this code component with this prop." If that data lives next to the code, is reviewed like code, and ships with the code, then any tool can read it, including the one we couldn't afford.</p>
+      <p>Three rules followed from that and held for the whole project:</p>
+      <ul>
+        <li><b>Figma is the design source of truth. Git is the build source of truth.</b> Designers propose in Figma. Nothing is real until it is merged.</li>
+        <li><b>One direction, Figma to code.</b> No tool in this workflow writes to Figma. That keeps the designer's file theirs and makes every sync reviewable as a diff.</li>
+        <li><b>A human gate on every merge.</b> The agent can read, diff, and open a merge request. It can't merge.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap media">
+    <figure class="reveal">
+      <div class="frame">
+    <div class="pipe" role="img" aria-label="One Figma button instance with Type set to destructive and State set to disabled is looked up in the component's map, which translates the variants to props, and comes out as a Button element with variant destructive and the disabled attribute">
+      <div class="step">
+        <div class="lbl"><span>Figma instance</span><b>in</b></div>
+        <div class="figchip"><i></i>Buttons</div>
+        <div class="var"><span>Type = <b>destructive</b></span><span>State = <b>disabled</b></span></div>
+        <div class="render"><span class="dsbtn dis">Delete</span><span class="note">mockup</span></div>
+      </div>
+      <div class="arrow">→<small>resolve_component</small></div>
+      <div class="step">
+        <div class="lbl"><span>button.figma-map.json</span><b>data</b></div>
+<pre><code><span class="p">"variant"</span>: { <span class="p">"fromVariant"</span>: <span class="s">"Type"</span>,
+  <span class="p">"map"</span>: { <span class="s">"destructive"</span>: <span class="s">"destructive"</span>, … } },
+<span class="p">"disabled"</span>: { <span class="p">"fromVariant"</span>: <span class="s">"State"</span>,
+  <span class="p">"map"</span>: { <span class="s">"disabled"</span>: <span class="s">true</span> } }</code></pre>
+      </div>
+      <div class="arrow">→<small>import + props</small></div>
+      <div class="step">
+        <div class="lbl"><span>React</span><b>out</b></div>
+<pre><code><span class="c">import { Button } from "…/design-system"</span>
+
+&lt;<span class="p">Button</span> <span class="s">variant</span>="destructive" <span class="s">disabled</span>&gt;
+  Delete
+&lt;/<span class="p">Button</span>&gt;</code></pre>
+        <div class="render"><span class="dsbtn dis">Delete</span><span class="note">rendered from the library</span></div>
+      </div>
+    </div>
+      </div>
+      <figcaption><b>One instance, resolved</b><span>Figma variants in, one lookup in the component's map, React props out. The whole idea in one row.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 04 workflow -->
+<section id="workflow">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">04</div>
+      <h2>Four lanes, three loops</h2>
+      <div class="k">Workflow</div>
+    </div>
+    <div class="prose">
+      <p>The team mapped the end-to-end flow on a FigJam board before building anything. Ideas start as Claude artifacts and an HTML prototype to settle the information architecture. The UX designer builds mockups from the Figma library and refines the library when a pattern is missing. I sync tokens and components into code, update the bindings and Storybook, and publish the package together with its MCP server. Whoever builds a product page then reads the mockup through the Figma MCP and resolves each instance through the design-system MCP.</p>
+      <p>The board also drew the alternative we rejected: treating the Claude artifact as the final spec and extracting its HTML into the repo. It looks faster and ends in the failure mode we were trying to kill: no component match, custom code creep, and every design update becoming a manual re-export.</p>
+    </div>
+  </div>
+  <div class="wrap media stack">
+    <figure class="reveal">
+      <div class="diagram">
+        <svg viewBox="0 0 1400 590" role="img" aria-label="Workflow A. Lane one, ideate, PM and UX: Claude artifact brainstorming leads to an HTML prototype and information architecture. Lane two, design, UX: the Figma design-system library is consumed by Figma mockup pages; a missing pattern leads to refining design-system components, which are published back to the library. Lane three, design-system code, frontend engineer: sync tokens and components, update the figma-map and Storybook, publish the package and MCP server. Lane four, build, product engineer: the Figma MCP reads the mockup and the design-system MCP resolves the mapping, producing pages built one-to-one from design-system instances. Cross-lane arrows: settled IA from lane one to two, change request from the library to lane three, mockup file from the mockups to lane four, npm install from the published package to the design-system MCP.">
+          <defs>
+            <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#141414"/></marker>
+          </defs>
+          <!-- lanes -->
+          <rect class="lane" x="20" y="90" width="320" height="420" rx="18" fill="#d9d3ff"/>
+          <rect class="lane" x="360" y="90" width="380" height="420" rx="18" fill="#ffe9a8"/>
+          <rect class="lane" x="780" y="90" width="300" height="420" rx="18" fill="#cfe0ff"/>
+          <rect class="lane" x="1100" y="90" width="280" height="420" rx="18" fill="#c9f2df"/>
+          <text class="lanet" x="44" y="124">01 Ideate · PM + UX</text>
+          <text class="lanet" x="384" y="124">02 Design · UX</text>
+          <text class="lanet" x="804" y="124">03 DS code · FE</text>
+          <text class="lanet" x="1124" y="124">04 Build · FE</text>
+          <!-- lane 1 -->
+          <rect class="node" x="50" y="150" width="260" height="64" rx="10"/><text class="t" x="180" y="177">Claude artifact</text><text class="t" x="180" y="197">brainstorming</text>
+          <rect class="node" x="50" y="270" width="260" height="64" rx="10"/><text class="t" x="180" y="297">HTML prototype</text><text class="t" x="180" y="317">+ information architecture</text>
+          <path class="e" d="M180 214 V270"/>
+          <!-- lane 2 -->
+          <rect class="node db" x="385" y="150" width="300" height="64" rx="10"/><text class="t inv" x="535" y="188">Figma DS library</text>
+          <rect class="node" x="385" y="270" width="300" height="64" rx="10"/><text class="t" x="535" y="308">Figma mockup pages</text>
+          <rect class="node" x="385" y="390" width="300" height="64" rx="10"/><text class="t" x="535" y="428">Refine DS components</text>
+          <path class="e" d="M535 214 V270"/><text class="l" x="565" y="247">consume</text>
+          <path class="e" d="M535 334 V390"/><text class="l" x="581" y="367">missing pattern</text>
+          <path class="e" d="M385 422 H372 V182 H385"/><text class="l" x="392" y="478" style="text-anchor:start">publish back to the library ↑</text>
+          <!-- lane 3 -->
+          <rect class="node" x="805" y="150" width="250" height="64" rx="10"/><text class="t" x="930" y="177">Sync tokens</text><text class="t" x="930" y="197">+ components</text>
+          <rect class="node" x="805" y="270" width="250" height="64" rx="10"/><text class="t" x="930" y="297">Update figma-map</text><text class="t" x="930" y="317">+ Storybook</text>
+          <rect class="node" x="805" y="390" width="250" height="64" rx="10"/><text class="t" x="930" y="417">Publish package</text><text class="t" x="930" y="437">+ MCP server</text>
+          <path class="e" d="M930 214 V270"/><path class="e" d="M930 334 V390"/>
+          <!-- lane 4 -->
+          <rect class="node tool" x="1125" y="150" width="230" height="64" rx="10"/><text class="t" x="1240" y="177">Figma MCP</text><text class="t" x="1240" y="197">read the mockup</text>
+          <rect class="node db" x="1125" y="270" width="230" height="64" rx="10"/><text class="t inv" x="1240" y="297">Pages built 1:1</text><text class="t inv" x="1240" y="317">from DS instances</text>
+          <rect class="node tool" x="1125" y="390" width="230" height="64" rx="10"/><text class="t" x="1240" y="417">Design-system MCP</text><text class="t" x="1240" y="437">resolve the mapping</text>
+          <path class="e" d="M1240 214 V270"/><path class="e" d="M1240 390 V334"/>
+          <!-- cross-lane -->
+          <path class="e" d="M310 302 H385"/><text class="l" x="338" y="292">settled IA</text>
+          <path class="e" d="M685 182 H805"/><text class="l" x="745" y="172">change request</text>
+          <path class="e" d="M1055 422 H1125"/><text class="l" x="1090" y="412">npm install</text>
+          <path class="e dash" d="M685 290 H700 V190 A8 8 0 0 0 700 174 V70 H1240 V150"/><text class="l" x="970" y="62">mockup file</text>
+        </svg>
+      </div>
+      <figcaption><b>Workflow A</b><span>Figma as the design source of truth. Redrawn from the team's FigJam board.</span></figcaption>
+    </figure>
+    <figure class="reveal">
+      <div class="diagram">
+        <svg viewBox="0 0 1400 210" role="img" aria-label="Workflow B, rejected. A Claude artifact's HTML is treated as the final spec and extracted into the repo. At the question 'design-system component match?', a guessed match goes through the design-system MCP, but no match leads to custom code creep, which violates the one-to-one rule, and every design update forces a manual re-extract.">
+          <defs>
+            <marker id="arrbad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#ff5a3c"/></marker>
+          </defs>
+          <rect class="node" x="20" y="72" width="250" height="64" rx="10"/><text class="t" x="145" y="99">Artifact HTML</text><text class="t" x="145" y="119">= final spec</text>
+          <rect class="node" x="330" y="72" width="240" height="64" rx="10"/><text class="t" x="450" y="99">Extract HTML</text><text class="t" x="450" y="119">into the repo</text>
+          <rect class="node" x="650" y="64" width="80" height="80" rx="10" transform="rotate(45 690 104)"/><text class="t" x="690" y="99" style="font-size:12px">DS match?</text>
+          <rect class="node tool" x="830" y="14" width="240" height="56" rx="10"/><text class="t" x="950" y="48">Design-system MCP resolves it</text>
+          <rect class="node bad" x="830" y="136" width="240" height="56" rx="10"/><text class="t" x="950" y="170">Custom code creep</text>
+          <rect class="node db" x="1130" y="72" width="250" height="64" rx="10"/><text class="t inv" x="1255" y="110">Product pages</text>
+          <path class="e" d="M270 104 H330"/>
+          <path class="e" d="M570 104 H633"/>
+          <path class="e" d="M690 47 V42 H830"/><text class="l" x="760" y="34">guessed match</text>
+          <path class="e bad" d="M690 161 V164 H830"/><text class="l" x="760" y="184">no match</text>
+          <path class="e" d="M1070 42 H1100 V104 H1130"/>
+          <path class="e bad" d="M1070 164 H1100 V104"/><text class="l" x="1230" y="164">violates the 1:1 rule</text>
+          <path class="e dash" d="M145 72 V30 H450 V72"/><text class="l" x="297" y="22">every design update: manual re-extract</text>
+        </svg>
+      </div>
+      <figcaption><b>Workflow B</b><span>The artifact as source of truth. Rejected, because it ends in custom code creep and a re-export on every design change.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 05 tokens -->
+<section class="cream">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">05</div>
+      <h2>One token, four places, zero copies</h2>
+      <div class="k">Design tokens</div>
+    </div>
+    <div class="prose">
+      <p>Tokens live in one JSON file in the repo, and nothing else is a source. Two Figma variable collections feed it: a primitive palette of seven colour families, and a semantic collection with light and dark modes that aliases into the palette. A sixty-line build script turns that JSON into CSS custom properties, a dark-mode block, and a Tailwind theme, so <code>bg-primary</code> exists as a utility because a designer created a variable named primary.</p>
+      <p>The sync is the same mechanism the component bindings use: a Claude skill driven through the Figma MCP, no plugin, no extra tier. It reads the two collections, diffs them against the JSON, shows the diff, writes the file, regenerates the CSS, and opens a merge request. Two details mattered more than expected. Everything resolves <b>by name, never by ID</b>, because Figma file copies get new IDs and designers duplicate files constantly. And the generated CSS is rebuilt before every dev run and every build, so it cannot drift from the JSON even if someone edits it by hand.</p>
+      <p>Typography deliberately does not sync. Type roles in code are Tailwind recipes applied inside components, documented once in Storybook. Turning every Figma text style into a token would have created a second system to maintain for no gain.</p>
+    </div>
+  </div>
+  <div class="wrap media">
+    <div class="trio reveal">
+      <div class="tok">
+        <div class="lbl">Figma variable</div>
+        <div class="sw" style="background:#215cd3">cobalt / 600</div>
+        <div class="mid"><span class="c">collection</span> mode<br><span class="c">light</span> primary → <span class="s">cobalt/600</span><br><span class="c">dark</span> primary → <span class="s">cobalt/400</span></div>
+        <div class="c">read by the sync skill, by name</div>
+      </div>
+      <div class="tok">
+        <div class="lbl">tokens.json</div>
+        <div class="mid"><span class="p">"primary"</span>: {<br>&nbsp;&nbsp;<span class="p">"value"</span>: <span class="s">"{cobalt.600}"</span>,<br>&nbsp;&nbsp;<span class="p">"type"</span>: <span class="s">"color"</span><br>}<br><span class="c">semantic-dark:</span> <span class="s">"{cobalt.400}"</span></div>
+        <div class="c">source of truth, reviewed in git</div>
+      </div>
+      <div class="tok">
+        <div class="lbl">generated CSS</div>
+        <div class="mid"><span class="p">--cobalt-600</span>: <span class="s">#215cd3</span>;<br><span class="p">--primary</span>: var(--cobalt-600);<br><span class="c">.dark {</span> <span class="p">--primary</span>: var(--cobalt-400); <span class="c">}</span><br><span class="c">@theme inline {</span><br>&nbsp;&nbsp;<span class="p">--color-primary</span>: var(--primary);<br><span class="c">}</span></div>
+        <div class="c">rebuilt on every dev run and build</div>
+      </div>
+      <div class="tok">
+        <div class="lbl">Component</div>
+        <div class="mid">className=<span class="s">"bg-primary<br>&nbsp;text-primary-foreground"</span></div>
+        <div class="btnrow"><span class="bp">Save</span><span class="bp dk">Save</span></div>
+        <div class="c">light and dark, no extra code</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 bindings -->
+<section>
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">06</div>
+      <h2>A map next to every component</h2>
+      <div class="k">Component bindings</div>
+    </div>
+    <div class="prose">
+      <p>Each component folder carries a small JSON map beside its code, stories, tests and docs. The map names the Figma component set, says whether the code side is a single component or a composition of sub-components, and translates each Figma variant axis into a prop. Where a Figma axis has no code equivalent, the map says so explicitly in an <code>unmapped</code> ledger instead of pretending.</p>
+      <p>That ledger turned out to be the most useful part. Figma is a design tool and its data is messy in human ways: a variant misspelled "hhost" for ghost, one axis doing the job of two, visual hover states that are not props. The map carries those facts rather than silently correcting them, so the designer can fix the source and the engineer knows exactly what will change when they do.</p>
+      <p>We kept real Code Connect files alongside the maps, unpublished. The map is the same information in a format we can use today. If the plan ever changes, publishing them lights up Dev Mode with no rework.</p>
+    </div>
+  </div>
+  <div class="wrap media grid2">
+    <figure class="reveal">
+      <div class="codehead"><span>button.figma-map.json</span><span>abridged</span></div>
+<pre class="code">{
+  <span class="p">"figmaName"</span>: <span class="s">"Buttons"</span>,
+  <span class="p">"kind"</span>: <span class="s">"single"</span>,
+  <span class="p">"component"</span>: <span class="s">"Button"</span>,
+  <span class="p">"import"</span>: <span class="s">"@/components/ui/button"</span>,
+  <span class="p">"props"</span>: {
+    <span class="p">"variant"</span>: { <span class="p">"fromVariant"</span>: <span class="s">"Type"</span>,
+      <span class="p">"map"</span>: { <span class="s">"primary"</span>: <span class="s">"default"</span>, <span class="s">"secondary"</span>: <span class="s">"secondary"</span>,
+               <span class="s">"destructive"</span>: <span class="s">"destructive"</span>, <span class="s">"outline"</span>: <span class="s">"outline"</span>,
+               <span class="s">"hhost"</span>: <span class="s">"ghost"</span>, <span class="s">"link"</span>: <span class="s">"link"</span> } },
+    <span class="p">"size"</span>: { <span class="p">"fromVariant"</span>: <span class="s">"Type"</span>,
+      <span class="p">"map"</span>: { <span class="s">"Size-small"</span>: <span class="s">"sm"</span>, <span class="s">"Size-large"</span>: <span class="s">"lg"</span>, <span class="s">"icon"</span>: <span class="s">"icon"</span> } },
+    <span class="p">"disabled"</span>: { <span class="p">"fromVariant"</span>: <span class="s">"State"</span>, <span class="p">"map"</span>: { <span class="s">"disabled"</span>: <span class="s">true</span> } }
+  },
+  <span class="p">"unmapped"</span>: {
+    <span class="p">"typeValues"</span>: [<span class="s">"with icon"</span>, <span class="s">"loading"</span>, <span class="s">"Rounded"</span>, <span class="s">"Button group"</span>],
+    <span class="p">"variantAxes"</span>: [<span class="s">"State default/hover: visual states, not props"</span>],
+    <span class="p">"notes"</span>: <span class="s">"hhost is a Figma typo for ghost; fix at source, then update the key."</span>
+  }
+}</pre>
+      <figcaption><b>The map</b><span>One Figma axis, Type, feeds two props. The ledger records what has no code equivalent.</span></figcaption>
+    </figure>
+    <figure class="reveal"><div class="frame light"><img src="../assets/work/design-system/figma-buttons.webp" width="1192" height="1308" loading="lazy" alt="The Buttons page of the Figma library: primary, secondary, outline, destructive, ghost and link variants in default, hover and disabled columns, plus icon buttons, sizes and a button group"></div><figcaption><b>The source</b><span>The Buttons component set in Figma, 42 variants across two axes. The map describes exactly this.</span></figcaption></figure>
+  </div>
+</section>
+
+<!-- 07 agent interface -->
+<section class="dark">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">07</div>
+      <h2>Ship the map, serve the map</h2>
+      <div class="k">Agent interface</div>
+    </div>
+    <div class="prose">
+      <p>A build step compiles the 58 maps into one manifest and the package exports it as a first-class artefact, next to the JavaScript and the CSS. Anyone who installs the design system gets the bindings for free, pinned to the exact version of the components they are using.</p>
+      <p>On top of that sits a Model Context Protocol server, about 180 lines with no dependencies, exposed as a binary in the package. It has two tools. One lists every component that can be resolved. The other takes a Figma component-set name and the selected variants and returns the import statement, the resolved props, the sub-components, a usage example, and the ledger of anything it could not map. Any agent that speaks MCP can use it. No skill to author, nothing to install beyond the package itself.</p>
+      <p>For our own team I also wrote two Claude skills that wrap the workflow end to end. <b>figma-to-code</b> reads a mockup through the Figma MCP, walks every instance including nested ones, resolves each through the map, and builds the screen. <b>sync-tokens</b> is the token capture described above. Both are read-only on Figma and both end at a merge request.</p>
+    </div>
+  </div>
+  <div class="wrap media grid2">
+    <figure class="reveal">
+      <div class="codehead"><span>stdio · JSON-RPC</span><span>real exchange, abridged</span></div>
+<pre class="code"><span class="c">→ tools/call resolve_component</span>
+{ <span class="p">"figmaName"</span>: <span class="s">"Buttons"</span>,
+  <span class="p">"variants"</span>: { <span class="p">"Type"</span>: <span class="s">"destructive"</span>, <span class="p">"State"</span>: <span class="s">"disabled"</span> } }
+
+<span class="c">← result</span>
+{
+  <span class="p">"figmaName"</span>: <span class="s">"Buttons"</span>,
+  <span class="p">"component"</span>: <span class="s">"Button"</span>,
+  <span class="p">"import"</span>: <span class="s">"import { Button } from \"…/design-system\""</span>,
+  <span class="p">"kind"</span>: <span class="s">"single"</span>,
+  <span class="p">"props"</span>: { <span class="p">"variant"</span>: <span class="s">"destructive"</span>, <span class="p">"disabled"</span>: <span class="s">true</span> },
+  <span class="p">"unmapped"</span>: {
+    <span class="p">"typeValues"</span>: [<span class="s">"with icon"</span>, <span class="s">"loading"</span>, <span class="s">"Rounded"</span>, <span class="s">"Button group"</span>],
+    <span class="p">"notes"</span>: <span class="s">"hhost is a Figma typo for ghost …"</span>
+  }
+}</pre>
+      <figcaption><b>The server</b><span>Two tools: list what exists, resolve one instance. The agent gets an import, props, and an honest list of gaps.</span></figcaption>
+    </figure>
+    <figure class="reveal">
+      <div class="codehead"><span>figma-to-code · guardrails</span><span>from the skill</span></div>
+<pre class="code"><span class="ok">1</span>  The map is the source of truth for bindings.
+   Never invent a component the system already has.
+<span class="ok">2</span>  Match by component-set name first, node id second.
+<span class="ok">3</span>  Not in the map? Surface it and offer to add an entry.
+   Never silently reinvent it.
+<span class="ok">4</span>  Style with semantic token classes.
+   Never hardcode a hex pulled from the mockup.
+<span class="ok">5</span>  Read-only on Figma. Always.
+<span class="ok">6</span>  Report the mapping: mockup node → component + props,
+   plus everything unmapped, so the binding is reviewable.
+<span class="ok">7</span>  Reproduce every instance's full content, recursively.
+   Never flatten, never drop items, never invent placeholders.
+<span class="ok">8</span>  Icon slots resolve to the icon library.
+   Never fall back to an icon the mockup didn't show.</pre>
+      <figcaption><b>The rules</b><span>Written for an agent, which means written for the worst-case reader. Every "never" came from a real failure.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 08 guardrails -->
+<section class="cream">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">08</div>
+      <h2>Trust it because it's checked</h2>
+      <div class="k">Guardrails</div>
+    </div>
+    <div class="prose">
+      <p>A binding layer is only useful if it is true. Two audits keep it that way. The first runs locally, with no network, on every commit and in the lint job: it parses each component's source, confirms the map's component is actually exported, and warns when code exposes a sub-component or variant the map doesn't mention. The second runs on a schedule against the Figma API: it reads each component set's real variant axes and reports any axis the map neither binds nor acknowledges. It never blocks a commit, because the Figma file changes on the designer's schedule, not ours. Its warnings are the standing backlog of "Figma is behind here".</p>
+      <p>I didn't take the audit's word for it. I deliberately deleted one sub-component from a map, pushed, watched the warning appear in the pipeline, and reverted. That commit pair is in the history on purpose.</p>
+      <p>Releases are boring by design. Merging to the default branch computes a version from the history and publishes the package, so there is no manual bump and no way for an unmerged branch to overwrite what consumers install.</p>
+    </div>
+  </div>
+  <div class="wrap media grid2">
+    <figure class="reveal">
+      <div class="codehead"><span>pre-commit · lint job</span><span>layer 1, local</span></div>
+<pre class="code">$ node scripts/audit-figma-map-code.mjs
+
+figma-map audit — Layer 1 (code ↔ map) — 58 maps scanned
+
+<span class="ok">no warnings ✓</span>
+
+<span class="c">hard errors: invalid map · component not exported by its import
+warnings:    sub-component in code but not in map
+             variants in code with an empty map and no ledger</span></pre>
+      <figcaption><b>Layer 1</b><span>Runs on every commit. Blocks on errors, warns on gaps, and has a strict mode for CI.</span></figcaption>
+    </figure>
+    <figure class="reveal">
+      <div class="codehead"><span>pipeline</span><span>prepare → check → build → deploy</span></div>
+      <div class="tbl">
+        <div><b>Determine version</b><span>Semantic version computed from history, mainline mode</span><em>every run</em></div>
+        <div><b>Lint</b><span>ESLint plus the layer-1 map audit</span><em class="block">blocking</em></div>
+        <div><b>Test</b><span>188 Vitest cases with coverage on the merge request</span><em class="block">blocking</em></div>
+        <div><b>Map coverage</b><span>Layer-1 audit in strict mode</span><em>warns</em></div>
+        <div><b>Audit against Figma</b><span>Layer 2, real variant axes from the Figma API</span><em>scheduled · warns</em></div>
+        <div><b>Build package</b><span>Library, CSS, and the compiled figma-map manifest</span><em>every run</em></div>
+        <div><b>Storybook</b><span>Published as static pages on the default branch</span><em>default branch</em></div>
+        <div><b>Publish</b><span>To the private registry, default branch only</span><em>default branch</em></div>
+      </div>
+      <figcaption><b>Layer 2 and release</b><span>The Figma audit is scheduled and advisory. Publishing is gated to merged work.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 09 payoff -->
+<section>
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">09</div>
+      <h2>What comes out the other end</h2>
+      <div class="k">Result</div>
+    </div>
+    <div class="prose">
+      <p>The output of the workflow is a product page built only from library imports, with every prop resolved through the map and every colour coming from a token. Those screens are internal, so they stay out of this case study. What I can show is what makes that output possible: every component has a Storybook page with usage, variants and a props table, so the same system an agent reads as JSON is readable by a person as documentation.</p>
+      <p>That mattered to the UX designer as much as the map mattered to the agent. Storybook became the visual QA for every sync, and any Figma variant a designer can see has to have a story that shows it. Our own patterns went through the same path as the shadcn base: designed in Figma, mapped, built, documented.</p>
+    </div>
+  </div>
+  <div class="wrap media stack">
+    <div class="grid2">
+      <figure class="reveal"><div class="frame light"><img src="../assets/work/design-system/storybook-button-docs.webp" width="1800" height="1250" loading="lazy" alt="Storybook documentation page for Button: description, usage snippet, live default button and a variants section"></div><figcaption><b>Readable by people</b><span>Every component has docs, stories and a props table.</span></figcaption></figure>
+      <figure class="reveal">
+        <div class="grid2" style="gap:14px;align-items:start">
+          <div class="frame light"><img src="../assets/work/design-system/figma-metric-card.webp" width="357" height="292" loading="lazy" alt="Metric card component in Figma: a title, a large value, a small area chart and a summary line"></div>
+          <div class="frame light"><img src="../assets/work/design-system/figma-badge.webp" width="516" height="411" loading="lazy" alt="Badge component variants in Figma including success and caution states with icons"></div>
+          <div class="frame light"><img src="../assets/work/design-system/figma-opportunity-card.webp" width="381" height="198" loading="lazy" alt="Opportunity card component in Figma: a type badge, a title, a details line and an outcome statement"></div>
+        </div>
+        <figcaption><b>Our own patterns</b><span>Beyond the shadcn base: metric card, badge states, opportunity card. Designed in Figma by the UX designer, mapped and built in code.</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 10 outcome -->
+<section class="dark">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">10</div>
+      <h2>One repo, everything in it</h2>
+      <div class="k">Outcome</div>
+    </div>
+    <div class="prose">
+      <p>The whole system lives in one repository. Fifty-five components, each with its code, map, stories, tests and docs. The token pipeline from Figma variables to generated CSS. Both audits, the compiled manifest, the MCP server, and the two skills that drive the workflow. The package publishes itself on merge. A designer can change a token in Figma and see it as a reviewable diff in a merge request the same day. An agent can build a page and be told, per instance, exactly what to import.</p>
+      <p>The part I'm proudest of is the part nobody sees: the workflow degrades honestly. When Figma is ahead of code, the audit says so. When code is ahead of Figma, the ledger says so. When a variant has no code meaning, the map says so, and the agent emits a plain component and flags it instead of inventing one.</p>
+    </div>
+  </div>
+  <div class="wrap facts reveal">
+    <div class="fact"><b>55</b><span>components, each with map, stories, tests, docs</span></div>
+    <div class="fact"><b>58</b><span>Figma-to-code bindings compiled into one manifest</span></div>
+    <div class="fact"><b>179</b><span>tokens, light and dark, generated into CSS</span></div>
+    <div class="fact"><b>0</b><span>dependencies in the MCP server</span></div>
+  </div>
+</section>
+
+<!-- 11 reflection -->
+<section>
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">11</div>
+      <h2>What I'd change next</h2>
+      <div class="k">Reflection</div>
+    </div>
+    <div class="prose">
+      <p><b>The MCP protocol is hand-rolled.</b> It was the right call for a zero-dependency proof, and it works. For production I'd swap the framing and handshake for the official SDK and keep the two tools exactly as they are.</p>
+      <p><b>One map per folder was an assumption that broke.</b> Tables and tabs needed several maps in one folder for their sub-components. The audit sees them all, but the manifest builder still picks one. That is a small fix with a large lesson: the moment a layout convention becomes an implicit contract, write the test for it.</p>
+      <p><b>Figma's messiness is the interesting part.</b> The overloaded axis, the typo, the copied files with new IDs. I spent more time designing how the system tolerates those than on any single component, and it was the time that paid off. A binding layer that only works on a clean file only works in a demo.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="next" id="booted">
+  <div class="wrap">
+    <div class="k">Next</div>
+    <h2>BluePrint Infinite</h2>
+    <p>Two call-centre tools became one. A UX Engineer case study at Bell.</p>
+    <div class="links">
+      <a href="blueprint.html">Read the case study</a>
+      <a href="../index.html#work">All work</a>
+      <a href="mailto:nobitanobi920219@gmail.com">Email</a>
+    </div>
+    <div class="foot"><span>Yucong Zhou — Design · Motion · Code</span><span>Internal MacroHealth work. Registry, identifiers and product content omitted.</span></div>
+  </div>
+</footer>
+
+<script>
+const h1=document.getElementById('title'),txt=h1.textContent;h1.setAttribute('aria-label',txt);
+h1.innerHTML=txt.split(' ').map(w=>`<span class="w">${[...w].map(c=>`<span class="ch rise" aria-hidden="true">${c}</span>`).join('')}</span>`).join(' ');
+document.querySelectorAll('.ch').forEach((c,i)=>c.style.animationDelay=(.12+i*.03)+'s');
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.08,rootMargin:'0px 0px -6% 0px'});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+const bar=document.getElementById('progress');
+const prog=()=>{const m=document.documentElement.scrollHeight-innerHeight;bar.style.width=(m>0?Math.min(1,scrollY/m)*100:0)+'%'};
+addEventListener('scroll',prog,{passive:true});addEventListener('resize',prog);prog();
+</script>
+</body>
+</html>

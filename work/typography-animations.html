@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Animated typefaces — motion design · Yucong Zhou</title>
+<meta name="description" content="Four typefaces animated character by character in After Effects for a typography app, 2018. Prove the motion on one letter, build every glyph from one controller, ship it as a loop.">
+<meta property="og:title" content="Animated typefaces — motion design">
+<meta property="og:description" content="Prove the motion on one letter, build every glyph from one controller, ship it as a loop. Freelance motion design for a typography app.">
+<meta property="og:image" content="../assets/work/typography/og.jpg">
+<meta property="og:type" content="article">
+<link rel="preload" as="image" href="../assets/work/typography/hero.webp">
+<link rel="expect" href="#booted" blocking="render">
+<script>document.documentElement.classList.add('js');addEventListener('pagereveal',e=>{if(e.viewTransition)document.documentElement.classList.add('vt')})</script>
+<style>
+:root{--ink:#141414;--cream:#f4efe6;--yellow:#ffc93c;--blue:#2f4bff;--max:1180px;--ease:cubic-bezier(.34,1.56,.64,1);--r:clamp(12px,1.5vw,24px)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#fff;color:var(--ink);font-family:Inter,"Helvetica Neue",Helvetica,-apple-system,"PingFang SC","Noto Sans SC",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit}
+::selection{background:var(--yellow);color:var(--ink)}
+
+/* cross-document view transition from the index: the page wipes up over the Motion scene */
+@view-transition{navigation:auto}
+::view-transition-image-pair(root){isolation:auto}
+::view-transition-old(root){animation:none;mix-blend-mode:normal}
+::view-transition-new(root){animation:vtUp .7s cubic-bezier(.22,1,.36,1) both;mix-blend-mode:normal}
+@keyframes vtUp{from{clip-path:polygon(0 100%,100% 100%,100% 100%,0 100%)}to{clip-path:polygon(0 -30%,100% 0,100% 100%,0 100%)}}
+@media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}
+
+.progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--ink);box-shadow:0 0 0 1px rgba(244,239,230,.35);z-index:10}
+.back{position:fixed;top:22px;left:24px;z-index:10;display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--cream);border:1.5px solid rgba(244,239,230,.35);text-decoration:none;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;padding:12px 18px;border-radius:999px;box-shadow:0 10px 24px rgba(20,20,20,.15);transition:transform .5s var(--ease),background .3s,color .3s}
+.back:hover{background:var(--yellow);color:var(--ink);transform:scale(1.06) rotate(-2deg)}
+.back:focus-visible{outline:2px solid var(--yellow);outline-offset:3px}
+
+.hero{background:var(--blue);color:var(--cream);padding:clamp(92px,13vh,124px) 6vw clamp(96px,10vw,140px);position:relative}
+.hero .brand{position:absolute;top:28px;right:32px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;text-decoration:none}
+.hero .brand span{opacity:.6;margin-left:14px;letter-spacing:.06em;text-transform:none;font-weight:400}
+.k{font-size:12px;letter-spacing:.24em;text-transform:uppercase;opacity:.7;margin-bottom:22px}
+h1{font-size:clamp(44px,7.2vw,112px);font-weight:800;letter-spacing:-.05em;line-height:.88}
+h1 .w{display:inline-block;white-space:nowrap}
+h1 .ch{display:inline-block}
+.lede{margin-top:24px;max-width:62ch;font-size:clamp(16px,1.25vw,19px);line-height:1.5}
+.metawrap{max-width:var(--max);margin:clamp(36px,4vw,56px) auto 0;padding:0 6vw;color:var(--ink)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:22px 32px;border-top:2px solid var(--ink);padding-top:22px}
+.meta dt{font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+.meta dd{margin-top:6px;font-weight:600;font-size:15px;letter-spacing:-.01em}
+.heroimg{max-width:calc(var(--max) + 12vw);margin:clamp(-64px,-6vw,-44px) auto 0;padding:0 6vw;position:relative;z-index:1}
+
+.frame{border-radius:var(--r);overflow:hidden;background:var(--ink);box-shadow:0 30px 60px rgba(20,20,20,.16)}
+.frame.light{background:#fff;outline:1px solid rgba(20,20,20,.08)}
+.frame img{width:100%}
+figure{margin:0}
+figcaption{margin-top:14px;display:flex;gap:12px;align-items:baseline;font-size:12.5px;letter-spacing:.03em;line-height:1.5;opacity:.65}
+figcaption b{font-weight:800;letter-spacing:-.04em;font-size:15px;color:var(--ink);opacity:1;flex:0 0 auto}
+.dark figcaption b{color:var(--yellow)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:32px 28px;align-items:start}
+
+section{padding:clamp(80px,11vw,150px) 6vw}
+.wrap{max-width:var(--max);margin:0 auto}
+.row{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,9fr);gap:40px 6vw;align-items:start}
+.row .side{position:sticky;top:110px}
+.num{font-size:clamp(44px,5.2vw,76px);font-weight:800;letter-spacing:-.05em;line-height:1}
+h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-height:1.02;margin-top:16px}
+.side .k{margin:22px 0 0;opacity:.55}
+.prose p{font-size:clamp(16px,1.2vw,19px);line-height:1.62;max-width:62ch;opacity:.88}
+.prose p+p{margin-top:1.15em}
+.prose p b{font-weight:600;opacity:1}
+.media{margin-top:clamp(44px,5vw,72px)}
+.cream{background:var(--cream)}
+.dark{background:var(--ink);color:var(--cream)}
+.dark .num{color:var(--yellow)}
+.dark .frame{box-shadow:0 30px 60px rgba(0,0,0,.45);outline:1px solid rgba(244,239,230,.08)}
+
+.next{background:var(--yellow);padding:clamp(80px,11vw,150px) 6vw clamp(60px,7vw,90px)}
+.next .k{opacity:.6}
+.next h2{font-size:clamp(40px,6.5vw,110px);letter-spacing:-.05em;margin-top:8px}
+.next p{margin-top:18px;font-size:clamp(15px,1.2vw,18px);opacity:.75}
+.links{margin-top:40px;display:flex;gap:26px;flex-wrap:wrap;font-size:14px;letter-spacing:.06em}
+.links a{color:inherit;text-decoration:none;border-bottom:2px solid currentColor;padding-bottom:3px;transition:transform .4s var(--ease)}
+.links a:hover{transform:translateY(-3px) rotate(-1.5deg)}
+.foot{margin-top:70px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:11px;letter-spacing:.1em;opacity:.6}
+
+.js .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .9s var(--ease)}
+.js .reveal.in{opacity:1;transform:none}
+.js .rise{animation:rise .9s var(--ease) both}
+.vt .rise{animation:none}
+@keyframes rise{from{opacity:0;transform:translateY(.55em)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .js .reveal,.js .rise{opacity:1;transform:none;transition:none;animation:none}
+}
+@media (max-width:860px){
+  .row{grid-template-columns:1fr;gap:28px}
+  .row .side{position:static}
+  .grid2{grid-template-columns:1fr}
+  .hero{padding-top:110px}
+  .hero .brand{display:none}
+  .back{top:14px;left:14px;padding:10px 14px;font-size:11px}
+  .meta{grid-template-columns:repeat(2,1fr)}
+  .metawrap{padding:0 5vw}
+  .heroimg{padding:0 4vw}
+  section,.next{padding-left:5vw;padding-right:5vw}
+  figcaption{font-size:12px}
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<a class="back" href="../index.html#motion">← Motion</a>
+
+<header class="hero">
+  <a class="brand" href="../index.html">Yucong Zhou <span>Design · Motion · Code</span></a>
+  <div class="k rise" style="animation-delay:.05s">Project · Motion design · Typography · 2018</div>
+  <h1 id="title">Animated typefaces</h1>
+  <p class="lede rise" style="animation-delay:.55s">In 2018 I animated typefaces for Type Art, a typography app, as a freelance motion designer. Each brief was a font. Each delivery was every character of that font in motion, built in After Effects from a single controller so colour, stroke and speed could be changed in one place and every letter would follow.</p>
+</header>
+<div class="heroimg rise" style="animation-delay:.85s">
+  <div class="frame"><img src="../assets/work/typography/hero.webp" width="1600" height="1200" alt="Four animated typefaces in a two-by-two grid: a script alphabet with colour accents, a blue inline neon alphabet, a glowing neon word, and white geometric letters on pink" fetchpriority="high"></div>
+</div>
+<div class="metawrap rise" style="animation-delay:1s">
+  <dl class="meta">
+    <div><dt>Role</dt><dd>Freelance motion designer</dd></div>
+    <div><dt>Client</dt><dd>Type Art · typography app</dd></div>
+    <div><dt>Year</dt><dd>2018</dd></div>
+    <div><dt>Tools</dt><dd>After Effects · expressions</dd></div>
+    <div><dt>Deliverables</dt><dd>Four typefaces · upper, lower and special characters · demo loops</dd></div>
+  </dl>
+</div>
+
+<section>
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">01</div>
+      <h2>Prove it on one letter</h2>
+      <div class="k">Analyse · Demo</div>
+    </div>
+    <div class="prose">
+      <p>Every job started with the typeface, not the animation. Serif or sans, loops or no loops, swashes, stroke contrast: each of those decides which kinds of motion the letters can carry. A script face wants to be drawn, a geometric face wants to be assembled, an inline face wants light running through it.</p>
+      <p>From that read I would build several candidate animations on the capital A alone and send them over. The client picked one. Nothing else was animated until they had.</p>
+    </div>
+  </div>
+  <div class="wrap media">
+    <figure class="reveal"><div class="frame"><img src="../assets/work/typography/process.webp" width="720" height="431" loading="lazy" alt="Three animated versions of the capital letter A side by side: one with a striped fill and outline, one with a flat two-tone fill, one extruded in three dimensions"></div><figcaption><b>Three A's</b><span>Candidate directions for one brief. One gets chosen, then the whole alphabet follows it.</span></figcaption></figure>
+  </div>
+</section>
+
+<section class="cream">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">02</div>
+      <h2>Then every letter, from one controller</h2>
+      <div class="k">Build</div>
+    </div>
+    <div class="prose">
+      <p>Once a direction was agreed I applied it to every uppercase, lowercase and special character the brief asked for. Each glyph is its own composition in After Effects, so it can be exported on its own and dropped into the app.</p>
+      <p>The part that made this workable at alphabet scale was a controller composition: a handful of colour controls and a speed slider, referenced by expression from every layer in every letter. Change the palette or the timing once and the whole typeface updates. It is the same idea I would later apply to design tokens in code: decide the variables first, then let every instance inherit the change.</p>
+    </div>
+  </div>
+  <div class="wrap media grid2">
+    <figure class="reveal"><div class="frame"><img src="../assets/work/typography/ae-letters.webp" width="1800" height="1058" loading="lazy" alt="After Effects project panel listing one composition per character, with the capital A open on the canvas and a trim-path stroke animating along its curve"></div><figcaption><b>One comp per glyph</b><span>The project panel is the alphabet. The A on the canvas is a stroke drawing itself along the letterform.</span></figcaption></figure>
+    <figure class="reveal"><div class="frame"><img src="../assets/work/typography/ae-controls.webp" width="1800" height="1051" loading="lazy" alt="After Effects controller composition with four colour controls and a slider control on an adjustment layer, and an expression on a letter's stroke colour pointing at the controller"></div><figcaption><b>The controller</b><span>Four colours and one slider. Every letter's stroke reads its colour from here by expression.</span></figcaption></figure>
+  </div>
+</section>
+
+<section class="dark">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">03</div>
+      <h2>Ship it as a loop</h2>
+      <div class="k">Deliver</div>
+    </div>
+    <div class="prose">
+      <p>The client needed to see the whole set move before signing off, so every typeface shipped with a demo loop running through its characters, and sometimes a short promo video for the app. Four of those loops are below, playing as they were delivered.</p>
+    </div>
+  </div>
+  <div class="wrap media grid2">
+    <figure class="reveal"><div class="frame"><img src="../assets/work/typography/loop-1.webp" width="720" height="540" loading="lazy" alt="Animated loop: a blue inline neon uppercase alphabet builds in letter by letter with light pulses running along the strokes"></div><figcaption><b>Inline neon</b><span>Uppercase set, light running through the inline strokes.</span></figcaption></figure>
+    <figure class="reveal"><div class="frame"><img src="../assets/work/typography/loop-2.webp" width="720" height="540" loading="lazy" alt="Animated loop: the words Animated Typeface in a pink script face draw themselves on with colour accents trailing the stroke"></div><figcaption><b>Script</b><span>Stroke draw-on with colour accents trailing the pen.</span></figcaption></figure>
+    <figure class="reveal"><div class="frame"><img src="../assets/work/typography/loop-3.webp" width="720" height="540" loading="lazy" alt="Animated loop: glowing orange and blue neon strokes flicker on to form a word on a dark background"></div><figcaption><b>Neon glow</b><span>Strokes flicker on like tubes warming up.</span></figcaption></figure>
+    <figure class="reveal"><div class="frame"><img src="../assets/work/typography/loop-4.webp" width="720" height="540" loading="lazy" alt="Animated loop: white geometric letters on hot pink assemble from bars and arcs sliding into place"></div><figcaption><b>Geometric</b><span>Letters assembled from bars and arcs sliding into place.</span></figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">04</div>
+      <h2>Looking back</h2>
+      <div class="k">Reflection</div>
+    </div>
+    <div class="prose">
+      <p>This was repetitive work made interesting by systems thinking. Twenty-six letters twice over plus punctuation is not something to hand-animate, and the controller turned it from a marathon into a method. Most of what I now do with motion in code, easing curves as shared constants and durations as tokens, started with that After Effects slider.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="next" id="booted">
+  <div class="wrap">
+    <div class="k">Next</div>
+    <h2>A design system AI can read</h2>
+    <p>The same instinct, years later: define the variables, then let every component inherit them. A design system built so coding agents can read it.</p>
+    <div class="links">
+      <a href="design-system.html">Read the case study</a>
+      <a href="../index.html#motion">Back to motion</a>
+      <a href="mailto:nobitanobi920219@gmail.com">Email</a>
+    </div>
+    <div class="foot"><span>Yucong Zhou — Design · Motion · Code</span><span>Freelance work for Type Art, 2018. Loops shown as delivered.</span></div>
+  </div>
+</footer>
+
+<script>
+const h1=document.getElementById('title'),txt=h1.textContent;h1.setAttribute('aria-label',txt);
+h1.innerHTML=txt.split(' ').map(w=>`<span class="w">${[...w].map(c=>`<span class="ch rise" aria-hidden="true">${c}</span>`).join('')}</span>`).join(' ');
+document.querySelectorAll('.ch').forEach((c,i)=>c.style.animationDelay=(.12+i*.03)+'s');
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.08,rootMargin:'0px 0px -6% 0px'});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+const bar=document.getElementById('progress');
+const prog=()=>{const m=document.documentElement.scrollHeight-innerHeight;bar.style.width=(m>0?Math.min(1,scrollY/m)*100:0)+'%'};
+addEventListener('scroll',prog,{passive:true});addEventListener('resize',prog);prog();
+</script>
+</body>
+</html>

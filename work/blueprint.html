@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BluePrint Infinite — case study · Yucong Zhou</title>
+<meta name="description" content="How two Bell call-centre tools became one flow system for customer-service agents, cutting about a minute from every call. UX Engineer case study by Yucong Zhou.">
+<meta property="og:title" content="BluePrint Infinite — case study">
+<meta property="og:description" content="Merging two call-centre tools into one flow system for Bell's customer-service agents, and cutting about a minute from every call.">
+<meta property="og:image" content="../assets/work/blueprint/og.jpg">
+<meta property="og:type" content="article">
+<link rel="preload" as="image" href="../assets/work/blueprint/hero.webp">
+<link rel="expect" href="#booted" blocking="render">
+<script>document.documentElement.classList.add('js');addEventListener('pagereveal',e=>{if(e.viewTransition)document.documentElement.classList.add('vt')})</script>
+<style>
+:root{--ink:#141414;--cream:#f4efe6;--yellow:#ffc93c;--blue:#2f4bff;--coral:#ff5a3c;--lilac:#d9d3ff;--max:1180px;--ease:cubic-bezier(.34,1.56,.64,1);--r:clamp(12px,1.5vw,24px)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#fff;color:var(--ink);font-family:Inter,"Helvetica Neue",Helvetica,-apple-system,"PingFang SC","Noto Sans SC",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit}
+::selection{background:var(--yellow);color:var(--ink)}
+
+/* cross-document view transition from the index: the gallery thumbnail morphs into the hero while the page wipes up */
+@view-transition{navigation:auto}
+::view-transition-image-pair(root){isolation:auto}
+::view-transition-old(root){animation:none;mix-blend-mode:normal}
+::view-transition-new(root){animation:vtUp .7s cubic-bezier(.22,1,.36,1) both;mix-blend-mode:normal}
+@keyframes vtUp{from{clip-path:polygon(0 100%,100% 100%,100% 100%,0 100%)}to{clip-path:polygon(0 -30%,100% 0,100% 100%,0 100%)}}
+::view-transition-group(bp-hero){animation-duration:.7s;animation-timing-function:cubic-bezier(.34,1.25,.64,1)}
+.heroimg .frame{view-transition-name:bp-hero}
+@media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}
+
+/* fixed ui, same language as the index */
+.progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--ink);box-shadow:0 0 0 1px rgba(244,239,230,.35);z-index:10}
+.back{position:fixed;top:22px;left:24px;z-index:10;display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--cream);border:1.5px solid rgba(244,239,230,.35);text-decoration:none;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;padding:12px 18px;border-radius:999px;box-shadow:0 10px 24px rgba(20,20,20,.15);transition:transform .5s var(--ease),background .3s,color .3s}
+.back:hover{background:var(--yellow);color:var(--ink);transform:scale(1.06) rotate(-2deg)}
+.back:focus-visible{outline:2px solid var(--yellow);outline-offset:3px}
+
+/* hero */
+.hero{background:var(--yellow);padding:clamp(92px,13vh,124px) 6vw clamp(96px,10vw,140px);position:relative}
+.hero .brand{position:absolute;top:28px;right:32px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;text-decoration:none}
+.hero .brand span{opacity:.6;margin-left:14px;letter-spacing:.06em;text-transform:none;font-weight:400}
+.k{font-size:12px;letter-spacing:.24em;text-transform:uppercase;opacity:.7;margin-bottom:22px}
+h1{font-size:clamp(44px,7.2vw,112px);font-weight:800;letter-spacing:-.05em;line-height:.88}
+h1 .w{display:inline-block;white-space:nowrap}
+h1 .ch{display:inline-block}
+.lede{margin-top:24px;max-width:62ch;font-size:clamp(16px,1.25vw,19px);line-height:1.5}
+.metawrap{max-width:var(--max);margin:clamp(36px,4vw,56px) auto 0;padding:0 6vw;color:var(--ink)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:22px 32px;border-top:2px solid var(--ink);padding-top:22px}
+.meta dt{font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+.meta dd{margin-top:6px;font-weight:600;font-size:15px;letter-spacing:-.01em}
+.heroimg{max-width:calc(var(--max) + 12vw);margin:clamp(-64px,-6vw,-44px) auto 0;padding:0 6vw;position:relative;z-index:1}
+
+/* frames + figures */
+.frame{border-radius:var(--r);overflow:hidden;background:var(--ink);box-shadow:0 30px 60px rgba(20,20,20,.16)}
+.frame img{width:100%}
+figure{margin:0}
+figcaption{margin-top:14px;display:flex;gap:12px;align-items:baseline;font-size:12.5px;letter-spacing:.03em;line-height:1.5;opacity:.65}
+figcaption b{font-weight:800;letter-spacing:-.04em;font-size:15px;color:var(--ink);opacity:1;flex:0 0 auto}
+.dark figcaption b{color:var(--yellow)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:32px 28px}
+.stack>*+*{margin-top:clamp(28px,3vw,44px)}
+
+/* sections */
+section{padding:clamp(80px,11vw,150px) 6vw}
+.wrap{max-width:var(--max);margin:0 auto}
+.row{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,9fr);gap:40px 6vw;align-items:start}
+.row .side{position:sticky;top:110px}
+.num{font-size:clamp(44px,5.2vw,76px);font-weight:800;letter-spacing:-.05em;line-height:1}
+h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-height:1.02;margin-top:16px}
+.side .k{margin:22px 0 0;opacity:.55}
+.prose p{font-size:clamp(16px,1.2vw,19px);line-height:1.62;max-width:62ch;opacity:.88}
+.prose p+p{margin-top:1.15em}
+.prose p b{font-weight:600;opacity:1}
+.media{margin-top:clamp(44px,5vw,72px)}
+.tag{display:inline-block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;border:1.5px solid currentColor;border-radius:999px;padding:6px 12px;font-weight:600}
+
+/* dark blocks */
+.dark{background:var(--ink);color:var(--cream)}
+.dark .num,.dark .tag{color:var(--yellow)}
+.dark .tag{border-color:var(--yellow)}
+.dark .frame{box-shadow:0 30px 60px rgba(0,0,0,.45);outline:1px solid rgba(244,239,230,.08)}
+.cream{background:var(--cream)}
+
+/* problem statements */
+.probs{margin-top:clamp(44px,5vw,72px);display:grid;grid-template-columns:repeat(2,1fr);gap:2px;background:rgba(244,239,230,.14);border-radius:var(--r);overflow:hidden}
+.prob{background:var(--ink);padding:clamp(26px,3vw,40px)}
+.prob b{display:block;font-size:clamp(36px,4vw,54px);font-weight:800;letter-spacing:-.05em;line-height:1;color:var(--yellow)}
+.prob h3{margin-top:20px;font-size:clamp(19px,1.6vw,24px);font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.prob p{margin-top:10px;opacity:.72;font-size:15px;line-height:1.55}
+
+/* decisions */
+.dec{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,9fr);gap:28px 6vw;align-items:end;padding-top:clamp(56px,7vw,100px)}
+.dec:first-of-type{padding-top:clamp(44px,5vw,72px)}
+.dec h3{font-size:clamp(26px,2.8vw,40px);font-weight:800;letter-spacing:-.04em;line-height:1.05;margin-top:16px}
+.dec .prose{padding-bottom:6px}
+.dec figure{grid-column:1/-1}
+.dec .prose p{max-width:none}
+
+/* outcome */
+.big{font-size:clamp(96px,13vw,200px);font-weight:800;letter-spacing:-.06em;line-height:.85;color:var(--yellow);white-space:nowrap}
+.big span{font-size:.42em;letter-spacing:-.03em;margin-left:.08em}
+.big small{display:block;font-size:clamp(14px,1.2vw,18px);letter-spacing:.24em;text-transform:uppercase;font-weight:600;color:var(--cream);opacity:.7;margin-top:22px}
+.outcome .row{grid-template-columns:1fr 1fr;align-items:center}
+
+/* next / footer */
+.next{background:var(--yellow);padding:clamp(80px,11vw,150px) 6vw clamp(60px,7vw,90px)}
+.next .k{opacity:.6}
+.next h2{font-size:clamp(44px,8vw,128px);letter-spacing:-.05em;margin-top:8px}
+.next p{margin-top:18px;font-size:clamp(15px,1.2vw,18px);opacity:.75}
+.links{margin-top:40px;display:flex;gap:26px;flex-wrap:wrap;font-size:14px;letter-spacing:.06em}
+.links a{color:inherit;text-decoration:none;border-bottom:2px solid currentColor;padding-bottom:3px;transition:transform .4s var(--ease)}
+.links a:hover{transform:translateY(-3px) rotate(-1.5deg)}
+.foot{margin-top:70px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:11px;letter-spacing:.1em;opacity:.6}
+
+/* motion */
+.js .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .9s var(--ease)}
+.js .reveal.in{opacity:1;transform:none}
+.js .rise{animation:rise .9s var(--ease) both}
+.vt .rise{animation:none} /* arrived via a view transition: the morph is the entrance, don't stack the letter rise on top */
+@keyframes rise{from{opacity:0;transform:translateY(.55em)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .js .reveal,.js .rise{opacity:1;transform:none;transition:none;animation:none}
+}
+
+/* small screens */
+@media (max-width:860px){
+  .row,.dec,.outcome .row{grid-template-columns:1fr;gap:28px}
+  .row .side{position:static}
+  .grid2,.probs{grid-template-columns:1fr}
+  .hero{padding-top:110px}
+  .hero .brand{display:none}
+  .back{top:14px;left:14px;padding:10px 14px;font-size:11px}
+  .meta{grid-template-columns:repeat(2,1fr)}
+  .metawrap{padding:0 5vw}
+  .heroimg{padding:0 4vw}
+  section,.next{padding-left:5vw;padding-right:5vw}
+  figcaption{font-size:12px}
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<a class="back" href="../index.html#work">← Work</a>
+
+<header class="hero">
+  <a class="brand" href="../index.html">Yucong Zhou <span>Design · Motion · Code</span></a>
+  <div class="k rise" style="animation-delay:.05s">Case study · UX &amp; UI · Bell Canada</div>
+  <h1 id="title">BluePrint Infinite</h1>
+  <p class="lede rise" style="animation-delay:.55s">Bell's customer-service agents used to run two tools side by side on every call: one for the customer's data, one for the step-by-step flow that resolved the call. I led the redesign that merged them into one, built the design system, and shipped the core features in Angular. Average handling time dropped by about a minute per customer.</p>
+</header>
+<div class="heroimg rise" style="animation-delay:.85s">
+  <div class="frame"><img src="../assets/work/blueprint/hero.webp" width="1600" height="1200" alt="BluePrint Infinite dashboard: dark left navigation, a customer header, service tiles marked Eligible, and a usage chart" fetchpriority="high"></div>
+</div>
+<div class="metawrap rise" style="animation-delay:1s">
+  <dl class="meta">
+    <div><dt>Role</dt><dd>UX Engineer · design lead</dd></div>
+    <div><dt>Team</dt><dd>~10 · developers, PM, service managers</dd></div>
+    <div><dt>Timeline</dt><dd>2019 – 2021</dd></div>
+    <div><dt>Stack</dt><dd>Angular · Sketch · Figma · Miro</dd></div>
+    <div><dt>Measured with</dt><dd>Adobe Analytics</dd></div>
+  </dl>
+</div>
+
+<!-- 01 context -->
+<section>
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">01</div>
+      <h2>Two apps, one call</h2>
+      <div class="k">Context</div>
+    </div>
+    <div class="prose">
+      <p>BluePrint Infinite is the internal tool Bell's customer-service agents use while a customer is on the phone. A <b>flow</b> is a scripted sequence of steps that collects the customer's information and the reason for the call, then walks the agent to a resolution or an offer. Flows are authored by a separate team and cover everything from a bill dispute to booking a technician.</p>
+      <p>Before the redesign that job was split across two applications. BluePrints Infinite 1.0 showed the customer's profile, services, billing and usage. A second app ran the flows themselves. Agents kept both open and switched between them for the whole length of every call. Every switch cost seconds, broke concentration, and was a chance to lose the thread.</p>
+      <p>The brief had two parts. Merge the two experiences so an agent can finish a call in one place and in less time. And give the product a real identity, with a design system the team could keep reusing.</p>
+    </div>
+  </div>
+  <div class="wrap media grid2">
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/before-dashboard.webp" width="1800" height="1094" loading="lazy" alt="Legacy BluePrints Infinite 1.0 dashboard with a blue header, three pink notification bars and boxed customer profile panels"></div><figcaption><b>Before</b><span>BluePrints Infinite 1.0, the customer-data app. Everything on one page, all of it competing for attention.</span></figcaption></figure>
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/before-flow.webp" width="1400" height="742" loading="lazy" alt="Legacy flow system in a browser: a column of grey question cards with Next and Feedback buttons and a small account panel"></div><figcaption><b>Before</b><span>The flow system. One question after another, with almost no customer context beside it.</span></figcaption></figure>
+  </div>
+</section>
+
+<!-- 02 research -->
+<section class="cream">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">02</div>
+      <h2>Ask, then watch</h2>
+      <div class="k">Research</div>
+    </div>
+    <div class="prose">
+      <p>I started with one-on-one interviews with three or four agents and a manager from the service team, walking through their actual day: the calls they get, the workarounds they had built, and the edge cases the previous versions never accounted for.</p>
+      <p>Then we spent time on the floor of the call centre, watching agents work instead of asking them to describe it. That surfaced habits nobody had mentioned in the interviews. We also visited a Bell retail store, a group with a similar job and different tooling, to see how they handled the same customers and borrow what worked.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 03 problems -->
+<section class="dark">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">03</div>
+      <h2>Four things the redesign had to do</h2>
+      <div class="k">Analysis</div>
+    </div>
+    <div class="prose">
+      <p>The findings went onto a wall with the core developer, the project manager and the customer-service manager, and got boiled down to four problem statements. Every later decision was checked against them.</p>
+    </div>
+  </div>
+  <div class="wrap probs reveal">
+    <div class="prob"><b>01</b><h3>Merge without losing anything</h3><p>Every function of both apps has to exist in the new one, and be easy to reach.</p></div>
+    <div class="prob"><b>02</b><h3>Customer context inside the flow</h3><p>An agent should be able to browse the customer's information without switching apps or leaving the current step.</p></div>
+    <div class="prob"><b>03</b><h3>One step in focus</h3><p>Hide what isn't needed right now so the agent's attention stays on the current step.</p></div>
+    <div class="prob"><b>04</b><h3>Room for steps to grow</h3><p>A step has to be able to hold more functionality later without redesigning the shell around it.</p></div>
+  </div>
+  <div class="wrap media">
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/wall.webp" width="1800" height="1350" loading="lazy" alt="Handwritten sticky notes on a glass wall: merge BPI 1.0 and IC, browse customer information within a flow, new branding, logo, colour palette, design system (maybe?)"></div><figcaption><b>The wall</b><span>Problem statements on the left, branding tasks on the right. The note that says "design system (maybe?)" became a real one.</span></figcaption></figure>
+  </div>
+</section>
+
+<!-- 04 reverse engineering -->
+<section>
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">04</div>
+      <h2>Map what exists</h2>
+      <div class="k">Reverse engineering</div>
+    </div>
+    <div class="prose">
+      <p>Merging two apps means knowing exactly what is in them. I mapped both on a whiteboard: the information architecture of every screen, and the session logic underneath, including the branches for suspended sessions and returning customers that agents relied on but nobody had written down.</p>
+    </div>
+  </div>
+  <div class="wrap media grid2">
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/whiteboard-ia.webp" width="1800" height="1350" loading="lazy" alt="Whiteboard tree diagram: landing page branching into triage, flow search, account info, MOTD, links and history, with flow and steps below"></div><figcaption><b>IA</b><span>The merged app from landing page down to individual steps.</span></figcaption></figure>
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/whiteboard-flow.webp" width="1800" height="1350" loading="lazy" alt="Whiteboard flowchart: start, TMI selection, triage, search, launch flow, account info, end session, suspend, same customer, clear session"></div><figcaption><b>Session</b><span>Triage, search, launch, suspend, resume, end. The paths agents used that the old apps never made explicit.</span></figcaption></figure>
+  </div>
+</section>
+
+<!-- 05 use cases and flows -->
+<section class="cream">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">05</div>
+      <h2>Draw the system, then the paths</h2>
+      <div class="k">Use cases · User flows</div>
+    </div>
+    <div class="prose">
+      <p>From the whiteboard I built a use-case diagram of the whole system so the team could see how the agent app, the admin tool, the flow engine and the microservices fit together in one view.</p>
+      <p>Then user flows for the main scenarios in Miro, from the customer dialling in to the flow wrapping up, including the unhappy paths: the customer with one more question, the agent who has to hand off, the flow that has to be cancelled. Having them drawn meant anyone on the team could point at the exact case they were talking about.</p>
+    </div>
+  </div>
+  <div class="wrap media stack">
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/usecase.webp" width="1800" height="945" loading="lazy" alt="Use-case diagram: customer calls agent, agent uses BPI to launch flows, view MOTD, notifications and customer information; author configures content through BPI Admin and microservices"></div><figcaption><b>System</b><span>Agent-facing app on the left, authoring and services on the right.</span></figcaption></figure>
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/flow-agent.webp" width="1800" height="779" loading="lazy" alt="User flow from customer dial-in through landing page, launch flow, triage, wrap up, with branches to suspend or cancel"></div><figcaption><b>Primary flow</b><span>Dial-in to wrap-up, with the suspend and cancel paths.</span></figcaption></figure>
+  </div>
+</section>
+
+<!-- 06 wireframes -->
+<section>
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">06</div>
+      <h2>Settle the shell cheaply</h2>
+      <div class="k">Wireframes</div>
+    </div>
+    <div class="prose">
+      <p>Low-fidelity wireframes in Figma set the structure early: a persistent header with the customer's identity and a flow search, a left navigation, and a content area that changes with the task. They were cheap to change, so the team argued about structure here rather than later on polished mockups.</p>
+    </div>
+  </div>
+  <div class="wrap media grid2">
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/wire-landing.webp" width="951" height="612" loading="lazy" alt="Grey wireframe of the landing page with customer profile, eligibility, timeline, top flows, predicted flow and history blocks"></div><figcaption><b>Landing</b></figcaption></figure>
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/wire-triage.webp" width="951" height="616" loading="lazy" alt="Grey wireframe of the triage page: two columns of process rows, one expanded to show flows"></div><figcaption><b>Triage</b></figcaption></figure>
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/wire-flow.webp" width="951" height="612" loading="lazy" alt="Grey wireframe of the flow page: a support panel on the left, step 1 and step 2 cards on the right, a step strip at the bottom"></div><figcaption><b>Flow</b></figcaption></figure>
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/wire-device.webp" width="951" height="616" loading="lazy" alt="Grey wireframe of the device and plan page with services grouped and device detail cards"></div><figcaption><b>Device and plan</b></figcaption></figure>
+  </div>
+</section>
+
+<!-- 07 decisions -->
+<section class="cream">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">07</div>
+      <h2>Four problems, four decisions</h2>
+      <div class="k">Hi-fi design</div>
+    </div>
+    <div class="prose">
+      <p>Hi-fi design in Sketch came only after the team had agreed on the structure. Here is how each problem statement turned into something on screen.</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="dec reveal">
+      <div><span class="tag">Answers 01</span><h3>One shell for everything</h3></div>
+      <div class="prose"><p>The landing page became a dashboard that carries the whole of the old data app: profile, services and eligibility, usage, timeline and flow history. Predicted and commonly used flows sit right beside them, so the most likely next action is one click away. Flow search lives in the header on every screen, so an agent can start a flow from anywhere.</p></div>
+      <figure><div class="frame"><img src="../assets/work/blueprint/hifi-dashboard.webp" width="1800" height="1169" loading="lazy" alt="Hi-fi dashboard: customer profile, service tiles, predicted and common flows, flow history table, customer timeline, and open tasks in the sidebar"></div><figcaption><b>Dashboard</b><span>Everything the old data app did, plus the flows most likely to be needed next.</span></figcaption></figure>
+    </div>
+    <div class="dec reveal">
+      <div><span class="tag">Answers 02</span><h3>Customer context beside the step</h3></div>
+      <div class="prose"><p>Inside a flow, an <b>InContext</b> panel keeps account info, profile, usage and tech details alongside the current step, with tabs for the customer's timeline and insights. Sections collapse so the agent chooses what stays open. No more second window.</p></div>
+      <figure><div class="frame"><img src="../assets/work/blueprint/hifi-flow.webp" width="1800" height="1169" loading="lazy" alt="Hi-fi flow screen: InContext panel on the left with account info, profile and usage chart; a ticket details step on the right with a step strip along the bottom"></div><figcaption><b>Flow</b><span>The InContext panel on the left, the current step on the right.</span></figcaption></figure>
+    </div>
+    <div class="dec reveal">
+      <div><span class="tag">Answers 03</span><h3>One step in focus</h3></div>
+      <div class="prose"><p>The flow area shows only the current step. Answers from earlier steps compress into a strip along the bottom, so the agent can see the path and jump back without those steps taking up the screen. Secondary sections of a step start collapsed. Notifications are one bar, not a column. Wrong, Suspend and Cancel are always in the same place.</p></div>
+      <figure><div class="frame"><img src="../assets/work/blueprint/hifi-step.webp" width="1800" height="1675" loading="lazy" alt="Close-up of a flow step: ticket status, report form, flags, an appointment table, collapsed sections, Submit and Reset buttons, and a strip of earlier answers along the bottom"></div><figcaption><b>Step</b><span>Earlier answers as a strip at the bottom, a Summary one tap away.</span></figcaption></figure>
+    </div>
+    <div class="dec reveal">
+      <div><span class="tag">Answers 04</span><h3>A step is a container</h3></div>
+      <div class="prose"><p>Each step is a self-contained component with its own state, so a step can be a single question or a full ticket form with a report, an appointment table and flags. I specified the state logic for the developers: what initialises the form, what disables it in read-only mode, and how changes are detected to enable Save. Suspended flows show up as <b>Open Tasks</b> in the sidebar, so an agent can pick up where they left off.</p></div>
+      <figure><div class="frame"><img src="../assets/work/blueprint/flow-step-state.webp" width="1800" height="1262" loading="lazy" alt="Logic diagram for a ticket step: ticket update decision, apply update, enable cancel, dark mode and read-only checks, form value change, compare ticket data, and a Step State panel listing the stored data"></div><figcaption><b>Step state</b><span>The logic behind a step: initial data, read-only mode, and the dirty check that enables Save.</span></figcaption></figure>
+    </div>
+  </div>
+  <div class="wrap media grid2">
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/hifi-triage.webp" width="1400" height="909" loading="lazy" alt="Hi-fi triage screen: flows grouped by process and category in an expandable tree, Bill and Payments expanded down to usage charges"></div><figcaption><b>Triage</b><span>Every flow, grouped by process and category, searchable from the header.</span></figcaption></figure>
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/hifi-device.webp" width="1800" height="1169" loading="lazy" alt="Hi-fi device and plan screen: services grouped by service address, with cards for home phone, internet, TV, mobility and smart watch"></div><figcaption><b>Device and plan</b><span>Services grouped by address, so customers with two addresses stop being a special case.</span></figcaption></figure>
+  </div>
+</section>
+
+<!-- 08 identity -->
+<section id="identity">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">08</div>
+      <h2>A mark for the team, not just the app</h2>
+      <div class="k">Identity · Logo</div>
+    </div>
+    <div class="prose">
+      <p>The second half of the brief was an identity. The old app had a name and a blue header, and nothing else. The team was about to present its work to other departments at Bell and needed something to put on a slide, and the app needed a mark that could survive being shrunk into a sidebar.</p>
+      <p>I started on paper: letterforms built from the b and the p, peaks for the blueprint idea, and the infinity loop from the product's name. Five made it to vector. Three made it onto a sheet where each was checked on white, on dark and on the product blue, because the mark had to live on all three.</p>
+      <p>The final mark is a b and a p sharing one infinity loop, drawn from circles on a grid so it stays crisp at any size. It sits in the app's sidebar, appears as a watermark behind the dashboard, and its two blues carry through the interface.</p>
+    </div>
+  </div>
+  <div class="wrap media stack">
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/logo-sketches.webp" width="1800" height="1350" loading="lazy" alt="Dot-grid notebook page of pencil logo sketches: b and p letterforms, mountain peaks, infinity loops, and combinations of the three"></div><figcaption><b>Sketches</b><span>Letterforms, peaks, and the loop from "Infinite".</span></figcaption></figure>
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/logo-concepts.webp" width="1800" height="360" loading="lazy" alt="Five vector logo concepts in a row: layered rounded triangles, two half-circle shapes, two stacked triangles, a folded ribbon B, and a rounded B split by a curve"></div><figcaption><b>Concepts</b><span>Five directions taken to vector.</span></figcaption></figure>
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/logo-directions.webp" width="1800" height="891" loading="lazy" alt="Sketch artboards: three logo directions, each shown with the BluePrint wordmark on a white, a dark and a blue background"></div><figcaption><b>Shortlist</b><span>Three directions, each checked on white, dark and blue.</span></figcaption></figure>
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/logo-rationale.webp" width="1800" height="687" loading="lazy" alt="Diagram on dark: a lowercase b, plus a lowercase p, plus an infinity symbol, equals the final bp mark"></div><figcaption><b>Rationale</b><span>b + p + ∞.</span></figcaption></figure>
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/logo-final.webp" width="1800" height="1145" loading="lazy" alt="The final mark on its construction grid of circles and guide lines, beside the white BluePrint lockup on a dark background"></div><figcaption><b>Final</b><span>Construction grid, and the lockup.</span></figcaption></figure>
+  </div>
+</section>
+
+<!-- 09 design system -->
+<section class="cream">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">09</div>
+      <h2>One reference for both sides</h2>
+      <div class="k">Design system</div>
+    </div>
+    <div class="prose">
+      <p>With the shell and the identity settled I built the design system: type scale, colours, spacing, a component library and behaviour rules for the common patterns. Its point was speed for both sides of the table. Designers stop redrawing buttons and tables, developers get one reference to build against, and the back-and-forth between the two shrinks.</p>
+    </div>
+  </div>
+  <div class="wrap media">
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/ds-type.webp" width="1138" height="820" loading="lazy" alt="Type scale table: DisplayXLarge to Caption, each with typeface, size and line height, plus subdued, disabled and reversed variants"></div><figcaption><b>Type</b><span>Named styles that map one-to-one to the styles in code.</span></figcaption></figure>
+  </div>
+</section>
+
+<!-- 10 build -->
+<section>
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">10</div>
+      <h2>Designing what I built</h2>
+      <div class="k">Build · Test</div>
+    </div>
+    <div class="prose">
+      <p>I was the UX Engineer on a team of about ten, so the handoff was mostly to myself. The design system became an Angular component library, and the mockups and the app were assembled from the same parts. Where a step's behaviour got complicated I drew the logic before writing it, and the diagrams doubled as documentation for the other developers.</p>
+      <p>The deadline didn't leave room for a full build before testing. So I pushed the Sketch Cloud prototype as close to the real thing as I could and ran user testing with agents on that. It wasn't perfect, but it gave us real feedback early, and several rounds of polish came out of it before launch.</p>
+    </div>
+  </div>
+  <div class="wrap media stack">
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/flow-dispatch.webp" width="1800" height="1174" loading="lazy" alt="Decision diagram for a dispatch step, with a screenshot of the Angular code it drives and a sticky note saying the two field names need refactoring"></div><figcaption><b>Dispatch logic</b><span>A decision tree for a dispatch step, annotated with the code it drove and a note to refactor it.</span></figcaption></figure>
+    <figure class="reveal"><div class="frame"><img src="../assets/work/blueprint/prototype.webp" width="1800" height="1024" loading="lazy" alt="Sketch Cloud document listing desktop artboards for dashboard, inbox, links, flow search and history search, with 37 updates in the sidebar"></div><figcaption><b>Prototype</b><span>The shared prototype file. Thirty-seven rounds of updates before launch, most of them from agent feedback.</span></figcaption></figure>
+  </div>
+</section>
+
+<!-- 11 outcome -->
+<section class="dark outcome">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="big">≈1<span>min</span><small>less per customer</small></div>
+    </div>
+    <div class="prose">
+      <div class="num" style="font-size:clamp(36px,3.6vw,52px)">11</div>
+      <h2 style="margin-bottom:26px">Launched, measured, still going</h2>
+      <p>BluePrint Infinite launched in early 2021, with Adobe Analytics wired in from the first day. The average time an agent spends on one customer dropped by around a minute. Across the call volume of the largest telecom in Canada, that is a lot of hours handed back every week.</p>
+      <p>The app is still being extended. New features follow the same patterns and come out of the same component library, which was the point of building one.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 12 reflection -->
+<section>
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">12</div>
+      <h2>What I'd do differently</h2>
+      <div class="k">Reflection</div>
+    </div>
+    <div class="prose">
+      <p>We never wrote personas or a journey map. The interviews and the time on the floor gave us most of that understanding informally, but writing it down would have made the reasoning visible to people who joined later, and easier to challenge.</p>
+      <p>Testing on a prototype instead of the build meant some interaction details only surfaced after launch. With more runway I'd have tested on a real build with real customer data, earlier.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="next" id="booted">
+  <div class="wrap">
+    <div class="k">Next</div>
+    <h2>HealthWave</h2>
+    <p>Landing pages, an illustration set and an icon set for a practitioner platform. Designed and built by the same person.</p>
+    <div class="links">
+      <a href="healthwave.html">View the project</a>
+      <a href="../index.html#work">All work</a>
+      <a href="mailto:nobitanobi920219@gmail.com">Email</a>
+    </div>
+    <div class="foot"><span>Yucong Zhou — Design · Motion · Code</span><span>BluePrint Infinite is a Bell Canada product. Shown with the same material published in 2021.</span></div>
+  </div>
+</footer>
+
+<script>
+/* headline letters rise in one by one, same feel as the index */
+const h1=document.getElementById('title'),txt=h1.textContent;h1.setAttribute('aria-label',txt);
+h1.innerHTML=txt.split(' ').map(w=>`<span class="w">${[...w].map(c=>`<span class="ch rise" aria-hidden="true">${c}</span>`).join('')}</span>`).join(' ');
+document.querySelectorAll('.ch').forEach((c,i)=>c.style.animationDelay=(.12+i*.035)+'s');
+/* reveal on scroll */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.08,rootMargin:'0px 0px -6% 0px'});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+/* reading progress */
+const bar=document.getElementById('progress');
+const prog=()=>{const m=document.documentElement.scrollHeight-innerHeight;bar.style.width=(m>0?Math.min(1,scrollY/m)*100:0)+'%'};
+addEventListener('scroll',prog,{passive:true});addEventListener('resize',prog);prog();
+</script>
+</body>
+</html>

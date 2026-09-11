@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HealthWave — landing pages, illustration and icons · Yucong Zhou</title>
+<meta name="description" content="HealthWave marketing site, 2015 to 2016: two landing pages, a five-piece illustration set and an eight-icon set, designed and built by Yucong Zhou as designer and front-end developer.">
+<meta property="og:title" content="HealthWave — landing pages, illustration and icons">
+<meta property="og:description" content="Two landing pages, an illustration set and an icon set for a practitioner e-commerce platform. Designed and built by the same person.">
+<meta property="og:image" content="../assets/work/healthwave/og.jpg">
+<meta property="og:type" content="article">
+<link rel="preload" as="image" href="../assets/work/healthwave/hero.webp">
+<link rel="expect" href="#booted" blocking="render">
+<script>document.documentElement.classList.add('js');addEventListener('pagereveal',e=>{if(e.viewTransition)document.documentElement.classList.add('vt')})</script>
+<style>
+:root{--ink:#141414;--cream:#f4efe6;--yellow:#ffc93c;--lilac:#d9d3ff;--max:1180px;--ease:cubic-bezier(.34,1.56,.64,1);--r:clamp(12px,1.5vw,24px)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#fff;color:var(--ink);font-family:Inter,"Helvetica Neue",Helvetica,-apple-system,"PingFang SC","Noto Sans SC",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit}
+::selection{background:var(--yellow);color:var(--ink)}
+
+/* cross-document view transition from the index: the gallery thumbnail morphs into the hero while the page wipes up */
+@view-transition{navigation:auto}
+::view-transition-image-pair(root){isolation:auto}
+::view-transition-old(root){animation:none;mix-blend-mode:normal}
+::view-transition-new(root){animation:vtUp .7s cubic-bezier(.22,1,.36,1) both;mix-blend-mode:normal}
+@keyframes vtUp{from{clip-path:polygon(0 100%,100% 100%,100% 100%,0 100%)}to{clip-path:polygon(0 -30%,100% 0,100% 100%,0 100%)}}
+::view-transition-group(hw-hero){animation-duration:.7s;animation-timing-function:cubic-bezier(.34,1.25,.64,1)}
+.heroimg .frame{view-transition-name:hw-hero}
+@media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}
+
+.progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--ink);box-shadow:0 0 0 1px rgba(244,239,230,.35);z-index:10}
+.back{position:fixed;top:22px;left:24px;z-index:10;display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--cream);border:1.5px solid rgba(244,239,230,.35);text-decoration:none;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;padding:12px 18px;border-radius:999px;box-shadow:0 10px 24px rgba(20,20,20,.15);transition:transform .5s var(--ease),background .3s,color .3s}
+.back:hover{background:var(--yellow);color:var(--ink);transform:scale(1.06) rotate(-2deg)}
+.back:focus-visible{outline:2px solid var(--yellow);outline-offset:3px}
+
+.hero{background:var(--lilac);padding:clamp(92px,13vh,124px) 6vw clamp(96px,10vw,140px);position:relative}
+.hero .brand{position:absolute;top:28px;right:32px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;text-decoration:none}
+.hero .brand span{opacity:.6;margin-left:14px;letter-spacing:.06em;text-transform:none;font-weight:400}
+.k{font-size:12px;letter-spacing:.24em;text-transform:uppercase;opacity:.7;margin-bottom:22px}
+h1{font-size:clamp(44px,7.2vw,112px);font-weight:800;letter-spacing:-.05em;line-height:.88}
+h1 .w{display:inline-block;white-space:nowrap}
+h1 .ch{display:inline-block}
+.lede{margin-top:24px;max-width:62ch;font-size:clamp(16px,1.25vw,19px);line-height:1.5}
+.metawrap{max-width:var(--max);margin:clamp(36px,4vw,56px) auto 0;padding:0 6vw;color:var(--ink)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:22px 32px;border-top:2px solid var(--ink);padding-top:22px}
+.meta dt{font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+.meta dd{margin-top:6px;font-weight:600;font-size:15px;letter-spacing:-.01em}
+.heroimg{max-width:calc(var(--max) + 12vw);margin:clamp(-64px,-6vw,-44px) auto 0;padding:0 6vw;position:relative;z-index:1}
+
+.frame{border-radius:var(--r);overflow:hidden;background:var(--ink);box-shadow:0 30px 60px rgba(20,20,20,.16)}
+.frame.light{background:#fff;outline:1px solid rgba(20,20,20,.08)}
+.frame img{width:100%}
+figure{margin:0}
+figcaption{margin-top:14px;display:flex;gap:12px;align-items:baseline;font-size:12.5px;letter-spacing:.03em;line-height:1.5;opacity:.65}
+figcaption b{font-weight:800;letter-spacing:-.04em;font-size:15px;color:var(--ink);opacity:1;flex:0 0 auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:32px 28px;align-items:start}
+
+section{padding:clamp(80px,11vw,150px) 6vw}
+.wrap{max-width:var(--max);margin:0 auto}
+.row{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,9fr);gap:40px 6vw;align-items:start}
+.row .side{position:sticky;top:110px}
+.num{font-size:clamp(44px,5.2vw,76px);font-weight:800;letter-spacing:-.05em;line-height:1}
+h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-height:1.02;margin-top:16px}
+.side .k{margin:22px 0 0;opacity:.55}
+.prose p{font-size:clamp(16px,1.2vw,19px);line-height:1.62;max-width:62ch;opacity:.88}
+.prose p+p{margin-top:1.15em}
+.prose p b{font-weight:600;opacity:1}
+.media{margin-top:clamp(44px,5vw,72px)}
+.cream{background:var(--cream)}
+
+.next{background:var(--yellow);padding:clamp(80px,11vw,150px) 6vw clamp(60px,7vw,90px)}
+.next .k{opacity:.6}
+.next h2{font-size:clamp(40px,6.5vw,110px);letter-spacing:-.05em;margin-top:8px}
+.next p{margin-top:18px;font-size:clamp(15px,1.2vw,18px);opacity:.75}
+.links{margin-top:40px;display:flex;gap:26px;flex-wrap:wrap;font-size:14px;letter-spacing:.06em}
+.links a{color:inherit;text-decoration:none;border-bottom:2px solid currentColor;padding-bottom:3px;transition:transform .4s var(--ease)}
+.links a:hover{transform:translateY(-3px) rotate(-1.5deg)}
+.foot{margin-top:70px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:11px;letter-spacing:.1em;opacity:.6}
+
+.js .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .9s var(--ease)}
+.js .reveal.in{opacity:1;transform:none}
+.js .rise{animation:rise .9s var(--ease) both}
+.vt .rise{animation:none}
+@keyframes rise{from{opacity:0;transform:translateY(.55em)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .js .reveal,.js .rise{opacity:1;transform:none;transition:none;animation:none}
+}
+@media (max-width:860px){
+  .row{grid-template-columns:1fr;gap:28px}
+  .row .side{position:static}
+  .grid2{grid-template-columns:1fr}
+  .hero{padding-top:110px}
+  .hero .brand{display:none}
+  .back{top:14px;left:14px;padding:10px 14px;font-size:11px}
+  .meta{grid-template-columns:repeat(2,1fr)}
+  .metawrap{padding:0 5vw}
+  .heroimg{padding:0 4vw}
+  section,.next{padding-left:5vw;padding-right:5vw}
+  figcaption{font-size:12px}
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<a class="back" href="../index.html#work">← Work</a>
+
+<header class="hero">
+  <a class="brand" href="../index.html">Yucong Zhou <span>Design · Motion · Code</span></a>
+  <div class="k rise" style="animation-delay:.05s">Project · Landing pages · Illustration · Icons</div>
+  <h1 id="title">HealthWave</h1>
+  <p class="lede rise" style="animation-delay:.55s">HealthWave was an Ottawa platform for practitioners to recommend and sell professional-grade natural health products, later part of Fullscript. As the team's designer and front-end developer I designed and built its public marketing site: the landing pages, an illustration set and an icon set. This is a visual project rather than a case study. The pages are shown as the full-height mockups they were designed as.</p>
+</header>
+<div class="heroimg rise" style="animation-delay:.85s">
+  <div class="frame"><img src="../assets/work/healthwave/hero.webp" width="1800" height="938" alt="HealthWave home page hero: navigation, a headline reading the number one online platform to recommend and sell professional-grade natural health products, two buttons, and a photo of a smiling practitioner" fetchpriority="high"></div>
+</div>
+<div class="metawrap rise" style="animation-delay:1s">
+  <dl class="meta">
+    <div><dt>Role</dt><dd>Designer &amp; Front-end Developer</dd></div>
+    <div><dt>Employer</dt><dd>HealthWave, later Fullscript · Ottawa</dd></div>
+    <div><dt>Year</dt><dd>2015 – 2016</dd></div>
+    <div><dt>Deliverables</dt><dd>Two landing pages · five illustrations · eight icons</dd></div>
+    <div><dt>Built with</dt><dd>HTML · CSS · JavaScript</dd></div>
+  </dl>
+</div>
+
+<section>
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">01</div>
+      <h2>Two pages, top to bottom</h2>
+      <div class="k">Landing pages</div>
+    </div>
+    <div class="prose">
+      <p>The home page had three jobs on one scroll: explain the platform to a practitioner in a sentence, show the product on real devices, and get them to create a dispensary. The second page, How it works, carries the longer explanation with one illustration per step. Both were designed as full-height mockups and then built by me in HTML, CSS and JavaScript.</p>
+      <p>The copy in the mockups is placeholder. The shipped site carried the real text, and the company has redesigned it since.</p>
+    </div>
+  </div>
+  <div class="wrap media grid2">
+    <figure class="reveal"><div class="frame light"><img src="../assets/work/healthwave/home.webp" width="1600" height="4046" loading="lazy" alt="Full-height mockup of the HealthWave home page: hero with practitioner photo, three feature columns, a dark band with the product on laptop, tablet and phone, testimonials, a brand logo wall, a green call-to-action band and the footer"></div><figcaption><b>Home</b><span>One message per band, the call to action repeated where it's needed.</span></figcaption></figure>
+    <figure class="reveal"><div class="frame light"><img src="../assets/work/healthwave/how-it-works.webp" width="1600" height="2685" loading="lazy" alt="Full-height mockup of the HealthWave How it works page: dark hero with a tablet showing the product catalogue, then four alternating steps each with a circular illustration"></div><figcaption><b>How it works</b><span>Four steps, one illustration each, alternating sides.</span></figcaption></figure>
+  </div>
+</section>
+
+<section class="cream">
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">02</div>
+      <h2>Drawn for the pages</h2>
+      <div class="k">Illustration · Icons</div>
+    </div>
+    <div class="prose">
+      <p>The site needed a friendlier face than stock photography alone. I drew a set of five spot illustrations, one per feature, in a flat style on circular grounds, and an eight-icon set for the feature row and the footer. One line weight, one corner radius, one pair of greens, so both sets read as a single family across the two pages.</p>
+    </div>
+  </div>
+  <div class="wrap media grid2">
+    <figure class="reveal"><div class="frame light"><img src="../assets/work/healthwave/illustrations.webp" width="800" height="600" loading="lazy" alt="Five flat spot illustrations on circular backgrounds: a tablet with a checklist and pencil, a practitioner at a desk with a patient, open shipping boxes with products, a practitioner beside a product list, and the platform on laptop, tablet and phone"></div><figcaption><b>Illustrations</b><span>One per feature: prescribe, in-office checkout, delivery, recommend, every device.</span></figcaption></figure>
+    <figure class="reveal"><div class="frame light"><img src="../assets/work/healthwave/icons.webp" width="800" height="600" loading="lazy" alt="Eight green icons: speech bubbles, a clipboard with a check, an envelope with a megaphone, a shopping cart, a price tag, a stethoscope forming a heart, a group of people, and a product in a speech bubble"></div><figcaption><b>Icons</b><span>Eight glyphs, two greens, one weight.</span></figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div class="wrap row reveal">
+    <div class="side">
+      <div class="num">03</div>
+      <h2>Looking back</h2>
+      <div class="k">Reflection</div>
+    </div>
+    <div class="prose">
+      <p>It is a page from 2016 and it shows. Stock photography in the hero, a Google+ icon in the footer, light grey body text that would not pass today's contrast checks. What still holds up is the structure, one message per band and a clear next step at the bottom of each, and the fact that one person designed it, illustrated it and built it.</p>
+      <p>Today I would start from the copy instead of the layout, photograph the product instead of the people, and define the tokens before drawing a single page.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="next" id="booted">
+  <div class="wrap">
+    <div class="k">Next</div>
+    <h2>Animated typefaces</h2>
+    <p>Four typefaces animated character by character in After Effects, every letter driven from one controller.</p>
+    <div class="links">
+      <a href="typography-animations.html">View the project</a>
+      <a href="../index.html#work">All work</a>
+      <a href="mailto:nobitanobi920219@gmail.com">Email</a>
+    </div>
+    <div class="foot"><span>Yucong Zhou — Design · Motion · Code</span><span>Mockups as published in 2021. The live site has since been redesigned by the company.</span></div>
+  </div>
+</footer>
+
+<script>
+const h1=document.getElementById('title'),txt=h1.textContent;h1.setAttribute('aria-label',txt);
+h1.innerHTML=txt.split(' ').map(w=>`<span class="w">${[...w].map(c=>`<span class="ch rise" aria-hidden="true">${c}</span>`).join('')}</span>`).join(' ');
+document.querySelectorAll('.ch').forEach((c,i)=>c.style.animationDelay=(.12+i*.035)+'s');
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.08,rootMargin:'0px 0px -6% 0px'});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+const bar=document.getElementById('progress');
+const prog=()=>{const m=document.documentElement.scrollHeight-innerHeight;bar.style.width=(m>0?Math.min(1,scrollY/m)*100:0)+'%'};
+addEventListener('scroll',prog,{passive:true});addEventListener('resize',prog);prog();
+</script>
+</body>
+</html>

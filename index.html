@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Yucong Zhou — Portfolio (prototype v20)</title>
+<link rel="preload" as="image" href="assets/ds-01.webp"><link rel="preload" as="image" href="assets/ux-01.webp"><link rel="preload" as="image" href="assets/ux-03.webp"><!-- case-study thumbnail: must be decoded before first paint so the returning hero has something to morph into -->
+<link rel="expect" href="#booted" blocking="render"><!-- view transitions: don't snapshot the page until the script has drawn the first frame -->
 <style>
 :root{--fg:#141414;--cw:100vw;--ch:100vh}
 @supports (height:100svh){:root{--ch:100svh}} /* mobile: size the stage to the small viewport so nothing hides behind the browser toolbar */
@@ -52,6 +54,11 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
 .gal figure{margin:0 0 1.6vw}
 .gal img{width:100%;display:block;border-radius:.9vw;background:#f4efe6;transition:transform .5s cubic-bezier(.34,1.3,.64,1)}
 .gal figure:hover img{transform:scale(1.015)}
+.gal figure a{display:block;color:inherit;text-decoration:none;outline:none;border-radius:.9vw}
+.gal figure a:focus-visible img{box-shadow:0 0 0 3px #ffc93c}
+.gal .more{display:inline-block;margin-top:.55vw;font-size:.72vw;font-style:normal;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#ffc93c;transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.gal figure.has-cs:hover img{transform:scale(1.03)}
+.gal figure.has-cs:hover .more{transform:translateX(.4vw)}
 .gal figcaption{display:flex;gap:1vw;align-items:flex-start;padding:.9vw .2vw 0}
 .gal figcaption b{font-size:1.6vw;font-weight:800;letter-spacing:-.05em;line-height:1;color:#ffc93c}
 .gal figcaption strong{display:block;font-size:.95vw;font-weight:600;letter-spacing:-.01em}
@@ -92,6 +99,15 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
 .car .slide{position:relative;flex:0 0 100%;height:100%}
 .car .slide iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .car .cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1vw;cursor:pointer;transition:transform .6s cubic-bezier(.34,1.56,.64,1)}
+.car .cover .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.car .cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,20,20,.08) 0%,rgba(20,20,20,.16) 60%,rgba(20,20,20,.5) 100%);transition:background .3s}
+.car .cover:hover::after{background:linear-gradient(180deg,rgba(20,20,20,.02) 0%,rgba(20,20,20,.1) 60%,rgba(20,20,20,.45) 100%)}
+.car .cover::before{content:"";position:absolute;left:50%;top:50%;width:6.4vw;height:6.4vw;margin:-3.2vw 0 0 -3.2vw;border-radius:50%;background:rgba(20,20,20,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:1;transition:transform .5s cubic-bezier(.34,1.56,.64,1),background .3s}
+.car .cover:hover::before{transform:scale(1.12);background:rgba(20,20,20,.75)}
+.car .cover b,.car .cover i,.car .cover span{position:relative;z-index:2}
+.car .cover b{text-shadow:0 2px 24px rgba(0,0,0,.45)}
+.car .cover span{position:absolute;left:2vw;bottom:1.4vw;max-width:72%;background:rgba(20,20,20,.72);color:#f4efe6;padding:.55vw .9vw;border-radius:999px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.car .cover:focus-visible{outline:3px solid #ffc93c;outline-offset:-3px}
 .car .cover:hover{transform:scale(1.03)}
 .car .cover b{position:absolute;left:2vw;top:1.2vw;font-size:6vw;font-weight:800;letter-spacing:-.06em;line-height:1;opacity:.9}
 .car .cover i{width:0;height:0;border-left:3.2vw solid currentColor;border-top:2vw solid transparent;border-bottom:2vw solid transparent;margin-left:.6vw;transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
@@ -164,6 +180,14 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
 .toast b{color:#ffc93c;font-weight:600;margin-right:8px}
 .fx-wave{animation:fxWave .9s cubic-bezier(.34,1.56,.64,1)}
 @keyframes fxWave{0%{transform:translateY(0)}35%{transform:translateY(-28%) rotate(-6deg)}70%{transform:translateY(6%) rotate(3deg)}100%{transform:translateY(0)}}
+/* cross-document view transition back from a case study: the hero shrinks into its gallery card while the scene wipes down over the page */
+@view-transition{navigation:auto}
+::view-transition-image-pair(root){isolation:auto}
+::view-transition-old(root){animation:none;mix-blend-mode:normal}
+::view-transition-new(root){animation:vtDown .7s cubic-bezier(.22,1,.36,1) both;mix-blend-mode:normal}
+@keyframes vtDown{from{clip-path:polygon(0 0,100% 0,100% 0,0 0)}to{clip-path:polygon(0 0,100% 0,100% 130%,0 100%)}}
+::view-transition-group(bp-hero){animation-duration:.7s;animation-timing-function:cubic-bezier(.34,1.25,.64,1)}
+@media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}
 @media (max-width:720px){.brand span{display:none}}
 @media (orientation:portrait){
   body{height:550vh} /* half the scroll distance per section on phones: ~90vh per page instead of 180vh */
@@ -181,8 +205,10 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
   .counter{right:22px}
   .gal{padding:3vw;border-radius:4vw}.gal img{border-radius:2.5vw}.gal figure{margin-bottom:4vw}
   .gal figcaption{padding:2.5vw .5vw 0;gap:3vw}.gal figcaption strong{font-size:14px}.gal figcaption span{font-size:12px}.gal figcaption b{font-size:22px}
+  .gal .more{font-size:11px;margin-top:6px}
   .car{gap:3vw}.car .frame{border-radius:4vw}.car .ctl{gap:3vw}.car .ctl button{width:36px;height:36px;font-size:14px}.car .dots{gap:6px}.car .dots i{width:6px;height:6px}
   .car .cover b{font-size:14vw;left:5vw;top:3vw}.car .cover i{border-left-width:8vw;border-top-width:5vw;border-bottom-width:5vw}
+  .car .cover::before{width:16vw;height:16vw;margin:-8vw 0 0 -8vw}.car .cover span{left:4vw;bottom:3vw;max-width:80%;font-size:10px;padding:6px 10px}
   .tl{padding:4vw;border-radius:4vw}
   .xp{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto;gap:3vw 0}
   .xp .rail{display:contents}
@@ -337,15 +363,14 @@ const SCENES=[
     {t:'rect',x:47,y:30,w:'6vw',h:'12vw',c:C.coral,r:'3vw 3vw 0 0',d:.2},
     {t:'rect',x:47.5,y:66,w:'5vw',h:'5vw',c:C.blue,rot:45,d:.26},
     {t:'gallery',x:54,y:11,w:'40vw',h:'78vh',d:0,items:[
-      {src:'assets/ux-01.webp',title:'HealthWave',meta:'Practitioner e-commerce platform · Web'},
-      {src:'assets/ux-02.webp',title:'Homemade Food Marketplace',meta:'Ordering & chat flows · Mobile UI'},
-      {src:'assets/ux-03.webp',title:'BluePrint Infinite',meta:'Customer-service dashboard · Enterprise'},
-      {src:'assets/ux-04.webp',title:'Network Analytics Dashboard',meta:'Throughput & app usage monitoring · Data viz'}]},
+      {src:'assets/ds-01.webp',title:'MacroHealth Design System',meta:'A design system AI can read · Figma → code for agents · 2026',href:'work/design-system.html',vt:'ds-hero'},
+      {src:'assets/ux-03.webp',title:'BluePrint Infinite',meta:'Bell · Call-centre flow system · 2019–2021',href:'work/blueprint.html',vt:'bp-hero'},
+      {src:'assets/ux-01.webp',title:'HealthWave',meta:'Landing pages, illustration & icons · Ottawa · 2015–2016',href:'work/healthwave.html',vt:'hw-hero',cta:'View the project →'},]},
     {t:'rect',x:90,y:84,w:'8vw',h:'8vw',c:C.cream,r:'50% 0 50% 0',d:.3},
     {t:'rect',x:58,y:92,w:'12vw',h:'2.2vh',c:C.ink,r:'2vh',d:.36}]},
-  {bg:C.blue,fg:C.cream,k:'02 / Motion Design',title:['Make it','move'],p:'Micro-interactions, UI motion and motion graphics — from storyboards in After Effects to easing curves in code.',tags:['After Effects','Lottie / Rive','UI Motion'],
+  {bg:C.blue,fg:C.cream,k:'02 / Motion Design',title:['Make it','move'],p:'Micro-interactions, UI motion and motion graphics — from storyboards in After Effects to easing curves in code.',tags:['After Effects','Lottie / Rive','UI Motion'],links:['Animated typefaces case study →'],
    shapes:[
-    {t:'video',x:54,y:10,w:'40vw',h:'auto',c:C.cream,d:0,videos:[{id:'286234223',h:'f9b25af99f'},{id:'120609540',h:'7818cb482d'},{id:'121668116',h:'7551d8d867'},{id:'73495035',h:'95e8ff8ee7'}]},
+    {t:'video',x:54,y:10,w:'40vw',h:'auto',c:C.cream,d:0,videos:[{id:'286234223',h:'f9b25af99f',title:'Dancing Script animated typeface intro',dur:'0:28',poster:'assets/motion/reel-01.webp'},{id:'120609540',h:'7818cb482d',title:'Supertcp',dur:'1:08',poster:'assets/motion/reel-02.webp'},{id:'121668116',h:'7551d8d867',title:'PSI-missing PV',dur:'1:32',poster:'assets/motion/reel-03.webp'},{id:'73495035',h:'95e8ff8ee7',title:'腦漿炸裂少女 PV',dur:'1:44',poster:'assets/motion/reel-04.webp'}]},
     {t:'rect',x:54,y:62,w:'8vw',h:'8vw',c:C.cream,r:'50%',d:.1},
     {t:'rect',x:63,y:62,w:'8vw',h:'8vw',c:C.cream,r:'50% 50% 50% 0',d:.14},
     {t:'rect',x:72,y:62,w:'8vw',h:'8vw',c:C.yellow,r:'50% 50% 0 0',d:.18},
@@ -359,7 +384,7 @@ const SCENES=[
     {t:'ring',x:88,y:78,w:'7vw',h:'7vw',c:C.cream,bw:'1vw',d:.4},
     {t:'rect',x:47,y:74,w:'5vw',h:'5vw',c:C.coral,rot:30,d:.42},
     {t:'rect',x:88,y:3,w:'8vw',h:'8vw',c:C.ink,r:'60% 40% 30% 70% / 60% 30% 70% 40%',d:.44}]},
-  {bg:C.cream,fg:C.ink,k:'03 / Development & Ship',title:['Build it','and ship it'],p:'React, Next.js and TypeScript. Design tokens become components, motion specs become real interactions — then it goes live. Release, measure, iterate.',tags:['React / Next.js','TypeScript','GSAP / Framer Motion','Release & iterate'],
+  {bg:C.cream,fg:C.ink,k:'03 / Development & Ship',title:['Build it','and ship it'],p:'React, Next.js and TypeScript. Design tokens become components, motion specs become real interactions — then it goes live. Release, measure, iterate.',tags:['React / Next.js','TypeScript','GSAP / Framer Motion','Release & iterate'],links:['Design system case study →'],
    shapes:[
     {t:'rect',x:54,y:12,w:'40vw',h:'58vh',c:C.ink,r:'1.5vw',d:0},
     {t:'circle',x:55.4,y:13.6,w:'1vw',h:'1vw',c:C.coral,d:.04},
@@ -485,7 +510,7 @@ const S=SCENES.map((sc,i)=>{
     else if(s.t==='rig'){f.innerHTML=`<div class="char"><img src="${s.src}" alt="" draggable="false"><div class="face"></div><div class="bubble" aria-live="polite"></div></div>`;initRig(f.querySelector('.char'),s)}
     else if(s.t==='ring'){f.style.borderRadius='50%';f.style.border=`${U(s.bw)} solid ${s.c}`}
     else if(s.t==='gallery'){f.classList.add('gal');
-      f.innerHTML=`<div class="galhead"><span>Selected work</span><span>scroll ↓</span></div>`+s.items.map((it,i)=>`<figure><img src="${it.src}" alt="${it.title}" loading="lazy" draggable="false"><figcaption><b>0${i+1}</b><div><strong>${it.title}</strong><span>${it.meta}</span></div></figcaption></figure>`).join('');
+      f.innerHTML=`<div class="galhead"><span>Selected work</span><span>scroll ↓</span></div>`+s.items.map((it,i)=>{const inner=`<img src="${it.src}" alt="${it.title}" loading="${it.vt?'eager':'lazy'}" draggable="false"${it.vt?` data-vt="${it.vt}"`:''}><figcaption><b>0${i+1}</b><div><strong>${it.title}</strong><span>${it.meta}</span>${it.href?`<em class="more">${it.cta||'Read the case study →'}</em>`:''}</div></figcaption>`;return it.href?`<figure class="has-cs"><a href="${it.href}" aria-label="${it.title} — read the case study">${inner}</a></figure>`:`<figure>${inner}</figure>`}).join('');
       f.addEventListener('wheel',e=>{const atTop=f.scrollTop<=0&&e.deltaY<0,atEnd=f.scrollTop+f.clientHeight>=f.scrollHeight-1&&e.deltaY>0;if(!atTop&&!atEnd)e.stopPropagation()},{passive:true});}
     else if(s.t==='timeline'){f.classList.add('tl');const items=s.items;let idx=0;
       f.innerHTML=`<div class="galhead"><span>Experience</span></div><div class="xp"><div class="rail"><div class="yrs">${items.map(it=>`<button class="yr" type="button" title="${it.role}"><span class="full">${it.when}</span><span class="short">${it.when.slice(0,4)}</span><i></i></button>`).join('')}</div><div class="ctl"><button class="pv" aria-label="previous role">←</button><button class="nx" aria-label="next role">→</button><span class="cnt"></span></div></div><div class="card"><div class="body"></div></div></div>`;
@@ -498,15 +523,15 @@ const S=SCENES.map((sc,i)=>{
       f.tabIndex=0;f.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();go(idx+1)}else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();go(idx-1)}});
       body.addEventListener('wheel',e=>{const atTop=body.scrollTop<=0&&e.deltaY<0,atEnd=body.scrollTop+body.clientHeight>=body.scrollHeight-1&&e.deltaY>0;if(!atTop&&!atEnd)e.stopPropagation()},{passive:true});}
     else if(s.t==='video'){f.classList.add('car');const covers=[C.coral,C.yellow,C.cream,C.ink];
-      f.innerHTML=`<div class="frame"><div class="track">${s.videos.map((v,i)=>`<div class="slide"><div class="cover" style="background:${covers[i%4]};color:${covers[i%4]===C.ink?C.cream:C.ink}"><b>0${i+1}</b><i></i><span>Reel 0${i+1} · click to play</span></div></div>`).join('')}</div></div>
+      f.innerHTML=`<div class="frame"><div class="track">${s.videos.map((v,i)=>`<div class="slide"><div class="cover" role="button" tabindex="0" aria-label="Play ${v.title}" style="background:${covers[i%4]};color:${C.cream}"><img class="poster" src="${v.poster}" alt="" loading="lazy" draggable="false"><b>0${i+1}</b><i></i><span>${v.title} · ${v.dur}</span></div></div>`).join('')}</div></div>
         <div class="ctl"><button class="pv" aria-label="previous">←</button><span class="cnt">01 / 0${s.videos.length}</span><div class="dots">${s.videos.map((v,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div><button class="nx" aria-label="next">→</button></div>`;
       const track=f.querySelector('.track'),slides=[...f.querySelectorAll('.slide')],dots=[...f.querySelectorAll('.dots i')],cnt=f.querySelector('.cnt');let idx=0;
       const stop=()=>slides.forEach(sl=>{const fr=sl.querySelector('iframe');if(fr)fr.remove();sl.querySelector('.cover').style.display=''});
       const go=n=>{stop();idx=(n+slides.length)%slides.length;track.style.transform=`translateX(${-idx*100}%)`;dots.forEach((d,i)=>d.classList.toggle('on',i===idx));cnt.textContent=`0${idx+1} / 0${slides.length}`};
       f.querySelector('.pv').onclick=e=>{e.stopPropagation();go(idx-1)};f.querySelector('.nx').onclick=e=>{e.stopPropagation();go(idx+1)};
-      slides.forEach((sl,i)=>sl.querySelector('.cover').onclick=()=>{stop();const v=s.videos[i];const fr=document.createElement('iframe');
+      slides.forEach((sl,i)=>{const cv=sl.querySelector('.cover');cv.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();cv.click()}};cv.onclick=()=>{stop();const v=s.videos[i];const fr=document.createElement('iframe');
         fr.src=`https://player.vimeo.com/video/${v.id}?h=${v.h}&autoplay=1&title=0&byline=0&portrait=0&dnt=1`;fr.allow='autoplay; fullscreen; picture-in-picture';fr.setAttribute('allowfullscreen','');fr.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
-        sl.appendChild(fr);sl.querySelector('.cover').style.display='none'});
+        sl.appendChild(fr);sl.querySelector('.cover').style.display='none'}});
       d._stop=stop;}
     else if(s.t==='slot'){f.style.borderRadius=U(s.r||'1vw');f.style.border=`2px dashed ${s.c}`;f.style.color=s.c;f.innerHTML=`<span>${s.label}</span>`}
     else{f.style.background=s.c}
@@ -528,7 +553,7 @@ const S=SCENES.map((sc,i)=>{
   const letters=l=>l.split(' ').map(wd=>`<span class="w">${[...wd].map(ch=>`<span class="ch">${ch}</span>`).join('')}</span>`).join(' ');
   copy.innerHTML=`<div class="k">${sc.k}</div><h1>${sc.title.map(l=>`<span class="l"><span>${letters(l)}</span></span>`).join('')}</h1><p>${sc.p}</p>`+
     (sc.tags?`<div class="tags">${sc.tags.map(t=>`<span>${t}</span>`).join('')}</div>`:'')+
-    (sc.links?`<div class="links">${sc.links.map(t=>`<a href="${({Email:'mailto:nobitanobi920219@gmail.com',Dribbble:'https://dribbble.com/nobitanobi',Vimeo:'https://vimeo.com/user20148085'})[t]||'#'}" ${t==='Email'?'':'target="_blank" rel="noopener"'}>${t}</a>`).join('')}</div>`:'');
+    (sc.links?`<div class="links">${sc.links.map(t=>{const h=({Email:'mailto:nobitanobi920219@gmail.com',Dribbble:'https://dribbble.com/nobitanobi',Vimeo:'https://vimeo.com/user20148085','Design system case study →':'work/design-system.html','Animated typefaces case study →':'work/typography-animations.html'})[t]||'#';return `<a href="${h}"${h.startsWith('http')?' target="_blank" rel="noopener"':''}>${t}</a>`}).join('')}</div>`:'');
   el.appendChild(copy);
   const copyParts=[...copy.querySelectorAll('.k,h1 .l > span,p,.tags,.links')].map((e,j)=>({el:e,d:j*.06}));
   const LFX=['fx-jelly','fx-jump','fx-wobble','fx-shake','fx-squish','fx-flip'];
@@ -555,6 +580,9 @@ const progress=$('progress'),counter=$('counter'),hint=$('hint');
 let target=0,cur=0,prev=0,vel=0;
 const maxScroll=()=>document.body.scrollHeight-innerHeight;
 addEventListener('scroll',()=>{target=clamp(scrollY/maxScroll(),0,1)},{passive:true});
+/* deep links (index.html#work etc.) land on the scene directly; and whatever the start position, begin there instead of animating from page one */
+const IDS=['home','work','motion','dev','about','contact'];let lastHash=-1;
+{const gi=IDS.indexOf(location.hash.slice(1));if(gi>0)scrollTo(0,(gi/(N-1))*maxScroll());target=cur=prev=clamp(scrollY/maxScroll(),0,1)}
 /* portrait phones with little height (browser toolbar showing) get a compact layout; use the smallest height seen so the toolbar hiding on scroll doesn't flip it back */
 let minH=innerHeight,lastW=innerWidth;
 const fit=()=>{if(innerWidth!==lastW){lastW=innerWidth;minH=innerHeight}minH=Math.min(minH,innerHeight);document.documentElement.classList.toggle('short',matchMedia('(orientation: portrait)').matches&&minH<700)};
@@ -590,6 +618,7 @@ function frame(){
   const inTrans=f>T0&&f<T1;
   const type=TRANS[i];
   const base=f<T0?i:(f>=T1?i+1:i);curBase=base;
+  if(base!==lastHash){lastHash=base;try{history.replaceState(null,'',base?'#'+IDS[base]:location.pathname+location.search)}catch(e){}}
   const A=S[i],B=S[i+1];
 
   /* springs */
@@ -661,7 +690,6 @@ function frame(){
   navBtns.forEach((b,j)=>b.classList.toggle('on',j===Math.round(s)));
   requestAnimationFrame(frame);
 }
-requestAnimationFrame(frame);
 /* ---------- easter egg: poke 20 different letters ---------- */
 const egg={count:0,fired:0,need:()=>matchMedia('(pointer: coarse)').matches?8:30, /* touch screens: fewer pokes */
   poke(ch){if(ch._busy)return; /* counts each real pop, not re-entries mid-animation */
@@ -679,6 +707,16 @@ const egg={count:0,fired:0,need:()=>matchMedia('(pointer: coarse)').matches?8:30
 /* random letter pops on the current scene */
 let curBase=0;
 (function tick(){const sc=S[curBase];if(sc&&sc.el.classList.contains('on')&&sc.el._playRandomLetter)sc.el._playRandomLetter();setTimeout(tick,3200+Math.random()*1600)})();
+/* view transitions to/from the case studies: only the card involved gets a view-transition-name, and only while the transition runs.
+   A permanently named thumbnail is lifted out of the gallery's scroll clip for the whole animation, which shows as a one-second flash of cards outside the frame. */
+const cardFor=url=>{const path=(url||'').split('?')[0].split('#')[0];return [...document.querySelectorAll('.gal figure.has-cs')].find(f=>{const a=f.querySelector('a');return a&&path.endsWith(a.getAttribute('href'))})};
+const clearCardNames=()=>document.querySelectorAll('.gal img[data-vt]').forEach(i=>{i.style.viewTransitionName=''});
+addEventListener('pageswap',e=>{if(!e.viewTransition)return;clearCardNames();const to=e.activation&&e.activation.entry&&e.activation.entry.url;const fig=cardFor(to);if(fig){const img=fig.querySelector('img');img.style.viewTransitionName=img.dataset.vt}});
+addEventListener('pagereveal',e=>{clearCardNames();if(!e.viewTransition)return;const from=(window.navigation&&navigation.activation&&navigation.activation.from&&navigation.activation.from.url)||document.referrer||'';
+  const fig=cardFor(from);if(!fig)return;const g=fig.closest('.gal');if(g)g.scrollTop=Math.max(0,fig.offsetTop-(g.clientHeight-fig.offsetHeight)/2);
+  const img=fig.querySelector('img');img.style.viewTransitionName=img.dataset.vt;e.viewTransition.finished.finally(clearCardNames)});
+frame(); /* draw the first frame synchronously: no empty stage on first paint, and view transitions snapshot a real scene */
 </script>
+<div id="booted" hidden></div>
 </body>
 </html>
