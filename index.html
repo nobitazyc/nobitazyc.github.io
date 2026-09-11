@@ -11,7 +11,7 @@
 @supports (height:100svh){:root{--ch:100svh}} /* mobile: size the stage to the small viewport so nothing hides behind the browser toolbar */
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:auto}
-body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetica,-apple-system,"PingFang SC","Noto Sans SC",sans-serif;color:var(--fg);overflow-x:hidden}
+body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetica,-apple-system,"PingFang SC","Noto Sans SC",sans-serif;color:var(--fg);overflow-x:hidden}
 #stage{position:fixed;inset:0;overflow:hidden}
 #bg{position:absolute;inset:0}
 #wipe{position:absolute;inset:0;width:100%;height:100%;display:block}
@@ -51,6 +51,7 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
 .gal{height:100%;overflow-y:auto;overscroll-behavior:contain;border-radius:1.5vw;background:#141414;color:#f4efe6;padding:1.4vw;scrollbar-width:thin;scrollbar-color:#f4efe6 transparent}
 .gal::-webkit-scrollbar{width:6px}.gal::-webkit-scrollbar-thumb{background:#f4efe6;border-radius:3px}.gal::-webkit-scrollbar-track{background:transparent}
 .galhead{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6;padding:.2vw .2vw 1.2vw}
+.galhead em{font-style:normal}
 .gal figure{margin:0 0 1.6vw}
 .gal img{width:100%;display:block;border-radius:.9vw;background:#f4efe6;transition:transform .5s cubic-bezier(.34,1.3,.64,1)}
 .gal figure:hover img{transform:scale(1.015)}
@@ -63,8 +64,13 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
 .gal figcaption b{font-size:1.6vw;font-weight:800;letter-spacing:-.05em;line-height:1;color:#ffc93c}
 .gal figcaption strong{display:block;font-size:.95vw;font-weight:600;letter-spacing:-.01em}
 .gal figcaption span{display:block;font-size:.75vw;opacity:.6;margin-top:.25vw;letter-spacing:.02em}
+/* experience (scene 5): the dark card is the frame, the controls sit under it like the reels; ink controls so they read on lilac and over the cream shape */
+.car.tcar .ctl{color:#141414}
+.car.tcar .ctl button{background:#141414;color:#f4efe6}.car.tcar .ctl button:hover{background:#ffc93c;color:#141414}
+.fx.tcar{display:flex;flex-direction:column;gap:1.2vw}
+.tcar .frame.tl{aspect-ratio:auto;flex:1;min-height:0;height:auto}
 .shape .tl{height:100%;border-radius:1.5vw;background:#141414;color:#f4efe6;padding:1.4vw 1.6vw;display:flex;flex-direction:column;overflow:hidden;outline:none}
-.tl:focus-visible{box-shadow:0 0 0 2px #ffc93c inset}
+.tcar:focus-visible .frame{box-shadow:0 0 0 2px #ffc93c inset}
 .xp{flex:1;min-height:0;display:grid;grid-template-columns:8.5vw 1fr;grid-template-rows:minmax(0,1fr);gap:0 1.8vw}
 .xp .rail{display:flex;flex-direction:column;align-self:start}
 .xp .yrs{position:relative;display:flex;flex-direction:column}
@@ -93,7 +99,7 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
 .xp .cnt{font-size:12px;letter-spacing:.2em;font-variant-numeric:tabular-nums;flex-basis:100%;margin-top:.5vw;opacity:.7}
 .xp .card.swap .body{animation:xpIn .55s cubic-bezier(.34,1.3,.64,1)}
 @keyframes xpIn{0%{opacity:0;transform:translateY(16px)}100%{opacity:1;transform:none}}
-.car{display:flex;flex-direction:column;gap:1.2vw}
+.car,.fx.car{display:flex;flex-direction:column;gap:1.2vw}
 .car .frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:1.5vw;overflow:hidden;background:#141414}
 .car .track{display:flex;height:100%;transition:transform .75s cubic-bezier(.34,1.25,.64,1)}
 .car .slide{position:relative;flex:0 0 100%;height:100%}
@@ -113,13 +119,13 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
 .car .cover i{width:0;height:0;border-left:3.2vw solid currentColor;border-top:2vw solid transparent;border-bottom:2vw solid transparent;margin-left:.6vw;transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
 .car .cover:hover i{transform:scale(1.2)}
 .car .cover span{font-size:12px;letter-spacing:.16em;text-transform:uppercase;opacity:.7}
-.car .ctl{display:flex;align-items:center;gap:1.2vw;color:#f4efe6}
-.car .ctl button{width:3vw;height:3vw;border-radius:50%;border:0;background:#f4efe6;color:#141414;font:700 1.2vw/1 Inter,sans-serif;cursor:pointer;transition:transform .4s cubic-bezier(.34,1.56,.64,1),background .3s}
-.car .ctl button:hover{transform:scale(1.15) rotate(-8deg);background:#ffc93c}
-.car .cnt{font-size:12px;letter-spacing:.2em;font-variant-numeric:tabular-nums}
-.car .dots{display:flex;gap:.6vw;margin-left:auto}
-.car .dots i{width:.7vw;height:.7vw;border-radius:50%;background:#f4efe6;opacity:.35;transition:all .3s}
-.car .dots i.on{opacity:1;transform:scale(1.4);background:#ffc93c}
+.car .ctl,.gal .ctl{display:flex;align-items:center;gap:1.2vw;color:#f4efe6}
+.car .ctl button,.gal .ctl button{width:3vw;height:3vw;border-radius:50%;border:0;background:#f4efe6;color:#141414;font:700 1.2vw/1 Inter,sans-serif;cursor:pointer;transition:transform .4s cubic-bezier(.34,1.56,.64,1),background .3s}
+.car .ctl button:hover,.gal .ctl button:hover{transform:scale(1.15) rotate(-8deg);background:#ffc93c}
+.car .cnt,.gal .cnt{font-size:12px;letter-spacing:.2em;font-variant-numeric:tabular-nums}
+.car .dots,.gal .dots{display:flex;gap:.6vw;margin-left:auto}
+.car .dots i,.gal .dots i{width:.7vw;height:.7vw;border-radius:50%;background:#f4efe6;opacity:.35;transition:all .3s}
+.car .dots i.on,.gal .dots i.on{opacity:1;transform:scale(1.4);background:#ffc93c}
 .fx-jelly{animation:fxJelly .7s cubic-bezier(.34,1.56,.64,1)}
 .fx-spin{animation:fxSpin .8s cubic-bezier(.34,1.4,.64,1)}
 .fx-wobble{animation:fxWobble .8s ease-out}
@@ -190,7 +196,7 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
 @media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}
 @media (max-width:720px){.brand span{display:none}}
 @media (orientation:portrait){
-  body{height:550vh} /* half the scroll distance per section on phones: ~90vh per page instead of 180vh */
+  body{height:530vh} /* shorter on phones: ~86vh of scrolling per page */
   .shape{left:var(--ml,var(--dl));top:var(--mt,var(--dt));bottom:var(--mb,var(--db));width:var(--mw,var(--dw));height:var(--mh,var(--dh))}
   .shape.txt .fx{font-size:var(--mfs,var(--dfs))}
   .shape.geo .fx{border-radius:var(--mr,var(--dr))}
@@ -203,17 +209,20 @@ body{height:1000vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helveti
   .copy .links{margin-top:20px;gap:18px;font-size:13px;flex-wrap:wrap}
   .nav{right:10px;gap:10px}
   .counter{right:22px}
-  .gal{padding:3vw;border-radius:4vw}.gal img{border-radius:2.5vw}.gal figure{margin-bottom:4vw}
+  .gal{padding:3vw;border-radius:4vw}.gal img{border-radius:2.5vw}.gal figure{margin-bottom:4vw}.galhead .gcount{display:none}
+  .short .shape.gallery{--mt:calc(var(--ch)*.5)!important;--mh:calc(var(--ch)*.46)!important}
   .gal figcaption{padding:2.5vw .5vw 0;gap:3vw}.gal figcaption strong{font-size:14px}.gal figcaption span{font-size:12px}.gal figcaption b{font-size:22px}
   .gal .more{font-size:11px;margin-top:6px}
+  .tcar .ctl{gap:3vw}.tcar .ctl button{width:36px;height:36px;font-size:14px}
   .car{gap:3vw}.car .frame{border-radius:4vw}.car .ctl{gap:3vw}.car .ctl button{width:36px;height:36px;font-size:14px}.car .dots{gap:6px}.car .dots i{width:6px;height:6px}
   .car .cover b{font-size:14vw;left:5vw;top:3vw}.car .cover i{border-left-width:8vw;border-top-width:5vw;border-bottom-width:5vw}
   .car .cover::before{width:16vw;height:16vw;margin:-8vw 0 0 -8vw}.car .cover span{left:4vw;bottom:3vw;max-width:80%;font-size:10px;padding:6px 10px}
-  .tl{padding:4vw;border-radius:4vw}
-  .xp{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto;gap:3vw 0}
+  .shape .tl{padding:6.5vw 6vw 5.5vw;border-radius:4vw} /* .shape .tl so it beats the desktop rule of the same name */
+  .xp{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto;gap:5vw 0}
+  .xp .body{padding-right:3vw}
   .xp .rail{display:contents}
   .xp .yrs{order:0}.xp .card{order:1}.xp .ctl{order:2}
-  .xp .yrs{flex-direction:row;justify-content:space-between;align-items:flex-end;padding:0 1vw}
+  .xp .yrs{flex-direction:row;justify-content:space-between;align-items:flex-end;padding:0 1.5vw}
   .xp .yrs::before{left:4vw;right:4vw;top:auto;bottom:calc(1.5vw - 1px);width:auto;height:2px}
   .xp .yr{flex-direction:column;gap:6px;padding:0}
   .xp .yr .full{display:none}.xp .yr .short{display:block;font-size:10px}
@@ -363,14 +372,14 @@ const SCENES=[
     {t:'rect',x:47,y:30,w:'6vw',h:'12vw',c:C.coral,r:'3vw 3vw 0 0',d:.2},
     {t:'rect',x:47.5,y:66,w:'5vw',h:'5vw',c:C.blue,rot:45,d:.26},
     {t:'gallery',x:54,y:11,w:'40vw',h:'78vh',d:0,items:[
-      {src:'assets/ds-01.webp',title:'MacroHealth Design System',meta:'A design system AI can read · Figma → code for agents · 2026',href:'work/design-system.html',vt:'ds-hero'},
+      {src:'assets/ds-01.webp',title:'MacroHealth Design System',meta:'A design system AI can read · Figma → code for agents · 2026',href:'work/design-system.html',vt:'ds-hero',pos:'center'},
       {src:'assets/ux-03.webp',title:'BluePrint Infinite',meta:'Bell · Call-centre flow system · 2019–2021',href:'work/blueprint.html',vt:'bp-hero'},
       {src:'assets/ux-01.webp',title:'HealthWave',meta:'Landing pages, illustration & icons · Ottawa · 2015–2016',href:'work/healthwave.html',vt:'hw-hero',cta:'View the project →'},]},
     {t:'rect',x:90,y:84,w:'8vw',h:'8vw',c:C.cream,r:'50% 0 50% 0',d:.3},
     {t:'rect',x:58,y:92,w:'12vw',h:'2.2vh',c:C.ink,r:'2vh',d:.36}]},
-  {bg:C.blue,fg:C.cream,k:'02 / Motion Design',title:['Make it','move'],p:'Micro-interactions, UI motion and motion graphics — from storyboards in After Effects to easing curves in code.',tags:['After Effects','Lottie / Rive','UI Motion'],links:['Animated typefaces case study →'],
+  {bg:C.blue,fg:C.cream,k:'02 / Motion Design',title:['Make it','move'],p:'Micro-interactions, UI motion and motion graphics — from storyboards in After Effects to easing curves in code.',tags:['After Effects','Cinema 4D / Blender','UI Motion'],links:['Animated typefaces case study →'],
    shapes:[
-    {t:'video',x:54,y:10,w:'40vw',h:'auto',c:C.cream,d:0,videos:[{id:'286234223',h:'f9b25af99f',title:'Dancing Script animated typeface intro',dur:'0:28',poster:'assets/motion/reel-01.webp'},{id:'120609540',h:'7818cb482d',title:'Supertcp',dur:'1:08',poster:'assets/motion/reel-02.webp'},{id:'121668116',h:'7551d8d867',title:'PSI-missing PV',dur:'1:32',poster:'assets/motion/reel-03.webp'},{id:'73495035',h:'95e8ff8ee7',title:'腦漿炸裂少女 PV',dur:'1:44',poster:'assets/motion/reel-04.webp'}]},
+    {t:'video',x:54,y:10,w:'40vw',h:'auto',c:C.cream,d:0,videos:[{id:'286234223',h:'f9b25af99f',title:'Dancing Script animated typeface intro',dur:'0:28',poster:'assets/motion/reel-01.webp'},{id:'1225807597',title:'Chaos Order',dur:'4:36',poster:'assets/motion/reel-chaos.webp'},{id:'120609540',h:'7818cb482d',title:'Supertcp',dur:'1:08',poster:'assets/motion/reel-02.webp'},{id:'121668116',h:'7551d8d867',title:'PSI-missing PV',dur:'1:32',poster:'assets/motion/reel-03.webp'},{id:'73495035',h:'95e8ff8ee7',title:'腦漿炸裂少女 PV',dur:'1:44',poster:'assets/motion/reel-04.webp'}]},
     {t:'rect',x:54,y:62,w:'8vw',h:'8vw',c:C.cream,r:'50%',d:.1},
     {t:'rect',x:63,y:62,w:'8vw',h:'8vw',c:C.cream,r:'50% 50% 50% 0',d:.14},
     {t:'rect',x:72,y:62,w:'8vw',h:'8vw',c:C.yellow,r:'50% 50% 0 0',d:.18},
@@ -384,7 +393,7 @@ const SCENES=[
     {t:'ring',x:88,y:78,w:'7vw',h:'7vw',c:C.cream,bw:'1vw',d:.4},
     {t:'rect',x:47,y:74,w:'5vw',h:'5vw',c:C.coral,rot:30,d:.42},
     {t:'rect',x:88,y:3,w:'8vw',h:'8vw',c:C.ink,r:'60% 40% 30% 70% / 60% 30% 70% 40%',d:.44}]},
-  {bg:C.cream,fg:C.ink,k:'03 / Development & Ship',title:['Build it','and ship it'],p:'React, Next.js and TypeScript. Design tokens become components, motion specs become real interactions — then it goes live. Release, measure, iterate.',tags:['React / Next.js','TypeScript','GSAP / Framer Motion','Release & iterate'],links:['Design system case study →'],
+  {bg:C.cream,fg:C.ink,k:'03 / Development & Ship',title:['Build it','and ship it'],p:'React, Next.js and TypeScript. Design tokens become components, motion specs become real interactions — then it goes live. Release, measure, iterate.',tags:['React / Next.js','TypeScript','Release & iterate'],links:['Design system case study →'],
    shapes:[
     {t:'rect',x:54,y:12,w:'40vw',h:'58vh',c:C.ink,r:'1.5vw',d:0},
     {t:'circle',x:55.4,y:13.6,w:'1vw',h:'1vw',c:C.coral,d:.04},
@@ -403,11 +412,11 @@ const SCENES=[
   {bg:C.lilac,fg:C.ink,k:'About',title:['Bit more','about me'],p:'I started out as an engineer and picked up UX and motion design along the way — so I can design what I build, and build what I design. Today I\'m a Senior Frontend Engineer at MacroHealth (Vancouver), working remotely from Ottawa.',
    shapes:[
     {t:'timeline',x:54,y:10,w:'40vw',h:'78vh',d:0,items:[
-      {when:'2021 — Now',role:'Senior Frontend Engineer',org:'MacroHealth · Vancouver (remote from Ottawa)',desc:'Front-end across MacroHealth\'s healthcare data products — from the shared component library to the customer portal.',bullets:['Led the migration of the customer Portal off Liferay onto a standalone React / Vite app with a Node BFF','Built and maintain the company-wide React component library (common-ui) used across all products','Created the design system package: Figma Code Connect mappings, token pipeline, Storybook and an MCP server for design-to-code','Shipped the Network Optimization Analytics UI — rule builder, regional maps, solution comparison, PDF export','Rebuilt Tableau dashboards as native React reporting widgets with drill-downs and streamed exports'],stack:['React','TypeScript','Vite','Tailwind','Storybook','GraphQL','Node.js','Figma Code Connect']},
-      {when:'2016 — 2021',role:'UX Developer',org:'Bell · Ottawa',desc:'Blueprint Infinite — Bell\'s large-scale agent web app.',bullets:['Led the end-to-end redesign: research, wireframes, UI mockups and prototypes','Designed and built the design system with Sketch, Angular and Storybook','Implemented core UI functionality in an Agile team with code reviews','Created new app branding and promotional videos'],stack:['Angular','Storybook','Sketch','After Effects']},
-      {when:'2015 — 2016',role:'Designer & Front-end Developer',org:'Fullscript · Ottawa',desc:'HealthWave — practitioner e-commerce platform.',bullets:['Designed the UI for the HealthWave iPad app','Created and implemented the UI kit for the web app','Built the public catalog and category pages','Designed and developed the marketing landing page'],stack:['UI Kit','HTML / CSS','JavaScript']},
-      {when:'2014 — 2015',role:'Designer & Front-end Developer',org:'LiveQoS · Ottawa',desc:'LiveInsight network analytics dashboard and SuperTCP.',bullets:['Built the LiveInsight dashboard with Angular.js and D3.js on Rails / PostgreSQL','UI/UX and mobile-first design for SuperTCP (Bootstrap, Less, CoffeeScript)','Produced promo videos with Cinema 4D, After Effects, Illustrator and Photoshop'],stack:['Angular.js','D3.js','Cinema 4D','After Effects']},
-      {when:'2013 — 2014',role:'Web Application Developer',org:'inVUze · Kitchener',desc:'Web apps, games and presentation tools.',bullets:['WebSocket presentation app: control slides from a phone while the audience comments live','"Dye Dash" — a four-player online game using phones as controllers','Designed and developed the company website'],stack:['ASP.NET','SQL Server','jQuery','HTML5']},
+      {when:'2021 — Now',role:'Senior Frontend Engineer',org:'MacroHealth · Vancouver (remote from Ottawa)',desc:'I own the front end across MacroHealth\'s healthcare data products, from the shared UI library to the customer portal.',bullets:['Led the design and build of the new customer portal, replacing a legacy CMS-based portal with a standalone React app','Led the design and implementation of the company-wide UI component library, now used by every product team','Made the design system machine-readable so designers and coding agents build from one source of truth','Led front-end delivery of the analytics product from first mockups to shipped features','Replaced embedded BI dashboards with native, interactive reporting inside the product'],stack:['React','TypeScript','Storybook','GraphQL','Node.js','Figma','MCP']},
+      {when:'2016 — 2021',role:'UX Developer',org:'Bell · Ottawa',desc:'BluePrint Infinite, the agent web app used across Bell\'s call centres.',bullets:['Led the end-to-end redesign that merged two legacy tools into one and cut average handling time per call','Designed and built the product\'s design system and component library, then implemented core features with the team','Created the product\'s identity and its promotional videos'],stack:['Angular','Storybook','Sketch','After Effects']},
+      {when:'2015 — 2016',role:'Designer & Front-end Developer',org:'Fullscript · Ottawa',desc:'HealthWave, a practitioner e-commerce platform.',bullets:['Designed the iPad app UI and built the UI kit for the web app','Designed and built the public marketing site, including its illustration and icon sets','Built the public catalogue and category pages'],stack:['UI Kit','HTML / CSS','JavaScript']},
+      {when:'2014 — 2015',role:'Designer & Front-end Developer',org:'LiveQoS · Ottawa',desc:'LiveInsight network analytics and the SuperTCP product.',bullets:['Built the LiveInsight analytics dashboard from the ground up, front end and data visualisation','Led UI/UX and mobile-first design for SuperTCP','Produced the products\' promotional videos'],stack:['Angular.js','D3.js','Cinema 4D','After Effects']},
+      {when:'2013 — 2014',role:'Web Application Developer',org:'inVUze · Kitchener',desc:'Web apps, games and presentation tools.',bullets:['Built a live presentation app: slides controlled from a phone while the audience comments in real time','Built a four-player online game that uses phones as controllers','Designed and developed the company website'],stack:['ASP.NET','SQL Server','jQuery','HTML5']},
       {when:'2011 — 2014',role:'Diploma, Computer Software Technology',org:'Conestoga College',desc:'',bullets:[],stack:[]}]},
     {t:'ring',x:46,y:12,w:'6vw',h:'6vw',c:C.ink,bw:'1.1vw',d:.14},
     {t:'rect',x:47,y:30,w:'6vw',h:'12vw',c:C.yellow,r:'3vw 3vw 0 0',d:.2},
@@ -427,8 +436,8 @@ const SCENES=[
 const bars=(i)=>({x:9+[0,6,6,12,12,6,0,0,6,12,6,0][i]*1.1,y:53.5+i*2.35,w:([10,20,10,16,8,22,6,14,18,12,9,5][i]*2.4)+'vw',h:'1.3vh'});
 const M=[
   [{x:14,y:36,w:'72vw',h:'72vw'},{x:-10,bottom:0,w:'36vw',h:'18vw'},{x:84,y:38,w:'7vw',h:'7vw'},{x:6,y:42,w:'5vw',h:'5vw'},null,{x:10,bottom:0,w:'80vw',h:'56vh'}],
-  [{x:82,y:44,w:'6vw',h:'6vw'},null,{x:5,y:45,w:'4vw',h:'4vw'},{x:6,y:52,w:'88vw',h:'43vh'},null,null],
-  [{x:6,y:46,w:'88vw',h:'auto'},{x:6,y:82,w:'14vw',h:'14vw'},{x:24,y:82,w:'14vw',h:'14vw'},{x:42,y:82,w:'14vw',h:'14vw'},{x:60,y:82,w:'14vw',h:'14vw'},{x:78,y:82,w:'7vw',h:'14vw'},null,null,null,null,null,{x:88,y:82,w:'6vw',h:'6vw'},null,{x:84,y:40,w:'9vw',h:'9vw'}],
+  [{x:82,y:44,w:'6vw',h:'6vw'},null,{x:5,y:45,w:'4vw',h:'4vw'},{x:6,y:45,w:'88vw',h:'50vh'},null,null],
+  [{x:6,y:53,w:'88vw',h:'auto'},null,null,null,null,null,null,null,null,null,null,null,null,{x:84,y:40,w:'9vw',h:'9vw'}], /* phones: only the carousel and the blob; the shape row underneath is hidden */
   [{x:6,y:48,w:'88vw',h:'36vh'},{x:8.5,y:49.6,w:'2.2vw',h:'2.2vw'},{x:11.8,y:49.6,w:'2.2vw',h:'2.2vw'},{x:15.1,y:49.6,w:'2.2vw',h:'2.2vw'},{x:22,y:49.4,w:'22vw',h:'1.2vh'},
    ...Array.from({length:12},(_,i)=>bars(i)),{x:22,y:82.5,w:'3vw',h:'1.6vh'},{x:66,y:76,fs:'22vw'},{x:80,y:90,w:'14vw',h:'14vw'},null,{x:84,y:40,w:'5vw',h:'5vw'},{x:6,y:91,w:'40vw',h:'1.6vh'},{x:48,y:91,w:'12vw',h:'1.6vh'},{x:64,y:90.2,fs:'3.8vw'}],
   [{x:6,y:50,w:'88vw',h:'46vh'},null,null,null,null,null],
@@ -509,11 +518,11 @@ const S=SCENES.map((sc,i)=>{
     else if(s.t==='img'){f.innerHTML=`<img src="${s.src}" alt="" draggable="false">`}
     else if(s.t==='rig'){f.innerHTML=`<div class="char"><img src="${s.src}" alt="" draggable="false"><div class="face"></div><div class="bubble" aria-live="polite"></div></div>`;initRig(f.querySelector('.char'),s)}
     else if(s.t==='ring'){f.style.borderRadius='50%';f.style.border=`${U(s.bw)} solid ${s.c}`}
-    else if(s.t==='gallery'){f.classList.add('gal');
-      f.innerHTML=`<div class="galhead"><span>Selected work</span><span>scroll ↓</span></div>`+s.items.map((it,i)=>{const inner=`<img src="${it.src}" alt="${it.title}" loading="${it.vt?'eager':'lazy'}" draggable="false"${it.vt?` data-vt="${it.vt}"`:''}><figcaption><b>0${i+1}</b><div><strong>${it.title}</strong><span>${it.meta}</span>${it.href?`<em class="more">${it.cta||'Read the case study →'}</em>`:''}</div></figcaption>`;return it.href?`<figure class="has-cs"><a href="${it.href}" aria-label="${it.title} — read the case study">${inner}</a></figure>`:`<figure>${inner}</figure>`}).join('');
+    else if(s.t==='gallery'){f.classList.add('gal');const n=s.items.length;
+      f.innerHTML=`<div class="galhead"><span>Selected work</span><span><em class="gcount">${n} case studies · </em>scroll ↓</span></div>`+s.items.map((it,i)=>{const inner=`<img src="${it.src}" alt="${it.title}" loading="${it.vt?'eager':'lazy'}" draggable="false"${it.vt?` data-vt="${it.vt}"`:''}><figcaption><b>0${i+1}</b><div><strong>${it.title}</strong><span>${it.meta}</span>${it.href?`<em class="more">${it.cta||'Read the case study →'}</em>`:''}</div></figcaption>`;return it.href?`<figure class="has-cs"><a href="${it.href}" aria-label="${it.title} — ${(it.cta||'Read the case study').replace(' →','').toLowerCase()}">${inner}</a></figure>`:`<figure>${inner}</figure>`}).join('');
       f.addEventListener('wheel',e=>{const atTop=f.scrollTop<=0&&e.deltaY<0,atEnd=f.scrollTop+f.clientHeight>=f.scrollHeight-1&&e.deltaY>0;if(!atTop&&!atEnd)e.stopPropagation()},{passive:true});}
-    else if(s.t==='timeline'){f.classList.add('tl');const items=s.items;let idx=0;
-      f.innerHTML=`<div class="galhead"><span>Experience</span></div><div class="xp"><div class="rail"><div class="yrs">${items.map(it=>`<button class="yr" type="button" title="${it.role}"><span class="full">${it.when}</span><span class="short">${it.when.slice(0,4)}</span><i></i></button>`).join('')}</div><div class="ctl"><button class="pv" aria-label="previous role">←</button><button class="nx" aria-label="next role">→</button><span class="cnt"></span></div></div><div class="card"><div class="body"></div></div></div>`;
+    else if(s.t==='timeline'){f.classList.add('car','tcar');const items=s.items;let idx=0;
+      f.innerHTML=`<div class="frame tl"><div class="galhead"><span>Experience</span></div><div class="xp"><div class="rail"><div class="yrs">${items.map(it=>`<button class="yr" type="button" title="${it.role}"><span class="full">${it.when}</span><span class="short">${it.when.slice(0,4)}</span><i></i></button>`).join('')}</div></div><div class="card"><div class="body"></div></div></div></div><div class="ctl"><button class="pv" aria-label="previous role">←</button><span class="cnt"></span><button class="nx" aria-label="next role" style="margin-left:auto">→</button></div>`;
       const body=f.querySelector('.body'),card=f.querySelector('.card'),cnt=f.querySelector('.cnt'),yrs=[...f.querySelectorAll('.yr')];
       const render=it=>`<div class="when">${it.when}</div><div class="role">${it.role}</div><div class="org">${it.org}</div>${it.desc?`<p>${it.desc}</p>`:''}${it.bullets&&it.bullets.length?`<ul>${it.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>`:''}${it.stack&&it.stack.length?`<div class="stack">${it.stack.map(t=>`<em>${t}</em>`).join('')}</div>`:''}`;
       const go=n=>{idx=(n+items.length)%items.length;body.innerHTML=render(items[idx]);body.scrollTop=0;cnt.textContent=`0${idx+1} / 0${items.length}`;yrs.forEach((y,i)=>y.classList.toggle('on',i===idx));card.classList.remove('swap');void card.offsetWidth;card.classList.add('swap')};
@@ -530,7 +539,7 @@ const S=SCENES.map((sc,i)=>{
       const go=n=>{stop();idx=(n+slides.length)%slides.length;track.style.transform=`translateX(${-idx*100}%)`;dots.forEach((d,i)=>d.classList.toggle('on',i===idx));cnt.textContent=`0${idx+1} / 0${slides.length}`};
       f.querySelector('.pv').onclick=e=>{e.stopPropagation();go(idx-1)};f.querySelector('.nx').onclick=e=>{e.stopPropagation();go(idx+1)};
       slides.forEach((sl,i)=>{const cv=sl.querySelector('.cover');cv.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();cv.click()}};cv.onclick=()=>{stop();const v=s.videos[i];const fr=document.createElement('iframe');
-        fr.src=`https://player.vimeo.com/video/${v.id}?h=${v.h}&autoplay=1&title=0&byline=0&portrait=0&dnt=1`;fr.allow='autoplay; fullscreen; picture-in-picture';fr.setAttribute('allowfullscreen','');fr.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
+        fr.src=`https://player.vimeo.com/video/${v.id}?${v.h?`h=${v.h}&`:''}autoplay=1&title=0&byline=0&portrait=0&dnt=1`;fr.allow='autoplay; fullscreen; picture-in-picture';fr.setAttribute('allowfullscreen','');fr.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
         sl.appendChild(fr);sl.querySelector('.cover').style.display='none'}});
       d._stop=stop;}
     else if(s.t==='slot'){f.style.borderRadius=U(s.r||'1vw');f.style.border=`2px dashed ${s.c}`;f.style.color=s.c;f.innerHTML=`<span>${s.label}</span>`}
@@ -583,6 +592,18 @@ addEventListener('scroll',()=>{target=clamp(scrollY/maxScroll(),0,1)},{passive:t
 /* deep links (index.html#work etc.) land on the scene directly; and whatever the start position, begin there instead of animating from page one */
 const IDS=['home','work','motion','dev','about','contact'];let lastHash=-1;
 {const gi=IDS.indexOf(location.hash.slice(1));if(gi>0)scrollTo(0,(gi/(N-1))*maxScroll());target=cur=prev=clamp(scrollY/maxScroll(),0,1)}
+/* snap: when scrolling stops between two scenes, finish the move. Past SNAP_AT of a segment in the direction of travel it completes to the next scene, otherwise it settles back. A new wheel/touch input cancels the animation. */
+const SNAP_AT=.22,SNAP_MS=650;let snapTimer=0,snapAnim=0,lastY=scrollY,dir=1;
+const segPx=()=>maxScroll()/(N-1);
+const cancelSnap=()=>{if(snapAnim){cancelAnimationFrame(snapAnim);snapAnim=0}};
+const animateTo=y=>{cancelSnap();const y0=scrollY,d=y-y0;if(Math.abs(d)<1)return;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){scrollTo(0,y);return}
+  const t0=performance.now();const step=now=>{const k=Math.min(1,(now-t0)/SNAP_MS),e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;scrollTo(0,y0+d*e);snapAnim=k<1?requestAnimationFrame(step):0};
+  snapAnim=requestAnimationFrame(step)};
+const snap=()=>{const sp=segPx();if(!sp)return;const s=scrollY/sp,i=Math.floor(s),f=s-i;if(f<.01||f>.99)return;
+  const to=dir>0?(f>SNAP_AT?i+1:i):(f<1-SNAP_AT?i:i+1);animateTo(clamp(to,0,N-1)*sp)};
+addEventListener('scroll',()=>{const y=scrollY;if(y!==lastY)dir=y>lastY?1:-1;lastY=y;if(snapAnim)return;clearTimeout(snapTimer);snapTimer=setTimeout(snap,180)},{passive:true});
+addEventListener('wheel',cancelSnap,{passive:true});addEventListener('touchstart',cancelSnap,{passive:true});addEventListener('keydown',cancelSnap);
 /* portrait phones with little height (browser toolbar showing) get a compact layout; use the smallest height seen so the toolbar hiding on scroll doesn't flip it back */
 let minH=innerHeight,lastW=innerWidth;
 const fit=()=>{if(innerWidth!==lastW){lastW=innerWidth;minH=innerHeight}minH=Math.min(minH,innerHeight);document.documentElement.classList.toggle('short',matchMedia('(orientation: portrait)').matches&&minH<700)};
@@ -595,7 +616,7 @@ let bulge=0,bulgeV=0;
 let sq=0,sqV=0;
 
 /* transition window inside each segment */
-const T0=.5,T1=.86;
+const T0=.35,T1=.95; /* transition occupies 60% of each segment, so it has room to ease in and out */
 
 function wipeD(type,p,b,W,H,cx,cy,sqz){
   switch(type){
@@ -608,13 +629,23 @@ function wipeD(type,p,b,W,H,cx,cy,sqz){
   }
 }
 
-function frame(){
-  cur+=(target-cur)*.085;const r=cur;
+/* how the stage follows the scroll: a critically damped spring (accelerates in, settles out, never overshoots) with a speed cap.
+   MAX_SCENES_PER_S is the cap for a one-scene move; longer jumps (nav dots, hard flicks) may go proportionally faster so they don't crawl,
+   but always slow to the base cap for the final scene. Scroll input itself is never intercepted. */
+const MAX_SCENES_PER_S=.9,SPRING_W=5;let vcur=0,lastFrame=0;
+function frame(now){
+  const dt=lastFrame?Math.min(.05,(now-lastFrame)/1000):1/60;lastFrame=now||performance.now();
+  const d=target-cur,remaining=Math.abs(d)*(N-1);
+  const vmax=MAX_SCENES_PER_S*Math.max(1,remaining/1.2)/(N-1);
+  vcur+=(d*SPRING_W*SPRING_W-2*SPRING_W*vcur)*dt;vcur=clamp(vcur,-vmax,vmax);
+  cur+=vcur*dt;if(Math.abs(target-cur)<1e-5){cur=target;vcur=0}
+  const r=cur;
   const dv=(r-prev)*(N-1);prev=r;vel=lerp(vel,dv,.2);            // scenes per frame
   mouse.x=lerp(mouse.x,mouse.tx,.06);mouse.y=lerp(mouse.y,mouse.ty,.06);
   const W=innerWidth,H=innerHeight;
   const s=r*(N-1),i=Math.min(Math.floor(s),N-2),f=s-i;
   const tt=clamp((f-T0)/(T1-T0),0,1);          // 0..1 transition progress
+  const te=tt*tt*(3-2*tt);                      // eased progress for the wipe and the incoming scene: gentle start, gentle landing
   const inTrans=f>T0&&f<T1;
   const type=TRANS[i];
   const base=f<T0?i:(f>=T1?i+1:i);curBase=base;
@@ -637,7 +668,7 @@ function frame(){
       pth.setAttribute('d',wipeD(rt,REST[rt],restBulge(rt,k,W,H,performance.now()),W,H,cx,cy,.06*Math.sin(performance.now()/2200+k)));pth.setAttribute('fill',SCENES[k+1].bg);pth.style.display='block'}
     else pth.style.display='none'});
   if(inTrans){
-    const p=(type==='snap'?easeOutBounce(tt):type==='blob'?easeOutExpo(tt):easeOutBack(tt,1.2))*REST[type];
+    const p=(type==='snap'?easeOutBounce(te):type==='blob'?easeOutExpo(te):easeOutBack(te,1.2))*REST[type];
     let cx=W*.5,cy=H*.5;if(type==='blob'){[cx,cy]=blobCenter(A)}
     /* blend the live bulge/squash into the resting wave near the end so the hand-off to the settled layer is seamless */
     const wEnd=smooth(.78,1,tt),now=performance.now();
@@ -668,7 +699,7 @@ function frame(){
   /* incoming scene B */
   if(f>T0){
     st(B.el,'transform',`scaleY(${1+sq}) `);st(B.el,'transformOrigin','50% 100%');st(B.el,'opacity',1);
-    const pi=f>=T1?1:tt;
+    const pi=f>=T1?1:te;
     B.shapes.forEach(sh=>{const q=clamp((pi*1.5-sh.d)/(1),0,1);let tr='';
       switch(type){
         case 'up':tr=`translateY(${(1-easeOutBack(q,1.6))*H*.45}px)`;break;
@@ -715,7 +746,7 @@ addEventListener('pageswap',e=>{if(!e.viewTransition)return;clearCardNames();con
 addEventListener('pagereveal',e=>{clearCardNames();if(!e.viewTransition)return;const from=(window.navigation&&navigation.activation&&navigation.activation.from&&navigation.activation.from.url)||document.referrer||'';
   const fig=cardFor(from);if(!fig)return;const g=fig.closest('.gal');if(g)g.scrollTop=Math.max(0,fig.offsetTop-(g.clientHeight-fig.offsetHeight)/2);
   const img=fig.querySelector('img');img.style.viewTransitionName=img.dataset.vt;e.viewTransition.finished.finally(clearCardNames)});
-frame(); /* draw the first frame synchronously: no empty stage on first paint, and view transitions snapshot a real scene */
+frame(performance.now()); /* draw the first frame synchronously: no empty stage on first paint, and view transitions snapshot a real scene */
 </script>
 <div id="booted" hidden></div>
 </body>
