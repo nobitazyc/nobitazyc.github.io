@@ -177,6 +177,7 @@ body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetic
 .nav button.on::after{background:currentColor;transform:scale(1.35)}
 .nav button i{position:absolute;right:28px;top:50%;transform:translateY(-50%);font:11px/1 Inter,sans-serif;font-style:normal;letter-spacing:.14em;white-space:nowrap;opacity:0;transition:opacity .3s}
 .nav button:hover i{opacity:.8}
+@media (hover:none){.nav button i{display:none}} /* touch screens: a tap would leave the hover label stuck open */
 .foot{position:absolute;left:32px;bottom:28px;font-size:11px;letter-spacing:.1em;opacity:.6}
 .party{position:fixed;inset:0;z-index:8;pointer-events:none;overflow:hidden}
 .party i{position:absolute;top:-8vh;display:block;animation:fall var(--d) cubic-bezier(.2,.6,.3,1) var(--dl) forwards}
@@ -203,7 +204,9 @@ body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetic
   .shape.txt .fx{font-size:var(--mfs,var(--dfs))}
   .shape.geo .fx{border-radius:var(--mr,var(--dr))}
   .shape.mhide{display:none}
-  .copy{left:6vw;top:calc(100% - var(--ch)*.91);transform:none;max-width:88vw} /* anchored to the same small-viewport box as the art, so the toolbar hiding doesn't open a gap */
+  .copy{left:6vw;top:calc(var(--ch)*.09);transform:none;max-width:88vw}
+  /* the art spans the whole stage on phones: when the browser toolbar hides, top-anchored things (heading, panel tops) stay where they are and only the stage bottom moves; panels sized in % of the art grow with it */
+  .art{top:0;height:auto}
   .copy .k{font-size:11px;margin-bottom:14px}
   .copy h1{font-size:clamp(36px,11vw,58px)}
   .copy p{max-width:88vw;font-size:14px;margin-top:16px;line-height:1.5}
@@ -579,7 +582,7 @@ const S=SCENES.map((sc,i)=>{
 });
 const N=SCENES.length;
 const nav=$('nav');
-SCENES.forEach((sc,i)=>{const b=document.createElement('button');b.innerHTML=`<i>${sc.k}</i>`;b.onclick=()=>scrollTo({top:(i/(N-1))*(document.body.scrollHeight-innerHeight),behavior:'smooth'});nav.appendChild(b)});
+SCENES.forEach((sc,i)=>{const b=document.createElement('button');b.innerHTML=`<i>${sc.k}</i>`;b.onclick=()=>{const from=Math.round(cur*(N-1));if(Math.abs(i-from)>1&&!matchMedia('(prefers-reduced-motion: reduce)').matches)startJump(from,i);else scrollTo({top:(i/(N-1))*maxScroll(),behavior:'smooth'})};nav.appendChild(b)});
 const navBtns=[...nav.children];
 for(let k=0;k<N-1;k++){const pth=document.createElementNS('http://www.w3.org/2000/svg','path');wipe.insertBefore(pth,wipePath);restPaths.push(pth)}
 wipeRest.remove();
@@ -606,9 +609,9 @@ addEventListener('scroll',()=>{const y=scrollY;if(y!==lastY)dir=y>lastY?1:-1;las
 addEventListener('wheel',cancelSnap,{passive:true});addEventListener('touchstart',cancelSnap,{passive:true});addEventListener('keydown',cancelSnap);
 /* portrait phones with little height (browser toolbar showing) get a compact layout; use the smallest height seen so the toolbar hiding on scroll doesn't flip it back */
 let minH=innerHeight,lastW=innerWidth;
-/* portrait: the scene-2 gallery and the About experience panel hang a fixed 28px under their copy (tags) and run down to 24px above the stage bottom, so the gap never depends on the viewport and a taller phone simply shows more of the list; on scene 2 the ring and diamond above the gallery ride along */
+/* portrait: the scene-2 gallery and the About experience panel hang a fixed 28px under their copy (tags) and run down to 24px above the stage bottom (height in % of the art, so it stretches live as the browser toolbar hides); on scene 2 the ring and diamond above the gallery ride along */
 const placePanel=(sc,panel,riders)=>{const art=sc.el.querySelector('.art'),vw=innerWidth/100,top=Math.round(sc.copy.offsetTop+sc.copy.offsetHeight-art.offsetTop+28);
-  const g=sc.shapes[panel].el.style;g.setProperty('--mt',top+'px');g.setProperty('--mh',Math.max(160,art.offsetHeight-top-24)+'px');
+  const g=sc.shapes[panel].el.style;g.setProperty('--mt',top+'px');g.setProperty('--mh',`max(160px,calc(100% - ${top+24}px))`);
   (riders||[]).forEach(([j,lift])=>sc.shapes[j].el.style.setProperty('--mt',Math.round(top-lift*vw)+'px'))};
 const placeGallery=()=>{if(!matchMedia('(orientation: portrait)').matches)return;
   if(S[1])placePanel(S[1],3,[[0,7],[2,6.5]]); /* work: gallery, with the ring and diamond above it */
@@ -640,6 +643,11 @@ function wipeD(type,p,b,W,H,cx,cy,sqz){
    MAX_SCENES_PER_S is the cap for a one-scene move; longer jumps (nav dots, hard flicks) may go proportionally faster so they don't crawl,
    but always slow to the base cap for the final scene. Scroll input itself is never intercepted. */
 const MAX_SCENES_PER_S=.9,SPRING_W=5;let vcur=0,lastFrame=0;
+/* nav-dot jumps across two or more pages: the scroll position and the real stage position move to the target at once (hash, counter,
+   progress bar follow), and the stage draws ONE direct transition from the page we left to the target page, using the target's own wipe:
+   quick start, long ease-out, no crawling through the pages in between. A real scroll during the jump hands back to the normal path. */
+const JUMP_MS=850;let jump=null;
+const startJump=(from,to)=>{cancelSnap();scrollTo(0,(to/(N-1))*maxScroll());target=cur=prev=to/(N-1);vcur=0;vel=0;jump={from,to,t0:performance.now()}};
 function frame(now){
   const dt=lastFrame?Math.min(.05,(now-lastFrame)/1000):1/60;lastFrame=now||performance.now();
   const d=target-cur,remaining=Math.abs(d)*(N-1);
@@ -650,17 +658,20 @@ function frame(now){
   const dv=(r-prev)*(N-1);prev=r;vel=lerp(vel,dv,.2);            // scenes per frame
   mouse.x=lerp(mouse.x,mouse.tx,.06);mouse.y=lerp(mouse.y,mouse.ty,.06);
   const W=innerWidth,H=innerHeight;
-  const s=r*(N-1),i=Math.min(Math.floor(s),N-2),f=s-i;
+  const s=r*(N-1);let i=Math.min(Math.floor(s),N-2),f=s-i,bi=i+1,jdir=0;   // A = S[i] (outgoing), B = S[bi] (incoming)
+  const base=f<T0?i:(f>=T1?i+1:i);curBase=base;   // hash, counter and progress follow the real position (already the target during a jump)
+  if(jump){if(Math.abs(target-cur)>.25/(N-1))jump=null;   // the user scrolled: back to the normal path
+    else{const k=Math.min(1,((now||performance.now())-jump.t0)/JUMP_MS),p=1-Math.pow(1-k,3);   // quick start, long ease-out
+      if(k>=1)jump=null;else{const fwd=jump.to>jump.from;jdir=fwd?1:-1;i=fwd?jump.from:jump.to;bi=fwd?jump.to:jump.from;f=fwd?T0+(T1-T0)*p:T1-(T1-T0)*p}}}
   const tt=clamp((f-T0)/(T1-T0),0,1);          // 0..1 transition progress
   const te=tt*tt*(3-2*tt);                      // eased progress for the wipe and the incoming scene: gentle start, gentle landing
   const inTrans=f>T0&&f<T1;
-  const type=TRANS[i];
-  const base=f<T0?i:(f>=T1?i+1:i);curBase=base;
+  const type=TRANS[bi-1];
   if(base!==lastHash){lastHash=base;try{history.replaceState(null,'',base?'#'+IDS[base]:location.pathname+location.search)}catch(e){}}
-  const A=S[i],B=S[i+1];
+  const A=S[i],B=S[bi];
 
   /* springs */
-  const dir=Math.sign(vel)||1;
+  const dir=jdir||Math.sign(vel)||1;
   const natural=Math.sin(Math.PI*tt)*H*.10*dir;
   const tb=inTrans?natural+clamp(vel*H*4,-H*.25,H*.25):0;
   bulgeV+=(tb-bulge)*.09-bulgeV*.16;bulge+=bulgeV;
@@ -685,7 +696,7 @@ function frame(now){
   }else wipePath.style.display='none';
 
   /* scenes */
-  S.forEach((sc,j)=>{const on=j===i||(j===i+1);if(!on||(j===i&&f>T0)){sc.shapes.forEach(sh=>sh.el._stop&&sh.el._stop())}sc.el.classList.toggle('on',on&&(j===i?f<T0+(T1-T0)*AOUT:f>T0));});
+  S.forEach((sc,j)=>{const on=j===i||(j===bi);if(!on||(j===i&&f>T0)){sc.shapes.forEach(sh=>sh.el._stop&&sh.el._stop())}sc.el.classList.toggle('on',on&&(j===i?f<T0+(T1-T0)*AOUT:f>T0));});
 
   /* outgoing scene A */
   if(f<T0+(T1-T0)*AOUT){

@@ -16,6 +16,7 @@
 :root{--ink:#141414;--cream:#f4efe6;--yellow:#ffc93c;--lilac:#d9d3ff;--max:1180px;--ease:cubic-bezier(.34,1.56,.64,1);--r:clamp(12px,1.5vw,24px)}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
+html{overflow-x:clip} /* iOS ignores overflow-x on body alone; clip doesn't create a scroll container */
 body{background:#fff;color:var(--ink);font-family:Inter,"Helvetica Neue",Helvetica,-apple-system,"PingFang SC","Noto Sans SC",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 img{display:block;max-width:100%;height:auto}
 a{color:inherit}
@@ -44,6 +45,27 @@ h1{font-size:clamp(44px,7.2vw,112px);font-weight:800;letter-spacing:-.05em;line-
 h1 .w{display:inline-block;white-space:nowrap}
 h1 .ch{display:inline-block}
 .lede{margin-top:24px;max-width:62ch;font-size:clamp(16px,1.25vw,19px);line-height:1.5}
+/* sections control: sits beside the back pill and stays fixed while reading. Shows the section you are in; opens a list of all sections to jump to */
+.tocbar{position:fixed;top:22px;left:140px;z-index:11}
+.tocbtn{display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--cream);border:1.5px solid rgba(244,239,230,.35);font:600 12px/1.5 Inter,"Helvetica Neue",Helvetica,sans-serif;letter-spacing:.2em;text-transform:uppercase;padding:12px 18px;border-radius:999px;box-shadow:0 10px 24px rgba(20,20,20,.15);cursor:pointer;font-variant-numeric:tabular-nums;transition:transform .5s var(--ease),background .3s,color .3s}
+.tocbtn .cur{color:var(--yellow)}
+.tocbtn .lbl{opacity:.75;letter-spacing:.12em;text-transform:none;font-weight:500;max-width:20ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tocbtn i{font-style:normal;font-size:10px;opacity:.7;transition:transform .3s}
+.tocbtn:hover,.tocbtn[aria-expanded=true]{background:var(--yellow);color:var(--ink);transform:scale(1.04)}
+.tocbtn:hover .cur,.tocbtn[aria-expanded=true] .cur{color:var(--ink)}
+.tocbtn[aria-expanded=true] i{transform:rotate(180deg)}
+.tocbtn:focus-visible{outline:2px solid var(--yellow);outline-offset:3px}
+.tocmenu{position:absolute;top:calc(100% + 10px);left:0;width:min(420px,calc(100vw - 48px));max-height:calc(100vh - 110px);overflow-y:auto;background:var(--ink);color:var(--cream);border:1.5px solid rgba(244,239,230,.25);border-radius:var(--r);padding:8px;box-shadow:0 30px 60px rgba(20,20,20,.3);display:grid;gap:2px;transform-origin:top left;animation:tocIn .35s var(--ease) both}
+.tocmenu[hidden]{display:none}
+@keyframes tocIn{from{opacity:0;transform:translateY(-8px) scale(.96)}to{opacity:1;transform:none}}
+.tocmenu a{display:grid;grid-template-columns:2.4em minmax(0,1fr);gap:0 10px;align-items:baseline;padding:10px 12px;border-radius:calc(var(--r) * .6);color:inherit;text-decoration:none;transition:background .2s}
+.tocmenu a b{font-weight:800;color:var(--yellow);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.tocmenu a strong{display:block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+.tocmenu a small{display:block;font-size:13px;opacity:.6;margin-top:3px;line-height:1.35}
+.tocmenu a:hover,.tocmenu a:focus-visible{background:rgba(244,239,230,.1);outline:none}
+.tocmenu a.on{background:rgba(244,239,230,.14)}
+.tocmenu a.on strong{color:var(--yellow)}
+section{scroll-margin-top:8px}
 .metawrap{max-width:var(--max);margin:clamp(36px,4vw,56px) auto 0;padding:0 6vw;color:var(--ink)}
 .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:22px 32px;border-top:2px solid var(--ink);padding-top:22px}
 .meta dt{font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
@@ -53,10 +75,10 @@ h1 .ch{display:inline-block}
 .frame{border-radius:var(--r);overflow:hidden;background:var(--ink);box-shadow:0 30px 60px rgba(20,20,20,.16)}
 .frame.light{background:#fff;outline:1px solid rgba(20,20,20,.08)}
 .frame img{width:100%}
-figure{margin:0}
+figure{margin:0;min-width:0}
 figcaption{margin-top:14px;display:flex;gap:12px;align-items:baseline;font-size:12.5px;letter-spacing:.03em;line-height:1.5;opacity:.65}
 figcaption b{font-weight:800;letter-spacing:-.04em;font-size:15px;color:var(--ink);opacity:1;flex:0 0 auto}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:32px 28px;align-items:start}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px 28px;align-items:start}
 
 section{padding:clamp(80px,11vw,150px) 6vw}
 .wrap{max-width:var(--max);margin:0 auto}
@@ -90,13 +112,15 @@ h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-h
   .js .reveal,.js .rise{opacity:1;transform:none;transition:none;animation:none}
 }
 @media (max-width:860px){
-  .row{grid-template-columns:1fr;gap:28px}
+  .row{grid-template-columns:minmax(0,1fr);gap:28px}
   .row .side{position:static}
-  .grid2{grid-template-columns:1fr}
+  .grid2{grid-template-columns:minmax(0,1fr)}
   .hero{padding-top:110px}
   .hero .brand{display:none}
   .back{top:14px;left:14px;padding:10px 14px;font-size:11px}
-  .meta{grid-template-columns:repeat(2,1fr)}
+  .tocbtn{padding:10px 14px;font-size:11px}.tocbtn .lbl{display:none}
+  .tocmenu{position:fixed;left:14px;right:14px;top:60px;width:auto;max-height:calc(100vh - 90px)}
+  .meta{grid-template-columns:repeat(2,minmax(0,1fr))}
   .metawrap{padding:0 5vw}
   .heroimg{padding:0 4vw}
   section,.next{padding-left:5vw;padding-right:5vw}
@@ -199,6 +223,21 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 const bar=document.getElementById('progress');
 const prog=()=>{const m=document.documentElement.scrollHeight-innerHeight;bar.style.width=(m>0?Math.min(1,scrollY/m)*100:0)+'%'};
 addEventListener('scroll',prog,{passive:true});addEventListener('resize',prog);prog();
+
+/* sections control: fixed beside the back pill. Shows the current section, opens a list of all of them; built from the numbered sections so it can't drift from the page */
+{const secs=[...document.querySelectorAll('section')].filter(s=>s.querySelector('.num')),back=document.querySelector('.back');
+ if(secs.length>1&&back){const items=secs.map(s=>{const num=s.querySelector('.num'),head=num.parentElement,k=head.querySelector('.k'),h=head.querySelector('h2'),n=num.textContent.trim();if(!s.id)s.id='s'+n;return{s,n,label:(k||h).textContent.trim(),title:h?h.textContent.trim():''}});
+  const bar=document.createElement('div');bar.className='tocbar';
+  bar.innerHTML=`<button class="tocbtn" type="button" aria-expanded="false" aria-controls="toc" aria-label="Sections of this page"><b class="cur">${items[0].n}</b><span>/ ${items[items.length-1].n}</span><span class="lbl">${items[0].label}</span><i aria-hidden="true">▾</i></button><nav id="toc" class="tocmenu" hidden>${items.map(it=>`<a href="#${it.s.id}"><b>${it.n}</b><span><strong>${it.label}</strong>${it.title?`<small>${it.title}</small>`:''}</span></a>`).join('')}</nav>`;
+  document.body.appendChild(bar);
+  const btn=bar.querySelector('.tocbtn'),menu=bar.querySelector('.tocmenu'),cur=btn.querySelector('.cur'),lbl=btn.querySelector('.lbl'),links=[...menu.querySelectorAll('a')];
+  const place=()=>{bar.style.left=(back.offsetLeft+back.offsetWidth+8)+'px';bar.style.top=back.offsetTop+'px'};place();addEventListener('resize',place);
+  const open=o=>{menu.hidden=!o;btn.setAttribute('aria-expanded',o)};
+  btn.addEventListener('click',()=>open(menu.hidden));links.forEach(a=>a.addEventListener('click',()=>open(false)));
+  addEventListener('click',e=>{if(!bar.contains(e.target))open(false)});addEventListener('keydown',e=>{if(e.key==='Escape')open(false)});
+  let idx=-1;const track=()=>{const y=innerHeight*.4;let i=0;items.forEach((it,j)=>{if(it.s.getBoundingClientRect().top<=y)i=j});
+    if(i!==idx){idx=i;cur.textContent=items[i].n;lbl.textContent=items[i].label;links.forEach((a,j)=>a.classList.toggle('on',j===i))}};
+  track();addEventListener('scroll',()=>requestAnimationFrame(track),{passive:true});addEventListener('resize',track)}}
 </script>
 </body>
 </html>
