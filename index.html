@@ -366,7 +366,7 @@ const SCENES=[
   {bg:'#ffffff',fg:C.ink,k:'Portfolio — 2026',title:['Yucong','Zhou'],p:'Product Designer · Motion Designer · Front-end Engineer',
    shapes:[
     {t:'circle',x:55,y:6,w:'42vw',h:'42vw',c:C.coral,d:0},
-    {t:'rect',x:-8,bottom:0,w:'30vw',h:'15vw',c:C.yellow,r:'15vw 15vw 0 0',d:.12},
+    {t:'circle',x:-8,bottom:'-18vw',w:'36vw',h:'36vw',c:C.yellow,d:.12}   /* a real circle centred on the bottom edge: only its top half shows */,
     {t:'rect',x:88,y:60,w:'9vw',h:'9vw',c:C.blue,rot:18,d:.2},
     {t:'circle',x:46,y:22,w:'5vw',h:'5vw',c:C.ink,d:.26},
     {t:'rect',x:50,y:88,w:'46vw',h:'3vh',c:C.ink,r:'2vh',d:.3},
@@ -440,7 +440,7 @@ const SCENES=[
 /* portrait (mobile) layout overrides — aligned with each scene's shapes array; null = hidden on mobile */
 const bars=(i)=>({x:9+[0,6,6,12,12,6,0,0,6,12,6,0][i]*1.1,y:53.5+i*2.35,w:([10,20,10,16,8,22,6,14,18,12,9,5][i]*2.4)+'vw',h:'1.3vh'});
 const M=[
-  [{x:14,y:36,w:'72vw',h:'72vw'},{x:-10,bottom:0,w:'36vw',h:'18vw'},{x:84,y:38,w:'7vw',h:'7vw'},{x:6,y:42,w:'5vw',h:'5vw'},null,{x:10,bottom:0,w:'80vw',h:'56vh'}],
+  [{x:14,y:36,w:'72vw',h:'72vw'},{x:-12,bottom:'-22vw',w:'44vw',h:'44vw'},{x:84,y:38,w:'7vw',h:'7vw'},{x:6,y:42,w:'5vw',h:'5vw'},null,{x:10,bottom:0,w:'80vw',h:'56vh'}],
   [{x:82,y:44,w:'6vw',h:'6vw'},null,{x:5,y:45,w:'4vw',h:'4vw'},{x:6,y:45,w:'88vw',h:'50vh'},null,null],
   [{x:6,y:53,w:'88vw',h:'auto'},null,null,null,null,null,null,null,null,null,null,null,null,{x:84,y:40,w:'9vw',h:'9vw'}], /* phones: only the carousel and the blob; the shape row underneath is hidden */
   [{x:6,y:48,w:'88vw',h:'36vh'},{x:8.5,y:49.6,w:'2.2vw',h:'2.2vw'},{x:11.8,y:49.6,w:'2.2vw',h:'2.2vw'},{x:15.1,y:49.6,w:'2.2vw',h:'2.2vw'},{x:22,y:49.4,w:'22vw',h:'1.2vh'},
@@ -744,7 +744,7 @@ function frame(now){
   else{pLagV+=((pWant-pLag)*EL_W*EL_W-2*EL_Z*EL_W*pLagV)*dt;pLag+=pLagV*dt}             /* let go: snap, rebound, settle */
   const cu=smooth(.85,.95,tt);pLag=lerp(pLag,pWant,cu);if(cu>=1)pLagV=0;
   const dir=jdir||Math.sign(vel)||1;
-  const BH=Math.min(H,W*.5);   /* the dome scales with the viewport height on desktop, but is held to the width on tall phones, where a height-based bump gets far too big */
+  const BH=Math.min(H*.75,W*.5);   /* the dome scales with the viewport height on desktop, but is held to the width on tall phones, where a height-based bump gets far too big */
   const natural=Math.sin(Math.PI*Math.pow(tt,.45))*BH*.16*dir+(pt-pLag)*BH*1.1;   /* base dome (inverts when retreating) + the stretch from the lead */
   const tb=inTrans?natural+clamp(vel*BH*4,-BH*.25,BH*.25):0;
   bulgeV+=(tb-bulge)*.09-bulgeV*.16;bulge+=bulgeV;
@@ -778,7 +778,7 @@ function frame(now){
     const po=f<T0?0:easeOutQuad(clamp(tt/AOUT,0,1));
     let tr='';
     switch(type){
-      case 'up':tr=`translateY(${-Math.min(po*H*.5,Math.max(0,pLag)*H)}px) scaleY(${1+po*.3})`;st(A.el,'transformOrigin','50% 100%');break;   /* lift no further than the wipe has risen: cut-off bottoms stay covered */
+      case 'up':tr=`translateY(${-Math.min(po*H*.5,Math.max(0,pLag)*H)}px) scaleY(${1+(i===0?0:po*.3)})`;st(A.el,'transformOrigin','50% 100%');break;   /* the home page (character) lifts and fades but never stretches */   /* lift no further than the wipe has risen: cut-off bottoms stay covered */
       case 'snap':tr=`translateY(${Math.min(po*H*.7,Math.max(0,pLag)*H)}px) scaleY(${1+po*.45})`;st(A.el,'transformOrigin','50% 0%');break;
       case 'right':tr=`translateX(${-Math.min(po*W*.55,Math.max(0,pLag)*W)}px) skewX(${-po*10}deg)`;st(A.el,'transformOrigin','0% 50%');break;
       case 'diag':tr=`translateX(${-Math.min(po*W*.5,Math.max(0,pLag)*W)}px) rotate(${-po*9}deg)`;st(A.el,'transformOrigin','0% 100%');break;
