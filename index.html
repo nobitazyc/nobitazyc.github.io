@@ -598,7 +598,7 @@ addEventListener('scroll',()=>{target=clamp(scrollY/maxScroll(),0,1)},{passive:t
 const IDS=['home','work','motion','dev','about','contact'];let lastHash=-1;
 {const gi=IDS.indexOf(location.hash.slice(1));if(gi>0)scrollTo(0,(gi/(N-1))*maxScroll());target=cur=prev=clamp(scrollY/maxScroll(),0,1)}
 /* snap: when scrolling stops between two scenes, finish the move. Past SNAP_AT of a segment in the direction of travel it completes to the next scene, otherwise it settles back. A new wheel/touch input cancels the animation. */
-const SNAP_AT=.35,SNAP_MS=650;let snapTimer=0,snapAnim=0,lastY=scrollY,dir=1;
+const SNAP_AT=.35,SNAP_MS=400;let snapTimer=0,snapAnim=0,lastY=scrollY,dir=1;
 const segPx=()=>maxScroll()/(N-1);
 const cancelSnap=()=>{if(snapAnim){cancelAnimationFrame(snapAnim);snapAnim=0}};
 const animateTo=(y,out,done)=>{cancelSnap();const y0=scrollY,d=y-y0;if(Math.abs(d)<1){done&&done();return}
@@ -617,8 +617,9 @@ addEventListener('keydown',()=>{cancelSnap();follow=false});
    Inner lists (gallery, experience) scroll natively and only hand over to the stage at their edge. */
 const DRAG_PAGE=.5,GO_AT=.3,FLICK_AT=.15,FLICK_V=.9,RELEASE_MS=520,WHEEL_GAP=500;   /* GO_AT: how far a released page must have travelled to carry on to the next one */   /* WHEEL_GAP: wheel events can't report a finger lift, so a pause this long stands in for one */
 let ges=null,follow=false;   /* follow: the stage tracks the scroll position tightly while a gesture or its release animation runs */
-const gesStart=()=>{const sp=segPx();if(!sp)return null;cancelSnap();const base=clamp(Math.round(scrollY/sp),0,N-1);follow=true;
-  return ges={sp,base,y0:scrollY,pos:scrollY,lo:Math.max(0,base-1)*sp,hi:Math.min(N-1,base+1)*sp,v:0,t:performance.now(),released:false}};
+let lastKind=matchMedia('(pointer: coarse)').matches?'touch':'wheel';   /* which input drove the last gesture: 'touch' keeps its spring release and stiff elastic snap; 'wheel' and 'notch' get fixed-time, evenly paced releases */
+const gesStart=kind=>{const sp=segPx();if(!sp)return null;cancelSnap();const base=clamp(Math.round(scrollY/sp),0,N-1);follow=true;lastKind=kind||'touch';
+  return ges={sp,base,kind:lastKind,y0:scrollY,pos:scrollY,lo:Math.max(0,base-1)*sp,hi:Math.min(N-1,base+1)*sp,v:0,t:performance.now(),released:false}};
 const gesMove=px=>{if(!ges||ges.released)return;const now=performance.now(),next=clamp(ges.y0+px,ges.lo,ges.hi);   /* px: content travel since the start, forward positive */
   ges.v=lerp(ges.v,(next-ges.pos)/Math.max(1,now-ges.t),.5);ges.pos=next;ges.t=now;scrollTo(0,next)};
 /* release: a critically damped spring from the current velocity, so the motion is continuous whatever state the page is in — a moving finger
@@ -629,7 +630,10 @@ const springTo=(y,v0,done)=>{cancelSnap();let x=scrollY,v=clamp(v0||0,-REL_W*Mat
   const step=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;const d=y-x;v+=(d*REL_W*REL_W-2*REL_W*v)*dt;x+=v*dt;
     if(Math.abs(y-x)<.5&&Math.abs(v)<15){scrollTo(0,y);snapAnim=0;done&&done();return}scrollTo(0,x);snapAnim=requestAnimationFrame(step)};
   snapAnim=requestAnimationFrame(step)};
-const gesGo=to=>{const g=ges,v=performance.now()-g.t>120?0:g.v*1000;g.released=true;follow=true;springTo(clamp(to,0,N-1)*g.sp,v,()=>{follow=false})};   /* a page that has sat still starts from rest, not from its last remembered speed */
+/* touch: a spring from the finger's velocity (continuous with the drag). Wheel / notch: the page has always come to rest by the time it
+   releases (pause or discrete notch), so a fixed-duration ease in-out gives the same pacing every time, whatever the distance left. */
+const gesGo=to=>{const g=ges,y=clamp(to,0,N-1)*g.sp;g.released=true;follow=true;
+  if(g.kind==='touch'){const v=performance.now()-g.t>120?0:g.v*1000;springTo(y,v,()=>{follow=false})}else animateTo(y,false,()=>{follow=false})};
 const gesEnd=()=>{if(!ges||ges.released)return;const g=ges,p=(g.pos-g.base*g.sp)/g.sp;   /* -1..1: how far from the base page */
   const dir=Math.sign(p)||1,flick=Math.abs(g.v)>=FLICK_V&&Math.sign(g.v)===dir&&Math.abs(p)>=FLICK_AT;
   gesGo((Math.abs(p)>=GO_AT||flick)?g.base+dir:g.base)};   /* past GO_AT of the way (or a fast flick) carries on; less settles back */
@@ -640,33 +644,25 @@ addEventListener('touchmove',e=>{if(!touch||touch.native||e.touches.length!==1)r
   if(touch.horiz===null&&(Math.abs(dx)>8||Math.abs(dy)>8))touch.horiz=Math.abs(dx)>Math.abs(dy);
   if(touch.horiz)return;
   if(!touch.on){if(touch.el){const el=touch.el,atTop=el.scrollTop<=0&&dy>0,atEnd=el.scrollTop+el.clientHeight>=el.scrollHeight-1&&dy<0;if(!atTop&&!atEnd){touch.native=true;return}}   /* the list has room: this touch is the list's */
-    if(!gesStart())return;touch.on=true;touch.y=t.clientY}
+    if(!gesStart('touch'))return;touch.on=true;touch.y=t.clientY}
   if(e.cancelable)e.preventDefault();
   gesMove(-(t.clientY-touch.y)*ges.sp/(innerHeight*DRAG_PAGE))},{passive:false});
 const touchDone=()=>{if(touch&&touch.on)gesEnd();touch=null};
 addEventListener('touchend',touchDone,{passive:true});addEventListener('touchcancel',touchDone,{passive:true});
-/* wheel / trackpad. Wheel events don't say when the fingers lift, so nothing is inferred: the page tracks the accumulated deltas (inertia
-   included) and only a pause of WHEEL_GAP ends the gesture and eases the page to the nearest one. Fresh movement after that grabs the page again
-   from wherever it is. A mouse notch can't be dragged, so a notch completes one move and further notches wait for that move to land. */
-let wtimer=0,wsum=0,wl=[],wlast=0;
+/* wheel / trackpad = the fullPage.js model (desktop only; touch keeps its finger-tracked drag above): native wheel scrolling is cancelled, a notch
+   or a trackpad swipe moves exactly one scene, and nothing more is accepted until that move has landed plus a cooldown. Trackpad inertia is
+   filtered the way fullPage does it: keep the recent |deltaY| values and only act while they are still accelerating (a decaying tail never
+   fires). The stage follows the eased scroll through its own spring, so the move has a soft start and a soft landing. Inner lists (gallery,
+   experience) stop propagation while they still have room, so the wheel scrolls them natively and only reaches the stage at their edge. */
+const WHEEL_COOL=150,WHEEL_MIN=4;let wl=[],wlast=0,wheelLock=0;
 addEventListener('wheel',e=>{if(Math.abs(e.deltaX)>Math.abs(e.deltaY))return;if(e.cancelable)e.preventDefault();if(jump)return;
-  const now=performance.now(),gap=now-wlast;wlast=now;
-  const d=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?innerHeight:1),ad=Math.abs(d);
-  clearTimeout(wtimer);wtimer=setTimeout(()=>{gesEnd();ges=null;wl=[]},WHEEL_GAP);
-  if(ad<1)return;
-  wl.push(ad);if(wl.length>8)wl.shift();
-  if(ges&&!ges.released){
-    /* a second push inside the pause window: the page is parked at the far end of this gesture's one-page range, the deltas had already died
-       down (finger slowed or lifted; a tail only decays) and are now clearly rising again. One long fast swipe never dips, so it stays one page. */
-    ges.peak=Math.max(ges.peak||0,ad);if(ad<ges.peak*.35)ges.dipped=true;
-    const parked=(ges.pos===ges.hi&&d>0)||(ges.pos===ges.lo&&d<0),n=wl.length,rising=n>=3&&wl[n-1]>wl[n-2]*1.2&&wl[n-2]>wl[n-3]*1.2;
-    if(parked&&ges.dipped&&rising){gesEnd();ges=null;wl=[ad]}}
-  if(ges&&ges.released){if(ges.notch&&snapAnim)return;ges=null}   /* a notch move still landing blocks; anything else is free for a new gesture */
-  if(!ges){wsum=0;if(!gesStart())return;
-    /* a mouse notch: a big integer delta arriving cold (no wheel event in the last 80ms). Trackpads ramp up from small values and never arrive
-       cold at that size, and a gesture re-based mid-stream is by definition not cold. One notch, one page. */
-    if(gap>80&&e.deltaMode===0&&Number.isInteger(d)&&ad>=80){ges.notch=true;gesGo(ges.base+Math.sign(d));return}}
-  wsum+=d;gesMove(wsum*ges.sp/(innerHeight*DRAG_PAGE))},{passive:false});
+  const now=performance.now(),d=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?innerHeight:1);
+  if(now-wlast>200)wl=[];wlast=now;wl.push(Math.abs(d));if(wl.length>150)wl.shift();
+  lastKind='wheel';
+  if(now<wheelLock||snapAnim||Math.abs(d)<WHEEL_MIN)return;
+  const avg=n=>{const a=wl.slice(-n);return a.reduce((x,y)=>x+y,0)/a.length};if(avg(10)<avg(70))return;   /* decaying = inertia, not intent */
+  const sp=segPx();if(!sp)return;const i=Math.round(scrollY/sp),to=clamp(i+(d>0?1:-1),0,N-1);
+  if(to!==i){wheelLock=now+SNAP_MS+WHEEL_COOL;follow=false;animateTo(to*sp)}},{passive:false});
 /* portrait phones with little height (browser toolbar showing) get a compact layout; use the smallest height seen so the toolbar hiding on scroll doesn't flip it back */
 let minH=innerHeight,lastW=innerWidth;
 /* portrait: the scene-2 gallery and the About experience panel hang a fixed 28px under their copy (tags) and run down to 24px above the stage bottom (height in % of the art, so it stretches live as the browser toolbar hides); on scene 2 the ring and diamond above the gallery ride along */
@@ -682,7 +678,7 @@ const mouse={x:0,y:0,tx:0,ty:0};
 addEventListener('pointermove',e=>{mouse.tx=(e.clientX/innerWidth-.5)*2;mouse.ty=(e.clientY/innerHeight-.5)*2});
 /* elastic bulge spring */
 let bulge=0,bulgeV=0,pLag=0,pLagV=0;   /* pLag: the wipe's flat baseline (the band's anchored edge), see 'elastic band' in frame */
-const EL_W=11,EL_Z=.45;   /* the band's snap when let go: stiffness and damping ratio (under-damped: one visible rebound) */
+const EL_W=11,EL_Z=.45;   /* the band's snap when let go (touch): stiffness and damping ratio (under-damped: one visible rebound) */
 /* squash spring for whole stage (drag feel) */
 let sq=0,sqV=0;
 
@@ -705,7 +701,7 @@ function wipeD(type,p,b,W,H,cx,cy,sqz,dm=0){
 /* how the stage follows the scroll: a critically damped spring (accelerates in, settles out, never overshoots) with a speed cap.
    MAX_SCENES_PER_S is the cap for a one-scene move; longer jumps (nav dots, hard flicks) may go proportionally faster so they don't crawl,
    but always slow to the base cap for the final scene. Scroll input itself is never intercepted. */
-const MAX_SCENES_PER_S=.9,SPRING_W=5;let vcur=0,lastFrame=0;
+const MAX_SCENES_PER_S=1.7,SPRING_W=8.5;let vcur=0,lastFrame=0;
 /* nav-dot jumps across two or more pages: the scroll position and the real stage position move to the target at once (hash, counter,
    progress bar follow), and the stage draws ONE direct transition from the page we left to the target page, using the target's own wipe:
    quick start, long ease-out, no crawling through the pages in between. A real scroll during the jump hands back to the normal path. */
@@ -740,6 +736,7 @@ function frame(now){
   const pt=te*REST[type],pulling=!!(ges&&!ges.released);
   const pWant=inTrans?(pulling?pt*(.04+.96*smooth(0,.85,tt)):pt):(f>=T1?pt:0);   /* while held, the edge barely moves early on */
   if(!inTrans){pLag=pWant;pLagV=0}
+  else if(lastKind!=='touch'){pLag=pWant;pLagV=0}                                          /* desktop: no elastic lag, the edge follows the stage */
   else if(pulling){pLag+=(pWant-pLag)*Math.min(1,dt*1.2);pLagV=0}                       /* stretching: the edge gives slowly */
   else{pLagV+=((pWant-pLag)*EL_W*EL_W-2*EL_Z*EL_W*pLagV)*dt;pLag+=pLagV*dt}             /* let go: snap, rebound, settle */
   const cu=smooth(.85,.95,tt);pLag=lerp(pLag,pWant,cu);if(cu>=1)pLagV=0;
