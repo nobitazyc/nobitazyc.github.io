@@ -606,7 +606,34 @@ const animateTo=y=>{cancelSnap();const y0=scrollY,d=y-y0;if(Math.abs(d)<1)return
 const snap=()=>{const sp=segPx();if(!sp)return;const s=scrollY/sp,i=Math.floor(s),f=s-i;if(f<.01||f>.99)return;
   const to=dir>0?(f>SNAP_AT?i+1:i):(f<1-SNAP_AT?i:i+1);animateTo(clamp(to,0,N-1)*sp)};
 addEventListener('scroll',()=>{const y=scrollY;if(y!==lastY)dir=y>lastY?1:-1;lastY=y;if(snapAnim)return;clearTimeout(snapTimer);snapTimer=setTimeout(snap,180)},{passive:true});
-addEventListener('wheel',cancelSnap,{passive:true});addEventListener('touchstart',cancelSnap,{passive:true});addEventListener('keydown',cancelSnap);
+addEventListener('keydown',cancelSnap);
+/* wheel = one scene per gesture, the fullPage.js model: native wheel scrolling is cancelled, so a notch or a trackpad swipe moves exactly one
+   scene and nothing more is accepted until that move has landed plus a cooldown. Trackpad inertia is filtered the way fullPage does it: keep the
+   recent |deltaY| values and only act while they are still accelerating (a decaying tail never fires). Inner lists (gallery, experience) stop
+   propagation while they still have room, so the wheel scrolls them natively and only reaches the stage at their edge. */
+const WHEEL_COOL=150,WHEEL_GAP=200,WHEEL_MIN=4;let wl=[],wlast=0,wheelLock=0;
+addEventListener('wheel',e=>{if(Math.abs(e.deltaX)>Math.abs(e.deltaY))return;if(e.cancelable)e.preventDefault();
+  const now=performance.now(),d=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?innerHeight:1);
+  if(now-wlast>WHEEL_GAP)wl=[];wlast=now;wl.push(Math.abs(d));if(wl.length>150)wl.shift();
+  if(now<wheelLock||snapAnim||jump||Math.abs(d)<WHEEL_MIN)return;
+  const avg=n=>{const a=wl.slice(-n);return a.reduce((x,y)=>x+y,0)/a.length};if(avg(10)<avg(70))return;   // decaying = inertia, not intent
+  const sp=segPx();if(!sp)return;const i=Math.round(scrollY/sp),to=clamp(i+(d>0?1:-1),0,N-1);
+  if(to!==i){wheelLock=now+SNAP_MS+WHEEL_COOL;animateTo(to*sp)}},{passive:false});
+/* touch = one scene per swipe, the fullPage.js model: the finger owns the gesture and native momentum never runs. A swipe past TOUCH_AT of the
+   viewport height moves one scene; nothing else is accepted until that move has landed plus a short cooldown (fullPage's canScroll gate).
+   Inside the gallery / experience list the swipe scrolls the list natively and only hands over to the stage at the list's edge. Sideways swipes are ignored. */
+const TOUCH_AT=.05,TOUCH_COOL=150;let touch=null,touchLock=0;
+const innerList=el=>el&&el.closest?el.closest('.gscroll,.xp .body'):null;
+addEventListener('touchstart',e=>{if(e.touches.length!==1){touch=null;return}const t=e.touches[0];touch={x:t.clientX,y:t.clientY,el:innerList(e.target),fired:false,horiz:null}},{passive:true});
+addEventListener('touchmove',e=>{if(!touch||e.touches.length!==1)return;const t=e.touches[0],dx=t.clientX-touch.x,dy=t.clientY-touch.y;
+  if(touch.horiz===null&&(Math.abs(dx)>8||Math.abs(dy)>8))touch.horiz=Math.abs(dx)>Math.abs(dy);
+  if(touch.horiz)return;
+  if(touch.el){const el=touch.el,atTop=el.scrollTop<=0&&dy>0,atEnd=el.scrollTop+el.clientHeight>=el.scrollHeight-1&&dy<0;if(!atTop&&!atEnd)return}
+  if(e.cancelable)e.preventDefault();
+  if(touch.fired||performance.now()<touchLock)return;
+  if(Math.abs(dy)>=innerHeight*TOUCH_AT){touch.fired=true;const sp=segPx();if(!sp)return;const i=Math.round(scrollY/sp),to=clamp(i+(dy<0?1:-1),0,N-1);
+    if(to!==i){touchLock=performance.now()+SNAP_MS+TOUCH_COOL;animateTo(to*sp)}}},{passive:false});
+addEventListener('touchend',()=>{touch=null},{passive:true});addEventListener('touchcancel',()=>{touch=null},{passive:true});
 /* portrait phones with little height (browser toolbar showing) get a compact layout; use the smallest height seen so the toolbar hiding on scroll doesn't flip it back */
 let minH=innerHeight,lastW=innerWidth;
 /* portrait: the scene-2 gallery and the About experience panel hang a fixed 28px under their copy (tags) and run down to 24px above the stage bottom (height in % of the art, so it stretches live as the browser toolbar hides); on scene 2 the ring and diamond above the gallery ride along */
