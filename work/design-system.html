@@ -42,7 +42,7 @@ a{color:inherit}
 .hero .brand{position:absolute;top:28px;right:32px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;text-decoration:none}
 .hero .brand span{opacity:.6;margin-left:14px;letter-spacing:.06em;text-transform:none;font-weight:400}
 .k{font-size:12px;letter-spacing:.24em;text-transform:uppercase;opacity:.7;margin-bottom:22px}
-h1{font-size:clamp(44px,7.2vw,112px);font-weight:800;letter-spacing:-.05em;line-height:.9}
+h1{font-size:clamp(40px,6.6vw,126px);font-weight:800;letter-spacing:-.05em;line-height:.9} /* sized so the long title stays on one line and the hero image starts in the viewport, like the other case pages */
 h1 .w{display:inline-block;white-space:nowrap}
 h1 .ch{display:inline-block}
 .lede{margin-top:24px;max-width:62ch;font-size:clamp(16px,1.25vw,19px);line-height:1.5}
@@ -193,6 +193,7 @@ pre.code .s{color:var(--yellow)}pre.code .p{color:#8fd3ff}pre.code .c{opacity:.5
   .facts{grid-template-columns:1fr 1fr}
   .hero{padding-top:110px}
   .hero .brand{display:none}
+  .k .xs{display:none} /* keep the hero short on phones so the morph target starts inside the viewport */
   .back{top:14px;left:14px;padding:10px 14px;font-size:11px}
   .meta{grid-template-columns:repeat(2,1fr)}
   .metawrap{padding:0 5vw}
@@ -212,13 +213,13 @@ pre.code .s{color:var(--yellow)}pre.code .p{color:#8fd3ff}pre.code .c{opacity:.5
 
 <header class="hero">
   <a class="brand" href="../index.html">Yucong Zhou <span>Design · Motion · Code</span></a>
-  <div class="k rise" style="animation-delay:.05s">Case study · Design system · Developer tooling · MacroHealth</div>
+  <div class="k rise" style="animation-delay:.05s"><span class="xs">Case study · </span>Design system · <span class="xs">Developer tooling · </span>MacroHealth</div>
   <h1 id="title">A design system AI can read</h1>
-  <p class="lede rise" style="animation-delay:.55s">MacroHealth's product team designs in Figma and increasingly builds with coding agents. The agents kept guessing which component a mockup meant, and the official Figma tooling for telling them wasn't available on our plan. So I made the design system machine-readable: every Figma variant is mapped to a React prop as data next to the component, the map ships inside the package, and a small MCP server hands it to any agent that asks. Designers keep Figma. Engineers keep git. The agent stops guessing.</p>
+  <p class="lede rise" style="animation-delay:.55s">MacroHealth designs in Figma and builds with coding agents, and the agents kept guessing which component a mockup meant. I made the design system machine-readable: every Figma variant maps to a React prop, as data that ships in the package and is served to agents over MCP. Designers keep Figma, engineers keep git, the agent stops guessing.</p>
 </header>
 <div class="heroimg rise" style="animation-delay:.85s">
   <div class="frame">
-    <img src="../assets/ds-01.webp" width="1600" height="1200" alt="MacroHealth Design System cover: the MacroHealth logo and the words Design System in white on navy" fetchpriority="high">
+    <img src="../assets/ds-01.webp" width="1600" height="1200" alt="MacroHealth Design System cover: the words Design System in white on navy, with the line MacroHealth, Figma to code for agents, 2026" fetchpriority="high">
   </div>
 </div>
 <div class="metawrap rise" style="animation-delay:1s">

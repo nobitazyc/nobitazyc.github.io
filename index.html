@@ -48,9 +48,11 @@ body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetic
 @keyframes idleB{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.04) rotate(-2deg)}}
 @keyframes idleC{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
 @keyframes idleD{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(2deg) scale(1.02)}75%{transform:rotate(-2deg) scale(.98)}}
-.gal{height:100%;overflow-y:auto;overscroll-behavior:contain;border-radius:1.5vw;background:#141414;color:#f4efe6;padding:1.4vw;scrollbar-width:thin;scrollbar-color:#f4efe6 transparent}
-.gal::-webkit-scrollbar{width:6px}.gal::-webkit-scrollbar-thumb{background:#f4efe6;border-radius:3px}.gal::-webkit-scrollbar-track{background:transparent}
-.galhead{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6;padding:.2vw .2vw 1.2vw}
+.gal,.fx.gal{height:100%;display:flex;flex-direction:column;overflow:hidden;border-radius:1.5vw;background:#141414;color:#f4efe6;padding:1.4vw}
+/* the cards live in a scroller under the header: cards keep their width-driven size, the scroller takes whatever height is left, so a taller viewport simply shows more of the list */
+.gscroll{position:relative;flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#f4efe6 transparent}
+.gscroll::-webkit-scrollbar{width:6px}.gscroll::-webkit-scrollbar-thumb{background:#f4efe6;border-radius:3px}.gscroll::-webkit-scrollbar-track{background:transparent}
+.galhead{flex:none;display:flex;justify-content:space-between;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6;padding:.2vw .2vw 1.2vw}
 .galhead em{font-style:normal}
 .gal figure{margin:0 0 1.6vw}
 .gal img{width:100%;display:block;border-radius:.9vw;background:#f4efe6;transition:transform .5s cubic-bezier(.34,1.3,.64,1)}
@@ -371,7 +373,7 @@ const SCENES=[
     {t:'ring',x:46,y:12,w:'6vw',h:'6vw',c:C.ink,bw:'1.1vw',d:.14},
     {t:'rect',x:47,y:30,w:'6vw',h:'12vw',c:C.coral,r:'3vw 3vw 0 0',d:.2},
     {t:'rect',x:47.5,y:66,w:'5vw',h:'5vw',c:C.blue,rot:45,d:.26},
-    {t:'gallery',x:54,y:11,w:'40vw',h:'78vh',d:0,items:[
+    {t:'gallery',x:54,y:'88px',w:'40vw',h:'calc(100vh - 176px)',d:0,items:[
       {src:'assets/ds-01.webp',title:'MacroHealth Design System',meta:'A design system AI can read · Figma → code for agents · 2026',href:'work/design-system.html',vt:'ds-hero',pos:'center'},
       {src:'assets/ux-03.webp',title:'BluePrint Infinite',meta:'Bell · Call-centre flow system · 2019–2021',href:'work/blueprint.html',vt:'bp-hero'},
       {src:'assets/ux-01.webp',title:'HealthWave',meta:'Landing pages, illustration & icons · Ottawa · 2015–2016',href:'work/healthwave.html',vt:'hw-hero',cta:'View the project →'},]},
@@ -519,8 +521,8 @@ const S=SCENES.map((sc,i)=>{
     else if(s.t==='rig'){f.innerHTML=`<div class="char"><img src="${s.src}" alt="" draggable="false"><div class="face"></div><div class="bubble" aria-live="polite"></div></div>`;initRig(f.querySelector('.char'),s)}
     else if(s.t==='ring'){f.style.borderRadius='50%';f.style.border=`${U(s.bw)} solid ${s.c}`}
     else if(s.t==='gallery'){f.classList.add('gal');const n=s.items.length;
-      f.innerHTML=`<div class="galhead"><span>Selected work</span><span><em class="gcount">${n} case studies · </em>scroll ↓</span></div>`+s.items.map((it,i)=>{const inner=`<img src="${it.src}" alt="${it.title}" loading="${it.vt?'eager':'lazy'}" draggable="false"${it.vt?` data-vt="${it.vt}"`:''}><figcaption><b>0${i+1}</b><div><strong>${it.title}</strong><span>${it.meta}</span>${it.href?`<em class="more">${it.cta||'Read the case study →'}</em>`:''}</div></figcaption>`;return it.href?`<figure class="has-cs"><a href="${it.href}" aria-label="${it.title} — ${(it.cta||'Read the case study').replace(' →','').toLowerCase()}">${inner}</a></figure>`:`<figure>${inner}</figure>`}).join('');
-      f.addEventListener('wheel',e=>{const atTop=f.scrollTop<=0&&e.deltaY<0,atEnd=f.scrollTop+f.clientHeight>=f.scrollHeight-1&&e.deltaY>0;if(!atTop&&!atEnd)e.stopPropagation()},{passive:true});}
+      f.innerHTML=`<div class="galhead"><span>Selected work</span><span><em class="gcount">${n} case studies · </em>scroll ↓</span></div><div class="gscroll">`+s.items.map((it,i)=>{const inner=`<img src="${it.src}" alt="${it.title}" loading="${it.vt?'eager':'lazy'}" draggable="false"${it.vt?` data-vt="${it.vt}"`:''}><figcaption><b>0${i+1}</b><div><strong>${it.title}</strong><span>${it.meta}</span>${it.href?`<em class="more">${it.cta||'Read the case study →'}</em>`:''}</div></figcaption>`;return it.href?`<figure class="has-cs"><a href="${it.href}" aria-label="${it.title} — ${(it.cta||'Read the case study').replace(' →','').toLowerCase()}">${inner}</a></figure>`:`<figure>${inner}</figure>`}).join('')+'</div>';
+      const sc=f.querySelector('.gscroll');sc.addEventListener('wheel',e=>{const atTop=sc.scrollTop<=0&&e.deltaY<0,atEnd=sc.scrollTop+sc.clientHeight>=sc.scrollHeight-1&&e.deltaY>0;if(!atTop&&!atEnd)e.stopPropagation()},{passive:true});}
     else if(s.t==='timeline'){f.classList.add('car','tcar');const items=s.items;let idx=0;
       f.innerHTML=`<div class="frame tl"><div class="galhead"><span>Experience</span></div><div class="xp"><div class="rail"><div class="yrs">${items.map(it=>`<button class="yr" type="button" title="${it.role}"><span class="full">${it.when}</span><span class="short">${it.when.slice(0,4)}</span><i></i></button>`).join('')}</div></div><div class="card"><div class="body"></div></div></div></div><div class="ctl"><button class="pv" aria-label="previous role">←</button><span class="cnt"></span><button class="nx" aria-label="next role" style="margin-left:auto">→</button></div>`;
       const body=f.querySelector('.body'),card=f.querySelector('.card'),cnt=f.querySelector('.cnt'),yrs=[...f.querySelectorAll('.yr')];
@@ -744,7 +746,7 @@ const cardFor=url=>{const path=(url||'').split('?')[0].split('#')[0];return [...
 const clearCardNames=()=>document.querySelectorAll('.gal img[data-vt]').forEach(i=>{i.style.viewTransitionName=''});
 addEventListener('pageswap',e=>{if(!e.viewTransition)return;clearCardNames();const to=e.activation&&e.activation.entry&&e.activation.entry.url;const fig=cardFor(to);if(fig){const img=fig.querySelector('img');img.style.viewTransitionName=img.dataset.vt}});
 addEventListener('pagereveal',e=>{clearCardNames();if(!e.viewTransition)return;const from=(window.navigation&&navigation.activation&&navigation.activation.from&&navigation.activation.from.url)||document.referrer||'';
-  const fig=cardFor(from);if(!fig)return;const g=fig.closest('.gal');if(g)g.scrollTop=Math.max(0,fig.offsetTop-(g.clientHeight-fig.offsetHeight)/2);
+  const fig=cardFor(from);if(!fig)return;const g=fig.closest('.gscroll');if(g)g.scrollTop=Math.max(0,fig.offsetTop-(g.clientHeight-fig.offsetHeight)/2);
   const img=fig.querySelector('img');img.style.viewTransitionName=img.dataset.vt;e.viewTransition.finished.finally(clearCardNames)});
 frame(performance.now()); /* draw the first frame synchronously: no empty stage on first paint, and view transitions snapshot a real scene */
 </script>
