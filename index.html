@@ -414,7 +414,7 @@ const SCENES=[
     {t:'rect',x:56,y:78,w:'20vw',h:'2.2vh',c:C.ink,r:'2vh',d:.44},
     {t:'rect',x:78,y:78,w:'6vw',h:'2.2vh',c:C.yellow,r:'2vh',d:.46},
     {t:'txt',x:86,y:76.6,txt:'LIVE',c:C.ink,fs:'2.4vw',d:.48}]},
-  {bg:C.lilac,fg:C.ink,k:'About',title:['Bit more','about me'],p:'I started out as an engineer and picked up UX and motion design along the way — so I can design what I build, and build what I design. Today I\'m a Senior Frontend Engineer at MacroHealth (Vancouver), working remotely from Ottawa.',
+  {bg:C.lilac,fg:C.ink,k:'About',title:['Bit more','about me'],p:'Engineer first, then UX and motion design — so I design what I build and build what I design. I care about the details people feel but never notice.',
    shapes:[
     {t:'timeline',x:54,y:10,w:'40vw',h:'78vh',d:0,items:[
       {when:'2021 — Now',role:'Senior Frontend Engineer',org:'MacroHealth · Vancouver (remote from Ottawa)',desc:'I own the front end across MacroHealth\'s healthcare data products, from the shared UI library to the customer portal.',bullets:['Led the design and build of the new customer portal, replacing a legacy CMS-based portal with a standalone React app','Led the design and implementation of the company-wide UI component library, now used by every product team','Made the design system machine-readable so designers and coding agents build from one source of truth','Led front-end delivery of the analytics product from first mockups to shipped features','Replaced embedded BI dashboards with native, interactive reporting inside the product'],stack:['React','TypeScript','Storybook','GraphQL','Node.js','Figma','MCP']},
@@ -428,7 +428,7 @@ const SCENES=[
     {t:'rect',x:47.5,y:66,w:'5vw',h:'5vw',c:C.blue,rot:45,d:.26},
     {t:'rect',x:90,y:84,w:'8vw',h:'8vw',c:C.cream,r:'50% 0 50% 0',d:.3},
     {t:'rect',x:58,y:92,w:'12vw',h:'2.2vh',c:C.ink,r:'2vh',d:.36}]},
-  {bg:C.ink,fg:C.cream,k:'Contact',title:["Let's make",'something real.'],p:'nobitanobi920219@gmail.com',links:['Email','Dribbble','Vimeo','Resume'],
+  {bg:C.ink,fg:C.cream,k:'Contact',title:["Let's make",'something real.'],p:'Open to design-engineering work, side projects and good conversations.',links:['Email','Dribbble','Vimeo','Resume'],
    shapes:[
     {t:'circle',x:60,y:18,w:'32vw',h:'32vw',c:C.coral,d:0},
     {t:'rect',x:66,y:28,w:'16vw',h:'16vw',c:C.ink,r:'50% 0 50% 0',d:.08},
@@ -673,7 +673,9 @@ const placePanel=(sc,panel,riders)=>{const art=sc.el.querySelector('.art'),vw=in
   (riders||[]).forEach(([j,lift])=>sc.shapes[j].el.style.setProperty('--mt',Math.round(top-lift*vw)+'px'))};
 const placeGallery=()=>{if(!matchMedia('(orientation: portrait)').matches)return;
   if(S[1])placePanel(S[1],3,[[0,7],[2,6.5]]); /* work: gallery, with the ring and diamond above it */
-  if(S[4])placePanel(S[4],0)};                 /* about: experience panel */
+  if(S[4])placePanel(S[4],0);                  /* about: experience panel */
+  if(S[2]){const car=S[2].shapes[0].el,top=Math.round(car.offsetTop+car.offsetHeight+18);   /* motion: the shape row hangs a fixed 18px under the carousel's control bar, whatever the carousel's height */
+    [1,2,3,4,5,6].forEach(j=>S[2].shapes[j].el.style.setProperty('--mt',top+'px'))}};
 const fit=()=>{if(innerWidth!==lastW){lastW=innerWidth;minH=innerHeight}minH=Math.min(minH,innerHeight);document.documentElement.classList.toggle('short',matchMedia('(orientation: portrait)').matches&&minH<700);placeGallery()};
 fit();addEventListener('resize',fit);addEventListener('load',fit);
 const mouse={x:0,y:0,tx:0,ty:0};
@@ -694,7 +696,8 @@ function wipeD(type,p,b,W,H,cx,cy,sqz,dm=0){
     case 'up':{const y=H*(1-p);return `M0 ${y} C${W*lerp(.28,.38,dm)} ${y-b*lerp(1.5,1.75,dm)} ${W*lerp(.62,.62,dm)} ${y+b*lerp(.7,-1.75,dm)} ${W} ${y-b*.4*(1-dm)} L${W} ${H+400} L0 ${H+400} Z`}
     case 'snap':{const y=H*p;return `M0 -400 L${W} -400 L${W} ${y+b*.4*(1-dm)} C${W*lerp(.62,.62,dm)} ${y+b*lerp(-.7,1.75,dm)} ${W*lerp(.28,.38,dm)} ${y+b*lerp(1.5,1.75,dm)} 0 ${y} Z`}
     case 'right':{const x=W*(1-p);return `M${x+b*.3*(1-dm)} -400 C${x-b*lerp(1.5,1.75,dm)} ${H*lerp(.3,.38,dm)} ${x+b*lerp(.8,-1.75,dm)} ${H*.62} ${x-b*.5*(1-dm)} ${H+400} L${W+400} ${H+400} L${W+400} -400 Z`}
-    case 'diag':{const k=.32,x=W*(1-p)*(1+k)+k*H*.5;return `M${x} -400 C${x-k*H*.3-b*lerp(1.3,1.75,dm)} ${H*.3} ${x-k*H*.7+b*lerp(.6,-1.75,dm)} ${H*.7} ${x-k*H} ${H+400} L${W+600} ${H+400} L${W+600} -400 Z`}
+    case 'diag':{const k=.32,D=W<H?W*.5:H,x=W*(1-p)*(1+k)+k*D*.5;   /* the slant scales with the height on desktop; on portrait phones that left a wedge a third of the screen wide, so there it scales with the width */
+      return `M${x} -400 C${x-k*D*.3-b*lerp(1.3,1.75,dm)} ${H*.3} ${x-k*D*.7+b*lerp(.6,-1.75,dm)} ${H*.7} ${x-k*D} ${H+400} L${W+600} ${H+400} L${W+600} -400 Z`}
     case 'blob':{const R=Math.hypot(Math.max(cx,W-cx),Math.max(cy,H-cy))*1.05*p;const rx=R*(1+sqz),ry=R*(1-sqz);
       return `M${cx-rx} ${cy} a${rx} ${ry} 0 1 0 ${rx*2} 0 a${rx} ${ry} 0 1 0 ${-rx*2} 0 Z`}
   }
