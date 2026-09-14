@@ -200,6 +200,31 @@ body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetic
 .arcade .nav button::after{border-radius:0}
 .arcade .char img{filter:contrast(1.25) saturate(1.4)}
 .arcade .progress{height:6px;background:repeating-linear-gradient(90deg,currentColor 0 10px,transparent 10px 14px)}
+/* blueprint overlay ("how it's built": press . or long-press the brand): a 10% grid, a dashed outline and label on every live shape, and a panel of the values driving the stage */
+.blue{position:fixed;inset:0;z-index:8;pointer-events:none;color:var(--fg);font:11px/1.35 ui-monospace,"SF Mono",Menlo,Consolas,monospace;background-image:linear-gradient(currentColor 1px,transparent 1px),linear-gradient(90deg,currentColor 1px,transparent 1px);background-size:10vw 10vh;opacity:0;transition:opacity .3s}
+.blue.on{opacity:1}
+.blue::before{content:"";position:absolute;inset:0;background-image:linear-gradient(currentColor 1px,transparent 1px),linear-gradient(90deg,currentColor 1px,transparent 1px);background-size:10vw 10vh;opacity:.12}
+.blue{background-image:none}
+.blue .bx{position:absolute;border:1px dashed currentColor;box-sizing:border-box}
+.blue .bx span{position:absolute;left:-1px;top:-17px;background:var(--fg);color:var(--bgc,#fff);padding:1px 5px;white-space:nowrap;letter-spacing:.02em;font-size:10px}
+.blue .bx.copy{border-style:solid;border-width:1px;opacity:.7}
+.blue .pn{position:absolute;left:24px;bottom:24px;background:#141414;color:#f4efe6;padding:12px 14px 12px;border-radius:12px;white-space:pre;box-shadow:0 12px 30px rgba(20,20,20,.25);line-height:1.5}
+.blue .pn b{color:#ffc93c;font-weight:600}
+.brand{pointer-events:auto}
+.blue .pn{left:24px;bottom:24px}
+@media (orientation:portrait){.blue .pn{left:12px;bottom:12px;font-size:10px;padding:10px 12px}}
+/* achievements: one pill, three slots, appears after the first egg is found and remembers across visits */
+.trophy{position:fixed;right:32px;bottom:28px;z-index:9;display:flex;align-items:center;gap:9px;background:#141414;color:#f4efe6;border:1.5px solid rgba(244,239,230,.35);border-radius:999px;padding:9px 13px 9px 12px;font:600 11px/1 Inter,"Helvetica Neue",Helvetica,sans-serif;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;box-shadow:0 10px 24px rgba(20,20,20,.18);opacity:0;transform:translateY(16px);transition:opacity .4s,transform .5s var(--ease,cubic-bezier(.34,1.56,.64,1)),background .3s,color .3s}
+.trophy.on{opacity:1;transform:none}
+.trophy i{width:12px;height:12px;border-radius:50%;border:1.5px solid currentColor;display:inline-block;transition:background .3s,transform .4s cubic-bezier(.34,1.56,.64,1)}
+.trophy i.got{background:#ffc93c;border-color:#ffc93c;transform:scale(1.15)}
+.trophy.all{background:#ffc93c;color:#141414;border-color:#141414}.trophy.all i.got{background:#141414;border-color:#141414}
+.trophy .list{position:absolute;right:0;bottom:calc(100% + 10px);background:#141414;color:#f4efe6;border:1.5px solid rgba(244,239,230,.25);border-radius:12px;padding:12px 14px;min-width:360px;white-space:nowrap;text-align:left;text-transform:none;letter-spacing:0;font-weight:400;font-size:12.5px;line-height:1.5;display:none;box-shadow:0 20px 50px rgba(20,20,20,.3)}
+.trophy.open .list{display:block}
+.trophy .list div{display:flex;gap:12px;align-items:baseline;padding:4px 0}
+.trophy .list b{font-weight:700;min-width:5.5em}.trophy .list span{opacity:.6}.trophy .list .got b{color:#ffc93c}
+.trophy .list .h{font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.5;margin-bottom:4px}
+@media (orientation:portrait){.trophy{right:12px;bottom:12px;padding:8px 11px 8px 10px;font-size:10px}.trophy .list{min-width:0;width:calc(100vw - 24px);font-size:12px}}
 .fx-wave{animation:fxWave .9s cubic-bezier(.34,1.56,.64,1)}
 @keyframes fxWave{0%{transform:translateY(0)}35%{transform:translateY(-28%) rotate(-6deg)}70%{transform:translateY(6%) rotate(3deg)}100%{transform:translateY(0)}}
 /* cross-document view transition back from a case study: the hero shrinks into its gallery card while the scene wipes down over the page */
@@ -593,7 +618,8 @@ const S=SCENES.map((sc,i)=>{
   chars.forEach(ch=>ch.addEventListener('pointerenter',()=>{egg.poke(ch);playLetter(ch)}));
   const playLetter=ch=>{if(ch._busy)return;ch._busy=true;
     const fx=LFX[Math.floor(Math.random()*LFX.length)];ch.classList.add(fx);ch.style.color=lpal[Math.floor(Math.random()*lpal.length)];
-    ch.addEventListener('animationend',()=>{ch.classList.remove(fx);ch._busy=false;setTimeout(()=>ch.style.color='',400)},{once:true})};
+    const done=()=>{ch.classList.remove(fx);ch._busy=false;setTimeout(()=>ch.style.color='',400)};
+    ch.addEventListener('animationend',done,{once:true});clearTimeout(ch._bt);ch._bt=setTimeout(done,950)};   /* fallback: a replaced animation never ends, so free the letter on a timer too */
   el._playRandomLetter=()=>{const free=chars.filter(c=>!c._busy);if(free.length)playLetter(free[Math.floor(Math.random()*free.length)])};
   copy.querySelectorAll('.tags span').forEach(tg=>{tg.addEventListener('pointerenter',()=>{const c=lpal[Math.floor(Math.random()*lpal.length)];tg.style.background=c;tg.style.borderColor=c;tg.style.color=(c===C.ink||c===C.blue)?C.cream:C.ink;tg.style.transform=`rotate(${(Math.random()-.5)*10}deg) scale(1.08)`});
     tg.addEventListener('pointerleave',()=>{tg.style.background='';tg.style.borderColor='';tg.style.color='';tg.style.transform=''})});
@@ -778,7 +804,7 @@ function frame(now){
   /* background: colour of the page before the current one, plus a settled wipe of the current page (leaves a sliver) */
   const bIdx=inTrans?i:base;                       // page whose colour is fully "on"
   bg.style.background=SCENES[0].bg;
-  document.documentElement.style.setProperty('--fg',SCENES[base].fg);
+  document.documentElement.style.setProperty('--fg',SCENES[base].fg);document.documentElement.style.setProperty('--bgc',SCENES[base].bg);
   wipe.style.display='block';wipe.setAttribute('viewBox',`0 0 ${W} ${H}`);wipe2.setAttribute('viewBox',`0 0 ${W} ${H}`);
   restPaths.forEach((pth,k)=>{if(k+1<=bIdx){const rt=TRANS[k];let cx=W*.5,cy=H*.5;if(rt==='blob'){[cx,cy]=blobCenter(S[k])}
       pth.setAttribute('d',wipeD(rt,REST[rt],restBulge(rt,k,W,H,performance.now()),W,H,cx,cy,.06*Math.sin(performance.now()/2200+k)));pth.setAttribute('fill',SCENES[k+1].bg);pth.style.display='block'}
@@ -837,12 +863,13 @@ function frame(now){
   const cn=Math.round(s)+1;counter.textContent=(arcade?'LVL ':'')+String(cn).padStart(2,'0')+' / '+String(N).padStart(2,'0');
   st(hint,'opacity',1-smooth(.01,.05,r));
   navBtns.forEach((b,j)=>b.classList.toggle('on',j===Math.round(s)));
+  if(blue)blueDraw(i,bi,f,tt,te,type,s,inTrans);
   requestAnimationFrame(frame);
 }
 /* ---------- easter egg: poke 20 different letters ---------- */
 const egg={count:0,fired:0,need:()=>matchMedia('(pointer: coarse)').matches?8:30, /* touch screens: fewer pokes */
   poke(ch){if(ch._busy)return; /* counts each real pop, not re-entries mid-animation */
-    if(++this.count>=this.need()){this.count=0;this.fired++;this.party()}},
+    if(++this.count>=this.need()){this.count=0;this.fired++;this.party();if(typeof badges!=='undefined')badges.award('poet')}},
   party(){const pal=[C.coral,C.yellow,C.blue,C.mint,C.pink,C.lilac,C.cream];
     const box=document.createElement('div');box.className='party';document.body.appendChild(box);
     for(let k=0;k<90;k++){const i=document.createElement('i');const sz=8+Math.random()*22;
@@ -861,7 +888,7 @@ const blip=()=>{if(arcade)beep(660,70)};   /* one blip per page change while the
 const say=(line,hold=3200)=>{const b=document.querySelector('.char .bubble');if(!b)return;b.textContent=line;b.classList.add('on');b._lock=performance.now()+hold;clearTimeout(b._h);b._h=setTimeout(()=>{b.classList.remove('on')},hold)};   /* holds the bubble: nothing else may overwrite or hide it meanwhile */
 const setArcade=on=>{if(on===arcade)return;arcade=on;document.documentElement.classList.toggle('arcade',on);
   if(!document.querySelector('.crt')){const c=document.createElement('div');c.className='crt';document.body.appendChild(c)}
-  if(on){[523,659,784,1047].forEach((f,i)=>beep(f,90,i*.09));if(egg.party)egg.party();showToast('Arcade mode. Esc, the code again, or three taps to leave.');say('Arcade mode activated.')}   /* party first: it writes its own toast, ours must land last */
+  if(on){[523,659,784,1047].forEach((f,i)=>beep(f,90,i*.09));if(egg.party)egg.party();badges.award('gamer');showToast('Arcade mode. Esc, the code again, or three taps to leave.');say('Arcade mode activated.')}   /* party first: it writes its own toast, ours must land last */
   else{beep(392,120,0,'square',.04);beep(262,160,.12,'square',.04);showToast('Back to normal.');say('Arcade mode off.')}};
 /* Konami code on a keyboard */
 {const KONAMI=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];let at=0;
@@ -879,6 +906,46 @@ const setArcade=on=>{if(on===arcade)return;arcade=on;document.documentElement.cl
     if(home&&ch&&ch._react&&b&&!b.classList.contains('on')&&!document.hidden&&performance.now()-lastPoke>8000){ch._react();n++}   /* the same reaction a click gives: a face and a line */
     setTimeout(tick,n===0?4000:10000+Math.random()*6000)};
   setTimeout(tick,4000)}
+/* ---------- blueprint overlay: how it's built ---------- */
+let blue=false,blueEl=null;
+const blueDraw=(i,bi,f,tt,te,type,s,inTrans)=>{const el=blueEl;if(!el)return;const boxes=el._boxes||(el._boxes=[]);let k=0;
+  const box=(r,label,cls)=>{let b=boxes[k];if(!b){b=document.createElement('div');b.className='bx';b.innerHTML='<span></span>';el.appendChild(b);boxes.push(b)}k++;
+    b.className='bx'+(cls?' '+cls:'');b.style.cssText=`left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px`;b.firstChild.textContent=label};
+  [i,bi].forEach(j=>{const sc=S[j];if(!sc||!sc.el.classList.contains('on'))return;
+    sc.shapes.forEach((sh,n)=>{const cfg=SCENES[j].shapes[n];if(!cfg||getComputedStyle(sh.el).display==='none')return;const r=sh.el.getBoundingClientRect();   /* 'mhide' only hides on phones: go by the computed display */if(r.width<2||r.height<2||r.bottom<0||r.top>innerHeight)return;
+      box(r,`${cfg.t} · ${cfg.w||'auto'}×${cfg.h||'auto'} · x${cfg.x} ${cfg.bottom!=null?'b'+cfg.bottom:'y'+cfg.y}${cfg.d?' · d'+cfg.d:''}`)});
+    const cr=sc.copy.getBoundingClientRect();if(cr.height>2&&cr.top<innerHeight)box(cr,`copy · ${sc.copy.querySelectorAll('h1 .ch').length} letters`,'copy')});
+  for(;k<boxes.length;k++)boxes[k].style.cssText='display:none';
+  const pn=el._pn||(el._pn=el.querySelector('.pn'));
+  const lock=Math.max(0,Math.round(wheelLock-performance.now()));
+  pn.innerHTML=`<b>how it's built</b>  press . to close
+scene <b>${String(i+1).padStart(2,'0')}</b> → <b>${String(bi+1).padStart(2,'0')}</b>   wipe: <b>${type}</b>${inTrans?'':'  (settled)'}
+scroll ${s.toFixed(3)} / ${N-1}   f ${f.toFixed(3)}   tt ${tt.toFixed(3)}   te ${te.toFixed(3)}
+edge ${pLag.toFixed(3)}   bulge ${Math.round(bulge)}px   vel ${vel.toFixed(4)}
+input <b>${lastKind}</b>${ges&&!ges.released?'  dragging':''}${follow?'  follow':''}${lock?'  lock '+lock+'ms':''}${arcade?'  arcade':''}
+${innerWidth}×${innerHeight}  dpr ${devicePixelRatio}  ${matchMedia('(orientation: portrait)').matches?'portrait':'landscape'}`};
+const setBlue=on=>{if(on===blue)return;blue=on;if(!blueEl){blueEl=document.createElement('div');blueEl.className='blue';blueEl.innerHTML='<div class="pn"></div>';document.body.appendChild(blueEl)}
+  blueEl.classList.toggle('on',on);if(on){showToast('Blueprint: the data behind the page. Press . to close.');say('Peeking under the hood?');badges.award('engineer')}else showToast('Blueprint off.')};
+addEventListener('keydown',e=>{if(e.key==='.'&&!e.metaKey&&!e.ctrlKey)setBlue(!blue);else if(e.key==='Escape'&&blue)setBlue(false)});
+/* phones: hold the brand line for a moment */
+{let hold=0;const brand=document.querySelector('.brand');if(brand){brand.addEventListener('pointerdown',()=>{clearTimeout(hold);hold=setTimeout(()=>setBlue(!blue),700)},{passive:true});['pointerup','pointercancel','pointerleave'].forEach(t=>brand.addEventListener(t,()=>clearTimeout(hold),{passive:true}))}}
+/* ---------- achievements: the three eggs, remembered ---------- */
+const BADGES=[{id:'poet',name:'Poet',how:'you made the words dance',hint:'letters like the attention'},
+  {id:'gamer',name:'Gamer',how:'cheat code accepted',hint:matchMedia('(pointer: coarse)').matches?'he has been playing something':'you know the Konami code, right?'},
+  {id:'engineer',name:'Engineer',how:'saw the page inside out',hint:'a single key turns the page inside out'}];
+const badges={got:new Set(JSON.parse(localStorage.getItem('yz-badges')||'[]')),el:null,
+  build(){if(this.el)return;const t=document.createElement('div');t.className='trophy';t.setAttribute('role','button');t.setAttribute('aria-label','Achievements');
+    t.innerHTML=`${BADGES.map(()=>'<i></i>').join('')}<span class="n"></span><div class="list"></div>`;document.body.appendChild(t);this.el=t;
+    t.addEventListener('click',e=>{e.stopPropagation();t.classList.toggle('open')});addEventListener('click',()=>t.classList.remove('open'));
+    addEventListener('keydown',e=>{if(e.key==='Escape')t.classList.remove('open')})},
+  render(){this.build();const t=this.el,n=this.got.size;t.querySelectorAll('i').forEach((i,k)=>i.classList.toggle('got',this.got.has(BADGES[k].id)));
+    t.querySelector('.n').textContent=`${n} / ${BADGES.length}`;t.classList.toggle('all',n===BADGES.length);t.classList.add('on');
+    t.querySelector('.list').innerHTML=`<div class="h">${n===BADGES.length?'All found':'Achievements'}</div>`+BADGES.map(b=>{const g=this.got.has(b.id);return `<div class="${g?'got':''}"><b>${g?'★':'☆'} ${b.name}</b><span>${g?b.how:b.hint}</span></div>`}).join('')},
+  award(id){if(this.got.has(id))return;this.got.add(id);try{localStorage.setItem('yz-badges',JSON.stringify([...this.got]))}catch(e){}
+    const b=BADGES.find(x=>x.id===id),n=this.got.size;this.render();if(id==='engineer'&&egg.party)egg.party();   /* the other two eggs bring their own party; this one gets it here */
+    if(n===BADGES.length){setTimeout(()=>{if(egg.party)egg.party();showToast('All three found. You are officially thorough.');say('You found everything. Respect.')},900)}   /* party first: it writes its own toast */
+    else setTimeout(()=>showToast(`★ ${b.name} unlocked · ${n} of ${BADGES.length}`),700)}};
+badges.render();   /* shown from the start: three empty slots are the invitation */
 /* random letter pops on the current scene */
 let curBase=0;
 (function tick(){const sc=S[curBase];if(sc&&sc.el.classList.contains('on')&&sc.el._playRandomLetter)sc.el._playRandomLetter();setTimeout(tick,3200+Math.random()*1600)})();
