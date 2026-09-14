@@ -189,6 +189,17 @@ body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetic
 .toast{position:fixed;left:50%;bottom:6vh;transform:translate(-50%,40px);z-index:9;background:#141414;color:#f4efe6;padding:14px 22px;border-radius:999px;font-size:13px;letter-spacing:.06em;opacity:0;transition:transform .6s cubic-bezier(.34,1.56,.64,1),opacity .4s;pointer-events:none;white-space:nowrap}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .toast b{color:#ffc93c;font-weight:600;margin-right:8px}
+/* arcade mode (Konami code / triple-tap the character): CRT scanlines, chromatic headline, everything square, monospace caps */
+.crt{position:fixed;inset:0;z-index:7;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 2px,transparent 2px 4px),radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.28) 100%);mix-blend-mode:multiply;opacity:0;transition:opacity .4s}
+.arcade .crt{opacity:1}
+.arcade #stage{filter:contrast(1.08) saturate(1.35)}
+.arcade .copy h1{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;text-transform:uppercase;letter-spacing:-.02em;text-shadow:3px 0 rgba(255,90,60,.85),-3px 0 rgba(47,75,255,.85)}
+.arcade .copy .k::before{content:"▶ "}
+.arcade .copy .k,.arcade .counter,.arcade .brand,.arcade .galhead,.arcade .xp .when{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.arcade .shape.geo .fx,.arcade .tags span,.arcade .car .ctl button,.arcade .gal img,.arcade .gal,.arcade .car .frame,.arcade .frame.tl,.arcade .xp .card,.arcade .toast,.arcade .bubble{border-radius:0!important}
+.arcade .nav button::after{border-radius:0}
+.arcade .char img{filter:contrast(1.25) saturate(1.4)}
+.arcade .progress{height:6px;background:repeating-linear-gradient(90deg,currentColor 0 10px,transparent 10px 14px)}
 .fx-wave{animation:fxWave .9s cubic-bezier(.34,1.56,.64,1)}
 @keyframes fxWave{0%{transform:translateY(0)}35%{transform:translateY(-28%) rotate(-6deg)}70%{transform:translateY(6%) rotate(3deg)}100%{transform:translateY(0)}}
 /* cross-document view transition back from a case study: the hero shrinks into its gallery card while the scene wipes down over the page */
@@ -455,7 +466,7 @@ SCENES.forEach((sc,i)=>sc.shapes.forEach((sh,j)=>{const mm=(M[i]||[])[j];sh.m=mm
 const TRANS=['up','right','blob','snap','diag'];
 
 /* ---------- character rig: eyes follow the pointer, random blinks, click for an expression + a line ---------- */
-const RIG_LINES=['Hey! Thanks for stopping by.','Scroll down, there is more.','I design it, then I build it. Both.','That tickles.','Poke the big letters too. They like it.','Ottawa says hi. It is probably snowing.','What is your favourite game? Mine is Persona 3.','Fun fact: this whole site was built with AI. I just did the directing.','I have been playing Big Walk with my family lately. Easily my GOTY.','Easing curves are a lifestyle.'];
+const RIG_LINES=['Up, up, down, down… you know the rest.','Hey! Thanks for stopping by.','Scroll down, there is more.','I design it, then I build it. Both.','That tickles.','Poke the big letters too. They like it.','Ottawa says hi. It is probably snowing.','What is your favourite game? Mine is Persona 3.','Fun fact: this whole site was built with AI. I just did the directing.','I have been playing Big Walk with my family lately. Easily my GOTY.','Easing curves are a lifestyle.'];
 function initRig(rig,s){
   const face=rig.querySelector('.face'),bubble=rig.querySelector('.bubble');
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -489,11 +500,13 @@ function initRig(rig,s){
     /* click: random expression + speech bubble, then back to rest */
     const EXPR=[{eyes:'happy',mouth:'open',brows:-8},{eyes:'open',mouth:'o',brows:-14},{eyes:'open',mouth:'flat',brows:5,gaze:[-RX,-4]},{eyes:'closed',mouth:'smile',brows:2},{eyes:'happy',mouth:'smile',brows:-4},{eyes:'open',mouth:'open',brows:-10}];
     let lastE=-1,lastL=-1,revert=0;
-    rig.addEventListener('click',()=>{let i;do{i=Math.floor(Math.random()*EXPR.length)}while(i===lastE);lastE=i;
+    const locked=()=>bubble._lock&&performance.now()<bubble._lock;   /* a priority line (arcade on/off) holds the bubble */
+    const react=()=>{if(locked())return;let i;do{i=Math.floor(Math.random()*EXPR.length)}while(i===lastE);lastE=i;
       Object.assign(cur,REST,EXPR[i]);apply();
       if(!reduce){rig.classList.remove('pop');void rig.offsetWidth;rig.classList.add('pop')}
       let j;do{j=Math.floor(Math.random()*RIG_LINES.length)}while(j===lastL);lastL=j;bubble.textContent=RIG_LINES[j];bubble.classList.add('on');
-      clearTimeout(revert);revert=setTimeout(()=>{Object.assign(cur,REST);apply();bubble.classList.remove('on')},2600+Math.random()*900)});
+      clearTimeout(revert);revert=setTimeout(()=>{Object.assign(cur,REST);apply();if(!locked())bubble.classList.remove('on')},2600+Math.random()*900)};
+    rig.addEventListener('click',react);rig._react=react;
   }
 }
 
@@ -740,7 +753,7 @@ function frame(now){
   const te=Math.pow(tt,1.3);                    // progress for the wipe and the incoming scene: stiff at first (the band is hard to get moving), then follows the drag
   const inTrans=f>T0&&f<T1;
   const type=TRANS[bi-1];
-  if(base!==lastHash){lastHash=base;try{history.replaceState(null,'',base?'#'+IDS[base]:location.pathname+location.search)}catch(e){}}
+  if(base!==lastHash){lastHash=base;blip();try{history.replaceState(null,'',base?'#'+IDS[base]:location.pathname+location.search)}catch(e){}}
   const A=S[i],B=S[bi];
 
   /* springs */
@@ -821,7 +834,7 @@ function frame(now){
 
   /* UI */
   progress.style.width=(r*100)+'%';
-  const cn=Math.round(s)+1;counter.textContent=String(cn).padStart(2,'0')+' / '+String(N).padStart(2,'0');
+  const cn=Math.round(s)+1;counter.textContent=(arcade?'LVL ':'')+String(cn).padStart(2,'0')+' / '+String(N).padStart(2,'0');
   st(hint,'opacity',1-smooth(.01,.05,r));
   navBtns.forEach((b,j)=>b.classList.toggle('on',j===Math.round(s)));
   requestAnimationFrame(frame);
@@ -840,6 +853,32 @@ const egg={count:0,fired:0,need:()=>matchMedia('(pointer: coarse)').matches?8:30
     const msgs=[`You poked ${this.need()} letters. They liked it.`,'Still here? The letters appreciate the attention.','Okay, you really like these letters.','At this point we should just be friends.'];
     let t=document.querySelector('.toast');if(!t){t=document.createElement('div');t.className='toast';document.body.appendChild(t)}
     t.textContent=msgs[Math.min(this.fired-1,msgs.length-1)];t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),3800)}};
+/* ---------- arcade mode: the character IS holding a controller ---------- */
+let arcade=false,audio=null;
+const showToast=msg=>{let t=document.querySelector('.toast');if(!t){t=document.createElement('div');t.className='toast';document.body.appendChild(t)}t.textContent=msg;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),3800)};
+const beep=(f,ms,at=0,type='square',gain=.05)=>{try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.value=f;g.gain.value=gain;o.connect(g);g.connect(audio.destination);const t=audio.currentTime+at;o.start(t);g.gain.setValueAtTime(gain,t);g.gain.exponentialRampToValueAtTime(.0001,t+ms/1000);o.stop(t+ms/1000+.02)}catch(e){}};
+const blip=()=>{if(arcade)beep(660,70)};   /* one blip per page change while the mode is on */
+const say=(line,hold=3200)=>{const b=document.querySelector('.char .bubble');if(!b)return;b.textContent=line;b.classList.add('on');b._lock=performance.now()+hold;clearTimeout(b._h);b._h=setTimeout(()=>{b.classList.remove('on')},hold)};   /* holds the bubble: nothing else may overwrite or hide it meanwhile */
+const setArcade=on=>{if(on===arcade)return;arcade=on;document.documentElement.classList.toggle('arcade',on);
+  if(!document.querySelector('.crt')){const c=document.createElement('div');c.className='crt';document.body.appendChild(c)}
+  if(on){[523,659,784,1047].forEach((f,i)=>beep(f,90,i*.09));if(egg.party)egg.party();showToast('Arcade mode. Esc, the code again, or three taps to leave.');say('Arcade mode activated.')}   /* party first: it writes its own toast, ours must land last */
+  else{beep(392,120,0,'square',.04);beep(262,160,.12,'square',.04);showToast('Back to normal.');say('Arcade mode off.')}};
+/* Konami code on a keyboard */
+{const KONAMI=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];let at=0;
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&arcade){setArcade(false);return}const k=e.key.length===1?e.key.toLowerCase():e.key;
+    const hit=k===KONAMI[at];
+    if(hit&&at>=2&&k.startsWith('Arrow'))e.preventDefault();   /* once ↑↑ are in, the rest of the code's arrows no longer scroll the page (↑↑ alone still work as normal navigation) */
+    at=hit?at+1:(k===KONAMI[0]?1:0);if(at===KONAMI.length){at=0;setArcade(!arcade)}})}
+/* on a phone: tap the character three times quickly */
+{let taps=[];addEventListener('pointerdown',e=>{if(!e.target.closest||!e.target.closest('.char'))return;const now=performance.now();taps=taps.filter(t=>now-t<900);taps.push(now);if(taps.length>=3){taps=[];setArcade(!arcade)}},{passive:true})}
+/* the character reacts on its own: a few seconds after landing, then now and then while the home page is showing and nobody has poked it
+   recently — the same face-and-line reaction a click gives, so people learn it's alive without being told */
+{let lastPoke=0,n=0;
+  addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('.char'))lastPoke=performance.now()},{passive:true});
+  const tick=()=>{const home=S[0]&&S[0].el.classList.contains('on')&&curBase===0,ch=document.querySelector('.char'),b=ch&&ch.querySelector('.bubble');
+    if(home&&ch&&ch._react&&b&&!b.classList.contains('on')&&!document.hidden&&performance.now()-lastPoke>8000){ch._react();n++}   /* the same reaction a click gives: a face and a line */
+    setTimeout(tick,n===0?4000:10000+Math.random()*6000)};
+  setTimeout(tick,4000)}
 /* random letter pops on the current scene */
 let curBase=0;
 (function tick(){const sc=S[curBase];if(sc&&sc.el.classList.contains('on')&&sc.el._playRandomLetter)sc.el._playRandomLetter();setTimeout(tick,3200+Math.random()*1600)})();
