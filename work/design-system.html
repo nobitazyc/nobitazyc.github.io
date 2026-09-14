@@ -116,6 +116,7 @@ h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-h
 h3{font-size:clamp(19px,1.5vw,22px);font-weight:700;letter-spacing:-.02em;line-height:1.2}
 .side .k{margin:22px 0 0;opacity:.55}
 .prose p{font-size:clamp(16px,1.2vw,19px);line-height:1.62;max-width:62ch;opacity:.88}
+.prose .hl{font-size:clamp(19px,1.55vw,26px);font-weight:700;letter-spacing:-.025em;line-height:1.3;opacity:1;max-width:44ch}   /* the one thing to take from the section */
 .prose p+p,.prose ul+p,.prose p+ul{margin-top:1.15em}
 .prose p b{font-weight:600;opacity:1}
 .prose ul{padding-left:1.1em;font-size:clamp(15px,1.1vw,17.5px);line-height:1.6;opacity:.88;max-width:62ch}
@@ -270,9 +271,8 @@ pre.code .s{color:var(--yellow)}pre.code .p{color:#8fd3ff}pre.code .c{opacity:.5
       <div class="k">Context</div>
     </div>
     <div class="prose">
-      <p>MacroHealth's marketplace is a React product with a small team: a UX designer, a PM, and frontend engineers who now do a lot of their building through coding agents. The design system is a shadcn-based React library with a matching Figma library, adapted from the shadcn kit and extended with our own patterns. I own the code side; the UX designer owns the Figma side.</p>
-      <p>A design system used to have one reader: a person opening Storybook or Figma. Ours had two. A designer reads Figma. An agent reads whatever it can find in the repo and the mockup, then writes code. If those two readers see different things, the product drifts, one component at a time.</p>
-      <p>The question this project answers is simple to state. <b>What does a design system need to look like so that a machine building from a Figma mockup lands on the same component, with the same props, that a human would?</b></p>
+      <p class="hl">Two readers, one design system: a designer in Figma and a coding agent in the repo.</p>
+      <p>MacroHealth's marketplace is built by a small team — a UX designer and two front-end engineers who now build largely through coding agents — on a shadcn-based React library with a matching Figma library. I own the code side, the designer owns Figma. If the two readers see different things, the product drifts one component at a time.</p>
     </div>
   </div>
 </section>
@@ -286,8 +286,8 @@ pre.code .s{color:var(--yellow)}pre.code .p{color:#8fd3ff}pre.code .c{opacity:.5
       <div class="k">Problem</div>
     </div>
     <div class="prose">
-      <p>We were drifting in two directions at once. Designers changed tokens and variants in Figma and the code found out weeks later. Agents building pages from mockups got the visual right and the component wrong: hand-rolled markup that looked like a Card instead of the Card, a hex value instead of a token. Every one of those is a future bug and a maintenance cost nobody chose.</p>
-      <p>The standard answer was behind a paywall. Figma Code Connect, which binds Figma components to code so Dev Mode and agents see real snippets, needs an Organization or Enterprise plan. We're on Professional. The usual plugin route for syncing tokens wanted a paid tier as well, and would have added a second tool to keep in step. Waiting for a plan upgrade wasn't a plan.</p>
+      <p class="hl">Designers changed Figma and the code found out weeks later. Agents got the look right and the component wrong.</p>
+      <p>Hand-rolled markup that resembled a Card instead of the Card, a hex value instead of a token — each one a future bug. And an agent working from a screenshot is a poor copyist: it lands close, never exact, and a human then spends longer nudging it pixel by pixel than it would have taken to build the screen by hand. The off-the-shelf fixes didn't fit either. Figma Code Connect and the token-sync plugins would each have added a dependency to keep in step, and Code Connect's stricter mapping means more to maintain every time a component changes. We wanted the bindings to live with the code, not in another tool.</p>
     </div>
   </div>
   <div class="wrap cards reveal">
@@ -307,8 +307,8 @@ pre.code .s{color:var(--yellow)}pre.code .p{color:#8fd3ff}pre.code .c{opacity:.5
       <div class="k">Principle</div>
     </div>
     <div class="prose">
-      <p>The insight that unlocked it: a Figma-to-code binding is not a feature of Figma. It is a small amount of data. "This Figma component set, with this variant axis set to this value, means this code component with this prop." If that data lives next to the code, is reviewed like code, and ships with the code, then any tool can read it, including the one we couldn't afford.</p>
-      <p>Three rules followed from that and held for the whole project:</p>
+      <p class="hl">A Figma-to-code binding isn't a Figma feature. It's a small amount of data, and data can live next to the code.</p>
+      <p>"This component set, with this variant set to this value, means this code component with this prop." Kept in the repo, reviewed like code and shipped with the code, any tool can read it, and nothing new has to be installed to keep it true. Three rules held for the whole project:</p>
       <ul>
         <li><b>Figma is the design source of truth. Git is the build source of truth.</b> Designers propose in Figma. Nothing is real until it is merged.</li>
         <li><b>One direction, Figma to code.</b> No tool in this workflow writes to Figma. That keeps the designer's file theirs and makes every sync reviewable as a diff.</li>
@@ -360,8 +360,8 @@ pre.code .s{color:var(--yellow)}pre.code .p{color:#8fd3ff}pre.code .c{opacity:.5
       <div class="k">Workflow</div>
     </div>
     <div class="prose">
-      <p>The team mapped the end-to-end flow on a FigJam board before building anything. Ideas start as Claude artifacts and an HTML prototype to settle the information architecture. The UX designer builds mockups from the Figma library and refines the library when a pattern is missing. I sync tokens and components into code, update the bindings and Storybook, and publish the package together with its MCP server. Whoever builds a product page then reads the mockup through the Figma MCP and resolves each instance through the design-system MCP.</p>
-      <p>The board also drew the alternative we rejected: treating the Claude artifact as the final spec and extracting its HTML into the repo. It looks faster and ends in the failure mode we were trying to kill: no component match, custom code creep, and every design update becoming a manual re-export.</p>
+      <p class="hl">Figma is the design source of truth, git is the build source of truth, and the agent bridges them without ever merging.</p>
+      <p>We mapped the flow on a FigJam board first: ideas as Claude artifacts and an HTML prototype, mockups from the Figma library, then tokens and components synced into code and published with their bindings, Storybook and an MCP server. The rejected alternative, treating the artifact's HTML as the spec, is exactly the custom-code creep we were trying to kill.</p>
     </div>
   </div>
   <div class="wrap media stack">
@@ -445,9 +445,8 @@ pre.code .s{color:var(--yellow)}pre.code .p{color:#8fd3ff}pre.code .c{opacity:.5
       <div class="k">Design tokens</div>
     </div>
     <div class="prose">
-      <p>Tokens live in one JSON file in the repo, and nothing else is a source. Two Figma variable collections feed it: a primitive palette of seven colour families, and a semantic collection with light and dark modes that aliases into the palette. A sixty-line build script turns that JSON into CSS custom properties, a dark-mode block, and a Tailwind theme, so <code>bg-primary</code> exists as a utility because a designer created a variable named primary.</p>
-      <p>The sync is the same mechanism the component bindings use: a Claude skill driven through the Figma MCP, no plugin, no extra tier. It reads the two collections, diffs them against the JSON, shows the diff, writes the file, regenerates the CSS, and opens a merge request. Two details mattered more than expected. Everything resolves <b>by name, never by ID</b>, because Figma file copies get new IDs and designers duplicate files constantly. And the generated CSS is rebuilt before every dev run and every build, so it cannot drift from the JSON even if someone edits it by hand.</p>
-      <p>Typography deliberately does not sync. Type roles in code are Tailwind recipes applied inside components, documented once in Storybook. Turning every Figma text style into a token would have created a second system to maintain for no gain.</p>
+      <p class="hl">One JSON file is the only source of tokens. Figma feeds it; a script generates everything else.</p>
+      <p>Two Figma variable collections, a primitive palette and a semantic light/dark layer, sync into that file through a Claude skill over the Figma MCP: read, diff, write, regenerate the CSS and Tailwind theme, open a merge request. Everything resolves by name, never by ID, because copied Figma files get new IDs. Typography deliberately doesn't sync; type roles live once, in code.</p>
     </div>
   </div>
   <div class="wrap media">
@@ -487,9 +486,8 @@ pre.code .s{color:var(--yellow)}pre.code .p{color:#8fd3ff}pre.code .c{opacity:.5
       <div class="k">Component bindings</div>
     </div>
     <div class="prose">
-      <p>Each component folder carries a small JSON map beside its code, stories, tests and docs. The map names the Figma component set, says whether the code side is a single component or a composition of sub-components, and translates each Figma variant axis into a prop. Where a Figma axis has no code equivalent, the map says so explicitly in an <code>unmapped</code> ledger instead of pretending.</p>
-      <p>That ledger turned out to be the most useful part. Figma is a design tool and its data is messy in human ways: a variant misspelled "hhost" for ghost, one axis doing the job of two, visual hover states that are not props. The map carries those facts rather than silently correcting them, so the designer can fix the source and the engineer knows exactly what will change when they do.</p>
-      <p>We kept real Code Connect files alongside the maps, unpublished. The map is the same information in a format we can use today. If the plan ever changes, publishing them lights up Dev Mode with no rework.</p>
+      <p class="hl">Every component folder carries a small JSON map: Figma variant axes in, React props out, plus an honest ledger of what doesn't map.</p>
+      <p>The ledger is the useful part. Figma is messy in human ways — a variant misspelled "hhost", one axis doing two jobs, hover states that aren't props — and the map records those facts instead of silently correcting them, so the designer fixes the source and the engineer knows what will change. Real Code Connect files sit alongside, unpublished, ready if we ever decide the extra tooling is worth it.</p>
     </div>
   </div>
   <div class="wrap media grid2">
@@ -530,9 +528,8 @@ pre.code .s{color:var(--yellow)}pre.code .p{color:#8fd3ff}pre.code .c{opacity:.5
       <div class="k">Agent interface</div>
     </div>
     <div class="prose">
-      <p>A build step compiles the 58 maps into one manifest and the package exports it as a first-class artefact, next to the JavaScript and the CSS. Anyone who installs the design system gets the bindings for free, pinned to the exact version of the components they are using.</p>
-      <p>On top of that sits a Model Context Protocol server, about 180 lines with no dependencies, exposed as a binary in the package. It has two tools. One lists every component that can be resolved. The other takes a Figma component-set name and the selected variants and returns the import statement, the resolved props, the sub-components, a usage example, and the ledger of anything it could not map. Any agent that speaks MCP can use it. No skill to author, nothing to install beyond the package itself.</p>
-      <p>For our own team I also wrote two Claude skills that wrap the workflow end to end. <b>figma-to-code</b> reads a mockup through the Figma MCP, walks every instance including nested ones, resolves each through the map, and builds the screen. <b>sync-tokens</b> is the token capture described above. Both are read-only on Figma and both end at a merge request.</p>
+      <p class="hl">The bindings ship inside the package and are served to any agent over MCP: two tools, about 180 lines, zero dependencies.</p>
+      <p>A build step compiles the 58 maps into one manifest that installs with the components, pinned to their version. The server lists resolvable components and turns a Figma component-set name plus variants into an import, props, sub-components, a usage example and the unmapped ledger. Two Claude skills wrap the workflow: figma-to-code builds a screen from a mockup, sync-tokens captures tokens. Both are read-only on Figma and both end at a merge request.</p>
     </div>
   </div>
   <div class="wrap media grid2">
@@ -586,9 +583,8 @@ pre.code .s{color:var(--yellow)}pre.code .p{color:#8fd3ff}pre.code .c{opacity:.5
       <div class="k">Guardrails</div>
     </div>
     <div class="prose">
-      <p>A binding layer is only useful if it is true. Two audits keep it that way. The first runs locally, with no network, on every commit and in the lint job: it parses each component's source, confirms the map's component is actually exported, and warns when code exposes a sub-component or variant the map doesn't mention. The second runs on a schedule against the Figma API: it reads each component set's real variant axes and reports any axis the map neither binds nor acknowledges. It never blocks a commit, because the Figma file changes on the designer's schedule, not ours. Its warnings are the standing backlog of "Figma is behind here".</p>
-      <p>I didn't take the audit's word for it. I deliberately deleted one sub-component from a map, pushed, watched the warning appear in the pipeline, and reverted. That commit pair is in the history on purpose.</p>
-      <p>Releases are boring by design. Merging to the default branch computes a version from the history and publishes the package, so there is no manual bump and no way for an unmerged branch to overwrite what consumers install.</p>
+      <p class="hl">A binding layer is only useful if it's true, so two audits check it: against the code on every commit, against Figma on a schedule.</p>
+      <p>The code audit confirms each map's component really is exported and flags variants the map doesn't mention; the Figma audit reads each component set and flags drift in either direction. I broke it on purpose, deleting a sub-component from a map, watching the pipeline warn, reverting — that commit pair is in the history. Releases version and publish themselves on merge, so nothing unmerged can reach consumers.</p>
     </div>
   </div>
   <div class="wrap media grid2">
@@ -631,8 +627,8 @@ warnings:    sub-component in code but not in map
       <div class="k">Result</div>
     </div>
     <div class="prose">
-      <p>The output of the workflow is a product page built only from library imports, with every prop resolved through the map and every colour coming from a token. Those screens are internal, so they stay out of this case study. What I can show is what makes that output possible: every component has a Storybook page with usage, variants and a props table, so the same system an agent reads as JSON is readable by a person as documentation.</p>
-      <p>That mattered to the UX designer as much as the map mattered to the agent. Storybook became the visual QA for every sync, and any Figma variant a designer can see has to have a story that shows it. Our own patterns went through the same path as the shadcn base: designed in Figma, mapped, built, documented.</p>
+      <p class="hl">Product pages built only from library imports, every prop resolved through the map, every colour from a token.</p>
+      <p>Those screens are internal, so what's shown here is what makes them possible: a Storybook page for every component with usage, variants and props, so the system an agent reads as JSON is the one a designer reads on screen. Storybook became the visual QA for every sync, and our own patterns went through the same path as the shadcn base.</p>
     </div>
   </div>
   <div class="wrap media stack">
@@ -659,8 +655,8 @@ warnings:    sub-component in code but not in map
       <div class="k">Outcome</div>
     </div>
     <div class="prose">
-      <p>The whole system lives in one repository. Fifty-five components, each with its code, map, stories, tests and docs. The token pipeline from Figma variables to generated CSS. Both audits, the compiled manifest, the MCP server, and the two skills that drive the workflow. The package publishes itself on merge. A designer can change a token in Figma and see it as a reviewable diff in a merge request the same day. An agent can build a page and be told, per instance, exactly what to import.</p>
-      <p>The part I'm proudest of is the part nobody sees: the workflow degrades honestly. When Figma is ahead of code, the audit says so. When code is ahead of Figma, the ledger says so. When a variant has no code meaning, the map says so, and the agent emits a plain component and flags it instead of inventing one.</p>
+      <p class="hl">One repository holds all of it: 55 components with code, map, stories, tests and docs, the token pipeline, both audits, the manifest, the MCP server and the two skills.</p>
+      <p>A designer changes a token in Figma and sees it as a reviewable diff in a merge request. And the workflow degrades honestly: when Figma is ahead, the audit says so; when code is ahead, the ledger says so; when a variant has no code meaning, the agent emits a plain component and flags it instead of inventing one.</p>
     </div>
   </div>
   <div class="wrap facts reveal">
@@ -680,9 +676,8 @@ warnings:    sub-component in code but not in map
       <div class="k">Reflection</div>
     </div>
     <div class="prose">
-      <p><b>The MCP protocol is hand-rolled.</b> It was the right call for a zero-dependency proof, and it works. For production I'd swap the framing and handshake for the official SDK and keep the two tools exactly as they are.</p>
-      <p><b>One map per folder was an assumption that broke.</b> Tables and tabs needed several maps in one folder for their sub-components. The audit sees them all, but the manifest builder still picks one. That is a small fix with a large lesson: the moment a layout convention becomes an implicit contract, write the test for it.</p>
-      <p><b>Figma's messiness is the interesting part.</b> The overloaded axis, the typo, the copied files with new IDs. I spent more time designing how the system tolerates those than on any single component, and it was the time that paid off. A binding layer that only works on a clean file only works in a demo.</p>
+      <p class="hl">Figma's messiness was the real design problem, and the time spent tolerating it paid off most.</p>
+      <p>Next: swap the hand-rolled MCP framing for the official SDK and keep the two tools as they are, and fix the one-map-per-folder assumption that tables and tabs broke — the audit sees every map, the manifest builder still picks one — then write the test for it. A binding layer that only works on a clean file only works in a demo.</p>
     </div>
   </div>
 </section>

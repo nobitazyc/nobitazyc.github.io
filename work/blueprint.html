@@ -94,6 +94,7 @@ section{padding:clamp(80px,11vw,150px) 6vw}
 h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-height:1.02;margin-top:16px}
 .side .k{margin:22px 0 0;opacity:.55}
 .prose p{font-size:clamp(16px,1.2vw,19px);line-height:1.62;max-width:62ch;opacity:.88}
+.prose .hl{font-size:clamp(19px,1.55vw,26px);font-weight:700;letter-spacing:-.025em;line-height:1.3;opacity:1;max-width:44ch}   /* the one thing to take from the section */
 .prose p+p{margin-top:1.15em}
 .prose p b{font-weight:600;opacity:1}
 .media{margin-top:clamp(44px,5vw,72px)}
@@ -202,9 +203,8 @@ h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-h
       <div class="k">Context</div>
     </div>
     <div class="prose">
-      <p>BluePrint Infinite is the internal tool Bell's customer-service agents use while a customer is on the phone. A <b>flow</b> is a scripted sequence of steps that collects the customer's information and the reason for the call, then walks the agent to a resolution or an offer. Flows are authored by a separate team and cover everything from a bill dispute to booking a technician.</p>
-      <p>Before the redesign that job was split across two applications. BluePrints Infinite 1.0 showed the customer's profile, services, billing and usage. A second app ran the flows themselves. Agents kept both open and switched between them for the whole length of every call. Every switch cost seconds, broke concentration, and was a chance to lose the thread.</p>
-      <p>The brief had two parts. Merge the two experiences so an agent can finish a call in one place and in less time. And give the product a real identity, with a design system the team could keep reusing.</p>
+      <p class="hl">Bell's agents ran two apps on every call: one for the customer's data, one for the scripted flow that resolved it.</p>
+      <p>BluePrint Infinite is the internal tool agents use while a customer is on the phone; flows are authored by a separate team and cover everything from billing to outages. Every switch between the two apps cost seconds and concentration. The brief: merge them so a call finishes in one place in less time, and give the product an identity and a design system the team could keep reusing.</p>
     </div>
   </div>
   <div class="wrap media grid2">
@@ -222,8 +222,8 @@ h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-h
       <div class="k">Research</div>
     </div>
     <div class="prose">
-      <p>I started with one-on-one interviews with three or four agents and a manager from the service team, walking through their actual day: the calls they get, the workarounds they had built, and the edge cases the previous versions never accounted for.</p>
-      <p>Then we spent time on the floor of the call centre, watching agents work instead of asking them to describe it. That surfaced habits nobody had mentioned in the interviews. We also visited a Bell retail store, a group with a similar job and different tooling, to see how they handled the same customers and borrow what worked.</p>
+      <p class="hl">Ask agents about their day, then watch it. The floor showed habits nobody mentioned in interviews.</p>
+      <p>One-on-one interviews with agents and a service manager covered real calls, workarounds and the edge cases the old versions never handled. Time on the call-centre floor, and a visit to a Bell retail store with a similar job and different tooling, filled in the rest.</p>
     </div>
   </div>
 </section>
@@ -237,7 +237,8 @@ h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-h
       <div class="k">Analysis</div>
     </div>
     <div class="prose">
-      <p>The findings went onto a wall with the core developer, the project manager and the customer-service manager, and got boiled down to four problem statements. Every later decision was checked against them.</p>
+      <p class="hl">Findings on a wall, boiled down to four problem statements with the core developer, the PM and the service manager.</p>
+      <p>Every later decision was checked against them.</p>
     </div>
   </div>
   <div class="wrap probs reveal">
@@ -260,7 +261,8 @@ h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-h
       <div class="k">Reverse engineering</div>
     </div>
     <div class="prose">
-      <p>Merging two apps means knowing exactly what is in them. I mapped both on a whiteboard: the information architecture of every screen, and the session logic underneath, including the branches for suspended sessions and returning customers that agents relied on but nobody had written down.</p>
+      <p class="hl">You can't merge two apps you haven't mapped.</p>
+      <p>Both went onto a whiteboard: the information architecture of every screen and the session logic underneath, including the branches for suspended sessions and returning customers that agents relied on but nobody had written down.</p>
     </div>
   </div>
   <div class="wrap media grid2">
@@ -278,8 +280,8 @@ h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-h
       <div class="k">Use cases · User flows</div>
     </div>
     <div class="prose">
-      <p>From the whiteboard I built a use-case diagram of the whole system so the team could see how the agent app, the admin tool, the flow engine and the microservices fit together in one view.</p>
-      <p>Then user flows for the main scenarios in Miro, from the customer dialling in to the flow wrapping up, including the unhappy paths: the customer with one more question, the agent who has to hand off, the flow that has to be cancelled. Having them drawn meant anyone on the team could point at the exact case they were talking about.</p>
+      <p class="hl">One diagram of the whole system, then user flows for every scenario, happy and unhappy.</p>
+      <p>The use-case diagram showed how the agent app, the admin tool, the flow engine and the microservices fit together. The Miro flows ran from the customer dialling in to wrap-up, including the customer with one more question, the agent who hands off and the flow that has to be cancelled, so anyone could point at the exact case under discussion.</p>
     </div>
   </div>
   <div class="wrap media stack">
@@ -297,7 +299,8 @@ h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-h
       <div class="k">Wireframes</div>
     </div>
     <div class="prose">
-      <p>Low-fidelity wireframes in Figma set the structure early: a persistent header with the customer's identity and a flow search, a left navigation, and a content area that changes with the task. They were cheap to change, so the team argued about structure here rather than later on polished mockups.</p>
+      <p class="hl">Settle the shell cheaply: header, left navigation, task area.</p>
+      <p>Low-fidelity Figma wireframes fixed the structure early — a persistent header with the customer's identity and flow search, a left nav, a content area that changes with the task — so the team argued about structure here rather than on polished mockups.</p>
     </div>
   </div>
   <div class="wrap media grid2">
@@ -317,28 +320,28 @@ h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-h
       <div class="k">Hi-fi design</div>
     </div>
     <div class="prose">
-      <p>Hi-fi design in Sketch came only after the team had agreed on the structure. Here is how each problem statement turned into something on screen.</p>
+      <p class="hl">Each of the four problem statements became one decision on screen.</p>
     </div>
   </div>
   <div class="wrap">
     <div class="dec reveal">
       <div><span class="tag">Answers 01</span><h3>One shell for everything</h3></div>
-      <div class="prose"><p>The landing page became a dashboard that carries the whole of the old data app: profile, services and eligibility, usage, timeline and flow history. Predicted and commonly used flows sit right beside them, so the most likely next action is one click away. Flow search lives in the header on every screen, so an agent can start a flow from anywhere.</p></div>
+      <div class="prose"><p>The landing page became a dashboard carrying everything the old data app did — profile, services, usage, timeline, flow history — with predicted and common flows beside them and flow search in the header of every screen.</p></div>
       <figure><div class="frame"><img src="../assets/work/blueprint/hifi-dashboard.webp" width="1800" height="1169" loading="lazy" alt="Hi-fi dashboard: customer profile, service tiles, predicted and common flows, flow history table, customer timeline, and open tasks in the sidebar"></div><figcaption><b>Dashboard</b><span>Everything the old data app did, plus the flows most likely to be needed next.</span></figcaption></figure>
     </div>
     <div class="dec reveal">
       <div><span class="tag">Answers 02</span><h3>Customer context beside the step</h3></div>
-      <div class="prose"><p>Inside a flow, an <b>InContext</b> panel keeps account info, profile, usage and tech details alongside the current step, with tabs for the customer's timeline and insights. Sections collapse so the agent chooses what stays open. No more second window.</p></div>
+      <div class="prose"><p>Inside a flow, an <b>InContext</b> panel keeps account, profile, usage and tech details beside the current step, with collapsible sections and tabs for timeline and insights. No more second window.</p></div>
       <figure><div class="frame"><img src="../assets/work/blueprint/hifi-flow.webp" width="1800" height="1169" loading="lazy" alt="Hi-fi flow screen: InContext panel on the left with account info, profile and usage chart; a ticket details step on the right with a step strip along the bottom"></div><figcaption><b>Flow</b><span>The InContext panel on the left, the current step on the right.</span></figcaption></figure>
     </div>
     <div class="dec reveal">
       <div><span class="tag">Answers 03</span><h3>One step in focus</h3></div>
-      <div class="prose"><p>The flow area shows only the current step. Answers from earlier steps compress into a strip along the bottom, so the agent can see the path and jump back without those steps taking up the screen. Secondary sections of a step start collapsed. Notifications are one bar, not a column. Wrong, Suspend and Cancel are always in the same place.</p></div>
+      <div class="prose"><p>The flow area shows only the current step. Earlier answers compress into a strip along the bottom for review and jump-back, secondary sections start collapsed, notifications are one bar, and Wrong, Suspend and Cancel always sit in the same place.</p></div>
       <figure><div class="frame"><img src="../assets/work/blueprint/hifi-step.webp" width="1800" height="1675" loading="lazy" alt="Close-up of a flow step: ticket status, report form, flags, an appointment table, collapsed sections, Submit and Reset buttons, and a strip of earlier answers along the bottom"></div><figcaption><b>Step</b><span>Earlier answers as a strip at the bottom, a Summary one tap away.</span></figcaption></figure>
     </div>
     <div class="dec reveal">
       <div><span class="tag">Answers 04</span><h3>A step is a container</h3></div>
-      <div class="prose"><p>Each step is a self-contained component with its own state, so a step can be a single question or a full ticket form with a report, an appointment table and flags. I specified the state logic for the developers: what initialises the form, what disables it in read-only mode, and how changes are detected to enable Save. Suspended flows show up as <b>Open Tasks</b> in the sidebar, so an agent can pick up where they left off.</p></div>
+      <div class="prose"><p>Each step is a self-contained component with its own state, from a single question to a full ticket form with report, appointment table and flags. I specified the state logic for the developers: initialisation, read-only mode, and the dirty check that enables Save.</p></div>
       <figure><div class="frame"><img src="../assets/work/blueprint/flow-step-state.webp" width="1800" height="1262" loading="lazy" alt="Logic diagram for a ticket step: ticket update decision, apply update, enable cancel, dark mode and read-only checks, form value change, compare ticket data, and a Step State panel listing the stored data"></div><figcaption><b>Step state</b><span>The logic behind a step: initial data, read-only mode, and the dirty check that enables Save.</span></figcaption></figure>
     </div>
   </div>
@@ -357,9 +360,8 @@ h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-h
       <div class="k">Identity · Logo</div>
     </div>
     <div class="prose">
-      <p>The second half of the brief was an identity. The old app had a name and a blue header, and nothing else. The team was about to present its work to other departments at Bell and needed something to put on a slide, and the app needed a mark that could survive being shrunk into a sidebar.</p>
-      <p>I started on paper: letterforms built from the b and the p, peaks for the blueprint idea, and the infinity loop from the product's name. Five made it to vector. Three went onto a sheet where each was checked on white, on dark and on the product blue, because the mark had to live on all three.</p>
-      <p>The chosen direction became a monogram drawn from circles on a grid so it stays crisp at any size. It sits in the app's sidebar, appears as a watermark behind the dashboard, and its two blues carry through the interface. The mark itself belongs to Bell, so it isn't reproduced here and is masked in the product screens; the exploration that led to it is what's shown.</p>
+      <p class="hl">The team needed a mark that could survive a slide deck and a sidebar.</p>
+      <p>The old app had a name and a blue header. I started on paper — letterforms from the b and the p, peaks for the blueprint idea, the infinity loop from the name — took five to vector and checked three on white, dark and the product blue. The chosen monogram is drawn from circles on a grid so it stays crisp at any size. It belongs to Bell, so only the explorations are shown here.</p>
     </div>
   </div>
   <div class="wrap media stack">
@@ -377,7 +379,8 @@ h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-h
       <div class="k">Design system</div>
     </div>
     <div class="prose">
-      <p>With the shell and the identity settled I built the design system: type scale, colours, spacing, a component library and behaviour rules for the common patterns. Its point was speed for both sides of the table. Designers stop redrawing buttons and tables, developers get one reference to build against, and the back-and-forth between the two shrinks.</p>
+      <p class="hl">One reference for both sides of the table.</p>
+      <p>Type scale, colours, spacing, a component library and behaviour rules for the common patterns. Designers stopped redrawing buttons and tables, developers got one thing to build against, and the back-and-forth between them shrank.</p>
     </div>
   </div>
   <div class="wrap media">
@@ -394,8 +397,8 @@ h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-h
       <div class="k">Build · Test</div>
     </div>
     <div class="prose">
-      <p>I was the UX Engineer on a team of about ten, so the handoff was mostly to myself. The design system became an Angular component library, and the mockups and the app were assembled from the same parts. Where a step's behaviour got complicated I drew the logic before writing it, and the diagrams doubled as documentation for the other developers.</p>
-      <p>The deadline didn't leave room for a full build before testing. So I pushed the Sketch Cloud prototype as close to the real thing as I could and ran user testing with agents on that. It wasn't perfect, but it gave us real feedback early, and several rounds of polish came out of it before launch.</p>
+      <p class="hl">The handoff was mostly to myself: the same UX Engineer designed the system and built it in Angular.</p>
+      <p>The design system became an Angular component library, and mockups and app were assembled from the same parts; complicated step logic was drawn before it was written and doubled as documentation. With no time for a full build before testing, I pushed the Sketch Cloud prototype as close to real as possible and tested with agents on that. Several rounds of polish came out of it before launch.</p>
     </div>
   </div>
   <div class="wrap media stack">
@@ -428,8 +431,8 @@ h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-h
       <div class="k">Reflection</div>
     </div>
     <div class="prose">
-      <p>We never wrote personas or a journey map. The interviews and the time on the floor gave us most of that understanding informally, but writing it down would have made the reasoning visible to people who joined later, and easier to challenge.</p>
-      <p>Testing on a prototype instead of the build meant some interaction details only surfaced after launch. With more runway I'd have tested on a real build with real customer data, earlier.</p>
+      <p class="hl">Write it down, and test on the real thing earlier.</p>
+      <p>We never wrote personas or a journey map; the floor time gave us the understanding, but writing it down would have made the reasoning visible and easier to challenge. Testing on a prototype meant some interaction details only surfaced after launch.</p>
     </div>
   </div>
 </section>
