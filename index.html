@@ -202,15 +202,18 @@ body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetic
 .arcade .progress{height:6px;background:repeating-linear-gradient(90deg,currentColor 0 10px,transparent 10px 14px)}
 /* blueprint overlay ("how it's built": press . or long-press the brand): a 10% grid, a dashed outline and label on every live shape, and a panel of the values driving the stage */
 .blue{position:fixed;inset:0;z-index:8;pointer-events:none;color:var(--fg);font:11px/1.35 ui-monospace,"SF Mono",Menlo,Consolas,monospace;background-image:linear-gradient(currentColor 1px,transparent 1px),linear-gradient(90deg,currentColor 1px,transparent 1px);background-size:10vw 10vh;opacity:0;transition:opacity .3s}
-.blue.on{opacity:1}
+.blue.on{opacity:1;visibility:visible;transition:opacity .3s,visibility 0s}
+.blue{visibility:hidden;transition:opacity .3s,visibility 0s linear .3s}   /* fades out, then stops existing for the pointer */
 .blue::before{content:"";position:absolute;inset:0;background-image:linear-gradient(currentColor 1px,transparent 1px),linear-gradient(90deg,currentColor 1px,transparent 1px);background-size:10vw 10vh;opacity:.12}
 .blue{background-image:none}
 .blue .bx{position:absolute;border:1px dashed currentColor;box-sizing:border-box}
 .blue .bx span{position:absolute;left:-1px;top:-17px;background:var(--fg);color:var(--bgc,#fff);padding:1px 5px;white-space:nowrap;letter-spacing:.02em;font-size:10px}
-.blue .bx.copy{border-style:solid;border-width:1px;opacity:.7}
+.blue .bx.cp{border-style:solid;border-width:1px;opacity:.7}
+.blue,.blue *{pointer-events:none!important}   /* the overlay must never take a tap, whatever else its children match */
 .blue .pn{position:absolute;left:24px;bottom:24px;background:#141414;color:#f4efe6;padding:12px 14px 12px;border-radius:12px;white-space:pre;box-shadow:0 12px 30px rgba(20,20,20,.25);line-height:1.5}
 .blue .pn b{color:#ffc93c;font-weight:600}
-.brand{pointer-events:auto}
+.brand{pointer-events:auto;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.copy h1,.copy .tags,.char{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}   /* interactive text: a stray selection would swallow the taps that follow */
 .blue .pn{left:24px;bottom:24px}
 @media (orientation:portrait){.blue .pn{left:12px;bottom:12px;font-size:10px;padding:10px 12px}}
 /* achievements: one pill, three slots, appears after the first egg is found and remembers across visits */
@@ -914,7 +917,7 @@ const blueDraw=(i,bi,f,tt,te,type,s,inTrans)=>{const el=blueEl;if(!el)return;con
   [i,bi].forEach(j=>{const sc=S[j];if(!sc||!sc.el.classList.contains('on'))return;
     sc.shapes.forEach((sh,n)=>{const cfg=SCENES[j].shapes[n];if(!cfg||getComputedStyle(sh.el).display==='none')return;const r=sh.el.getBoundingClientRect();   /* 'mhide' only hides on phones: go by the computed display */if(r.width<2||r.height<2||r.bottom<0||r.top>innerHeight)return;
       box(r,`${cfg.t} · ${cfg.w||'auto'}×${cfg.h||'auto'} · x${cfg.x} ${cfg.bottom!=null?'b'+cfg.bottom:'y'+cfg.y}${cfg.d?' · d'+cfg.d:''}`)});
-    const cr=sc.copy.getBoundingClientRect();if(cr.height>2&&cr.top<innerHeight)box(cr,`copy · ${sc.copy.querySelectorAll('h1 .ch').length} letters`,'copy')});
+    const cr=sc.copy.getBoundingClientRect();if(cr.height>2&&cr.top<innerHeight)box(cr,`copy · ${sc.copy.querySelectorAll('h1 .ch').length} letters`,'cp')});
   for(;k<boxes.length;k++)boxes[k].style.cssText='display:none';
   const pn=el._pn||(el._pn=el.querySelector('.pn'));
   const lock=Math.max(0,Math.round(wheelLock-performance.now()));
@@ -924,7 +927,7 @@ scroll ${s.toFixed(3)} / ${N-1}   f ${f.toFixed(3)}   tt ${tt.toFixed(3)}   te $
 edge ${pLag.toFixed(3)}   bulge ${Math.round(bulge)}px   vel ${vel.toFixed(4)}
 input <b>${lastKind}</b>${ges&&!ges.released?'  dragging':''}${follow?'  follow':''}${lock?'  lock '+lock+'ms':''}${arcade?'  arcade':''}
 ${innerWidth}×${innerHeight}  dpr ${devicePixelRatio}  ${matchMedia('(orientation: portrait)').matches?'portrait':'landscape'}`};
-const setBlue=on=>{if(on===blue)return;blue=on;if(!blueEl){blueEl=document.createElement('div');blueEl.className='blue';blueEl.innerHTML='<div class="pn"></div>';document.body.appendChild(blueEl)}
+const setBlue=on=>{if(on===blue)return;blue=on;try{getSelection().removeAllRanges()}catch(e){}if(!blueEl){blueEl=document.createElement('div');blueEl.className='blue';blueEl.innerHTML='<div class="pn"></div>';document.body.appendChild(blueEl)}
   blueEl.classList.toggle('on',on);if(on){showToast('Blueprint: the data behind the page. Press . to close.');say('Peeking under the hood?');badges.award('engineer')}else showToast('Blueprint off.')};
 addEventListener('keydown',e=>{if(e.key==='.'&&!e.metaKey&&!e.ctrlKey)setBlue(!blue);else if(e.key==='Escape'&&blue)setBlue(false)});
 /* phones: hold the brand line for a moment */
@@ -932,7 +935,7 @@ addEventListener('keydown',e=>{if(e.key==='.'&&!e.metaKey&&!e.ctrlKey)setBlue(!b
 /* ---------- achievements: the three eggs, remembered ---------- */
 const BADGES=[{id:'poet',name:'Poet',how:'you made the words dance',hint:'letters like the attention'},
   {id:'gamer',name:'Gamer',how:'cheat code accepted',hint:matchMedia('(pointer: coarse)').matches?'he has been playing something':'you know the Konami code, right?'},
-  {id:'engineer',name:'Engineer',how:'saw the page inside out',hint:'a single key turns the page inside out'}];
+  {id:'engineer',name:'Engineer',how:'saw the page inside out',hint:matchMedia('(pointer: coarse)').matches?'hold the name at the top a little longer':'a single key turns the page inside out'}];
 const badges={got:new Set(JSON.parse(localStorage.getItem('yz-badges')||'[]')),el:null,
   build(){if(this.el)return;const t=document.createElement('div');t.className='trophy';t.setAttribute('role','button');t.setAttribute('aria-label','Achievements');
     t.innerHTML=`${BADGES.map(()=>'<i></i>').join('')}<span class="n"></span><div class="list"></div>`;document.body.appendChild(t);this.el=t;
