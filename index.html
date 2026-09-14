@@ -53,7 +53,7 @@ body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetic
 @keyframes idleD{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(2deg) scale(1.02)}75%{transform:rotate(-2deg) scale(.98)}}
 .gal,.fx.gal{height:100%;display:flex;flex-direction:column;overflow:hidden;border-radius:1.5vw;background:#141414;color:#f4efe6;padding:1.4vw}
 /* the cards live in a scroller under the header: cards keep their width-driven size, the scroller takes whatever height is left, so a taller viewport simply shows more of the list */
-.gscroll{position:relative;flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#f4efe6 transparent}
+.gscroll{position:relative;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#f4efe6 transparent}
 .gscroll::-webkit-scrollbar{width:6px}.gscroll::-webkit-scrollbar-thumb{background:#f4efe6;border-radius:3px}.gscroll::-webkit-scrollbar-track{background:transparent}
 .galhead{flex:none;display:flex;justify-content:space-between;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.6;padding:.2vw .2vw 1.2vw}
 .galhead em{font-style:normal}
@@ -92,12 +92,12 @@ body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetic
 .xp .body::-webkit-scrollbar{width:6px}.xp .body::-webkit-scrollbar-thumb{background:#f4efe6;border-radius:3px}
 .xp .when{font-size:.75vw;letter-spacing:.14em;text-transform:uppercase;color:#ffc93c;margin-bottom:.7vw;font-variant-numeric:tabular-nums}
 .xp .role{font-size:1.6vw;font-weight:700;letter-spacing:-.03em;line-height:1.1}
-.xp .org{font-size:.85vw;opacity:.65;margin-top:.45vw}
-.xp p{font-size:.85vw;line-height:1.5;opacity:.85;margin-top:1vw}
-.xp ul{margin:.9vw 0 0 1vw;padding:0;font-size:.8vw;line-height:1.55;opacity:.85}
-.xp ul li{margin-bottom:.3vw}
+.xp .org{font-size:.95vw;opacity:.65;margin-top:.45vw}
+.xp p{font-size:.95vw;line-height:1.5;opacity:.85;margin-top:1vw}
+.xp ul{margin:.9vw 0 0 1vw;padding:0;font-size:.92vw;line-height:1.55;opacity:.85}
+.xp ul li{margin-bottom:.7vw}
 .xp .stack{display:flex;gap:.5vw;flex-wrap:wrap;margin-top:1vw;padding-bottom:.3vw}
-.xp .stack em{font-style:normal;font-size:.7vw;letter-spacing:.06em;border:1px solid rgba(244,239,230,.35);border-radius:999px;padding:.25vw .7vw}
+.xp .stack em{font-style:normal;font-size:.78vw;letter-spacing:.06em;border:1px solid rgba(244,239,230,.35);border-radius:999px;padding:.25vw .7vw}
 .xp .ctl{display:flex;flex-wrap:wrap;align-items:center;gap:.6vw;margin-top:1.6vw}
 .xp .ctl button{width:2.6vw;height:2.6vw;border-radius:50%;border:0;background:#f4efe6;color:#141414;font:700 1.1vw/1 Inter,sans-serif;cursor:pointer;transition:transform .4s cubic-bezier(.34,1.56,.64,1),background .3s}
 .xp .ctl button:hover{transform:scale(1.15) rotate(-8deg);background:#ffc93c}
@@ -234,7 +234,7 @@ body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetic
   .xp .yr{flex-direction:column;gap:6px;padding:0}
   .xp .yr .full{display:none}.xp .yr .short{display:block;font-size:10px}
   .xp .yr i{width:3vw;height:3vw}
-  .xp .when{font-size:10px}.xp .role{font-size:16px}.xp .org,.xp p,.xp ul{font-size:12px}.xp ul{margin-left:12px}.xp .stack em{font-size:10px;padding:2px 8px}
+  .xp .when{font-size:10px}.xp .role{font-size:17px}.xp .org,.xp p,.xp ul{font-size:13px}.xp ul{margin-left:12px}.xp ul li{margin-bottom:8px}.xp .stack em{font-size:11px;padding:2px 8px}
   .xp .ctl{margin-top:0;padding-top:3vw;gap:3vw;flex-wrap:nowrap;border-top:1px solid rgba(244,239,230,.15)}.xp .ctl button{width:34px;height:34px;font-size:14px}.xp .cnt{flex-basis:auto;margin:0 0 0 auto}
   .copy .tags span{font-size:10px;padding:4px 8px}
   .hint{display:none}
@@ -399,7 +399,7 @@ const SCENES=[
     {t:'ring',x:88,y:78,w:'7vw',h:'7vw',c:C.cream,bw:'1vw',d:.4},
     {t:'rect',x:47,y:74,w:'5vw',h:'5vw',c:C.coral,rot:30,d:.42},
     {t:'rect',x:88,y:3,w:'8vw',h:'8vw',c:C.ink,r:'60% 40% 30% 70% / 60% 30% 70% 40%',d:.44}]},
-  {bg:C.cream,fg:C.ink,k:'03 / Development & Ship',title:['Build it','and ship it'],p:'React, Next.js and TypeScript, now mostly written with coding agents. My job has shifted to making them accurate: machine-readable design systems, tight specs, audits and review gates. Then it goes live. Release, measure, iterate.',tags:['React / Next.js','TypeScript','Agentic workflows','MCP'],links:['Design system case study →'],
+  {bg:C.cream,fg:C.ink,k:'03 / Development & Ship',title:['Build and','ship it'],p:'React, Next.js and TypeScript, now mostly written with coding agents. My job has shifted to making them accurate: machine-readable design systems, tight specs, audits and review gates.',tags:['React / Next.js','TypeScript','Agentic workflows','MCP'],links:['Design system case study →'],
    shapes:[
     {t:'rect',x:54,y:12,w:'40vw',h:'58vh',c:C.ink,r:'1.5vw',d:0},
     {t:'circle',x:55.4,y:13.6,w:'1vw',h:'1vw',c:C.coral,d:.04},
@@ -418,12 +418,10 @@ const SCENES=[
   {bg:C.lilac,fg:C.ink,k:'About',title:['Bit more','about me'],p:'Engineer first, then UX and motion design — so I design what I build and build what I design. I care about the details people feel but never notice.',
    shapes:[
     {t:'timeline',x:54,y:10,w:'40vw',h:'78vh',d:0,items:[
-      {when:'2021 — Now',role:'Senior Frontend Engineer',org:'MacroHealth · Vancouver (remote from Ottawa)',desc:'I own the front end across MacroHealth\'s healthcare data products, from the shared UI library to the customer portal.',bullets:['Led the design and build of the new customer portal, replacing a legacy CMS-based portal with a standalone React app','Led the design and implementation of the company-wide UI component library, now used by every product team','Made the design system machine-readable so designers and coding agents build from one source of truth','Led front-end delivery of the analytics product from first mockups to shipped features','Replaced embedded BI dashboards with native, interactive reporting inside the product'],stack:['React','TypeScript','Storybook','GraphQL','Node.js','Figma','MCP']},
+      {when:'2021 — Now',role:'Senior Frontend Engineer',org:'MacroHealth · Vancouver (remote from Ottawa)',desc:'I own the front end across MacroHealth\'s healthcare data products, from the shared UI library to the customer portal.',bullets:['Led the design and build of the new customer portal, migrating it from a CMS to a standalone React SPA, and the company-wide UI component library','Made the design system machine-readable so designers and coding agents build from one source of truth','Led front-end delivery of the analytics product, replacing embedded BI dashboards with native, interactive reporting'],stack:['React','TypeScript','Storybook','GraphQL','Node.js','Figma','MCP']},
       {when:'2016 — 2021',role:'UX Developer',org:'Bell · Ottawa',desc:'BluePrint Infinite, the agent web app used across Bell\'s call centres.',bullets:['Led the end-to-end redesign that merged two legacy tools into one and cut average handling time per call','Designed and built the product\'s design system and component library, then implemented core features with the team','Created the product\'s identity and its promotional videos'],stack:['Angular','Storybook','Sketch','After Effects']},
       {when:'2015 — 2016',role:'Designer & Front-end Developer',org:'Fullscript · Ottawa',desc:'HealthWave, a practitioner e-commerce platform.',bullets:['Designed the iPad app UI and built the UI kit for the web app','Designed and built the public marketing site, including its illustration and icon sets','Built the public catalogue and category pages'],stack:['UI Kit','HTML / CSS','JavaScript']},
-      {when:'2014 — 2015',role:'Designer & Front-end Developer',org:'LiveQoS · Ottawa',desc:'LiveInsight network analytics and the SuperTCP product.',bullets:['Built the LiveInsight analytics dashboard from the ground up, front end and data visualisation','Led UI/UX and mobile-first design for SuperTCP','Produced the products\' promotional videos'],stack:['Angular.js','D3.js','Cinema 4D','After Effects']},
-      {when:'2013 — 2014',role:'Web Application Developer',org:'inVUze · Kitchener',desc:'Web apps, games and presentation tools.',bullets:['Built a live presentation app: slides controlled from a phone while the audience comments in real time','Built a four-player online game that uses phones as controllers','Designed and developed the company website'],stack:['ASP.NET','SQL Server','jQuery','HTML5']},
-      {when:'2011 — 2014',role:'Diploma, Computer Software Technology',org:'Conestoga College',desc:'',bullets:[],stack:[]}]},
+      {when:'2014 — 2015',role:'Designer & Front-end Developer',org:'LiveQoS · Ottawa',desc:'LiveInsight network analytics and the SuperTCP product.',bullets:['Built the LiveInsight analytics dashboard from the ground up, front end and data visualisation','Led UI/UX and mobile-first design for SuperTCP','Produced the products\' promotional videos'],stack:['Angular.js','D3.js','Cinema 4D','After Effects']}]},
     {t:'ring',x:46,y:12,w:'6vw',h:'6vw',c:C.ink,bw:'1.1vw',d:.14},
     {t:'rect',x:47,y:30,w:'6vw',h:'12vw',c:C.yellow,r:'3vw 3vw 0 0',d:.2},
     {t:'rect',x:47.5,y:66,w:'5vw',h:'5vw',c:C.blue,rot:45,d:.26},
@@ -528,17 +526,20 @@ const S=SCENES.map((sc,i)=>{
     else if(s.t==='ring'){f.style.borderRadius='50%';f.style.border=`${U(s.bw)} solid ${s.c}`}
     else if(s.t==='gallery'){f.classList.add('gal');const n=s.items.length;
       f.innerHTML=`<div class="galhead"><span>Selected work</span><span><em class="gcount">${n} case studies · </em>scroll ↓</span></div><div class="gscroll">`+s.items.map((it,i)=>{const inner=`<img src="${it.src}" alt="${it.title}" loading="${it.vt?'eager':'lazy'}" draggable="false"${it.vt?` data-vt="${it.vt}"`:''}><figcaption><b>0${i+1}</b><div><strong>${it.title}</strong><span>${it.meta}</span>${it.href?`<em class="more">${it.cta||'Read the case study →'}</em>`:''}</div></figcaption>`;return it.href?`<figure class="has-cs"><a href="${it.href}" aria-label="${it.title} — ${(it.cta||'Read the case study').replace(' →','').toLowerCase()}">${inner}</a></figure>`:`<figure>${inner}</figure>`}).join('')+'</div>';
-      const sc=f.querySelector('.gscroll');sc.addEventListener('wheel',e=>{const atTop=sc.scrollTop<=0&&e.deltaY<0,atEnd=sc.scrollTop+sc.clientHeight>=sc.scrollHeight-1&&e.deltaY>0;if(!atTop&&!atEnd)e.stopPropagation()},{passive:true});}
+      /* desktop: the wheel inside the list never reaches the stage, even at the list's ends — leave the list to change pages (touch keeps its edge hand-off).
+         The list scrolls ITSELF from the deltas and cancels the event: Chrome latches a wheel sequence to the scroller it started on (the page), and a
+         flick that lands here mid-sequence would otherwise have its momentum events — unseen by the stage and uncancelled — scroll the page natively. */
+      const sc=f.querySelector('.gscroll');sc.addEventListener('wheel',e=>{e.stopPropagation();if(e.cancelable)e.preventDefault();sc.scrollTop+=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?sc.clientHeight:1)},{passive:false});}
     else if(s.t==='timeline'){f.classList.add('car','tcar');const items=s.items;let idx=0;
       f.innerHTML=`<div class="frame tl"><div class="galhead"><span>Experience</span></div><div class="xp"><div class="rail"><div class="yrs">${items.map(it=>`<button class="yr" type="button" title="${it.role}"><span class="full">${it.when}</span><span class="short">${it.when.slice(0,4)}</span><i></i></button>`).join('')}</div></div><div class="card"><div class="body"></div></div></div></div><div class="ctl"><button class="pv" aria-label="previous role">←</button><span class="cnt"></span><button class="nx" aria-label="next role" style="margin-left:auto">→</button></div>`;
       const body=f.querySelector('.body'),card=f.querySelector('.card'),cnt=f.querySelector('.cnt'),yrs=[...f.querySelectorAll('.yr')];
-      const render=it=>`<div class="when">${it.when}</div><div class="role">${it.role}</div><div class="org">${it.org}</div>${it.desc?`<p>${it.desc}</p>`:''}${it.bullets&&it.bullets.length?`<ul>${it.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>`:''}${it.stack&&it.stack.length?`<div class="stack">${it.stack.map(t=>`<em>${t}</em>`).join('')}</div>`:''}`;
+      const render=it=>`<div class="when">${it.when}</div><div class="role">${it.role}</div><div class="org">${it.org}</div>${it.desc?`<p>${it.desc}</p>`:''}${it.stack&&it.stack.length?`<div class="stack">${it.stack.map(t=>`<em>${t}</em>`).join('')}</div>`:''}${it.bullets&&it.bullets.length?`<ul>${it.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>`:''}`;
       const go=n=>{idx=(n+items.length)%items.length;body.innerHTML=render(items[idx]);body.scrollTop=0;cnt.textContent=`0${idx+1} / 0${items.length}`;yrs.forEach((y,i)=>y.classList.toggle('on',i===idx));card.classList.remove('swap');void card.offsetWidth;card.classList.add('swap')};
       go(0);
       f.querySelector('.pv').onclick=e=>{e.stopPropagation();go(idx-1)};f.querySelector('.nx').onclick=e=>{e.stopPropagation();go(idx+1)};
       yrs.forEach((y,i)=>y.onclick=e=>{e.stopPropagation();go(i)});
       f.tabIndex=0;f.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();go(idx+1)}else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();go(idx-1)}});
-      body.addEventListener('wheel',e=>{const atTop=body.scrollTop<=0&&e.deltaY<0,atEnd=body.scrollTop+body.clientHeight>=body.scrollHeight-1&&e.deltaY>0;if(!atTop&&!atEnd)e.stopPropagation()},{passive:true});}
+      body.addEventListener('wheel',e=>{const d=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?body.clientHeight:1),atTop=body.scrollTop<=0&&d<0,atEnd=body.scrollTop+body.clientHeight>=body.scrollHeight-1&&d>0;if(atTop||atEnd)return;e.stopPropagation();if(e.cancelable)e.preventDefault();body.scrollTop+=d},{passive:false});   /* same reason as the gallery list: scroll itself, cancel the event; at its ends the stage takes over */}
     else if(s.t==='video'){f.classList.add('car');const covers=[C.coral,C.yellow,C.cream,C.ink];
       f.innerHTML=`<div class="frame"><div class="track">${s.videos.map((v,i)=>`<div class="slide"><div class="cover" role="button" tabindex="0" aria-label="Play ${v.title}" style="background:${covers[i%4]};color:${C.cream}"><img class="poster" src="${v.poster}" alt="" loading="lazy" draggable="false"><b>0${i+1}</b><i></i><span>${v.title} · ${v.dur}</span></div></div>`).join('')}</div></div>
         <div class="ctl"><button class="pv" aria-label="previous">←</button><span class="cnt">01 / 0${s.videos.length}</span><div class="dots">${s.videos.map((v,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div><button class="nx" aria-label="next">→</button></div>`;
@@ -657,13 +658,21 @@ addEventListener('touchend',touchDone,{passive:true});addEventListener('touchcan
    filtered the way fullPage does it: keep the recent |deltaY| values and only act while they are still accelerating (a decaying tail never
    fires). The stage follows the eased scroll through its own spring, so the move has a soft start and a soft landing. Inner lists (gallery,
    experience) stop propagation while they still have room, so the wheel scrolls them natively and only reaches the stage at their edge. */
-const WHEEL_COOL=150,WHEEL_MIN=4;let wl=[],wlast=0,wheelLock=0;
-addEventListener('wheel',e=>{if(Math.abs(e.deltaX)>Math.abs(e.deltaY))return;if(e.cancelable)e.preventDefault();if(jump)return;
+const WHEEL_COOL=450,WHEEL_MIN=4;let wl=[],wlast=0,wheelLock=0;   /* lock after a move = SNAP_MS + WHEEL_COOL (850ms): most of a hard flick's inertia tail is over before input is accepted again (fullPage.js locks ~1.3s) */
+addEventListener('wheel',e=>{
+  /* cancel FIRST, before any early return. Chrome decides at the first event of a wheel sequence whether the page scrolls natively; if that
+     event slips through uncancelled (say it leaned sideways), every later event in the sequence arrives non-cancelable, the body scrolls with
+     the flick's full momentum across several pages, and the snap then lands wherever it stopped. */
+  if(e.cancelable)e.preventDefault();else return;   /* non-cancelable = a native scroll is already under way: don't stack a move on top; the idle snap settles it */
+  if(Math.abs(e.deltaX)>Math.abs(e.deltaY))return;if(jump)return;
   const now=performance.now(),d=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?innerHeight:1);
   if(now-wlast>200)wl=[];wlast=now;wl.push(Math.abs(d));if(wl.length>150)wl.shift();
   lastKind='wheel';
   if(now<wheelLock||snapAnim||Math.abs(d)<WHEEL_MIN)return;
   const avg=n=>{const a=wl.slice(-n);return a.reduce((x,y)=>x+y,0)/a.length};if(avg(10)<avg(70))return;   /* decaying = inertia, not intent */
+  /* the long average above is diluted by the small deltas a swipe starts with, so a long decaying tail can still read as "accelerating" for a
+     while; a tail is also strictly decreasing event to event, so three consecutive drops mean inertia — never intent */
+  {const n=wl.length;if(n>=4&&wl[n-1]<wl[n-2]&&wl[n-2]<wl[n-3]&&wl[n-3]<wl[n-4])return}
   const sp=segPx();if(!sp)return;const i=Math.round(scrollY/sp),to=clamp(i+(d>0?1:-1),0,N-1);
   if(to!==i){wheelLock=now+SNAP_MS+WHEEL_COOL;follow=false;animateTo(to*sp)}},{passive:false});
 /* portrait phones with little height (browser toolbar showing) get a compact layout; use the smallest height seen so the toolbar hiding on scroll doesn't flip it back */
