@@ -241,7 +241,11 @@ pre.code .s{color:var(--yellow)}pre.code .p{color:#8fd3ff}pre.code .c{opacity:.5
 window.CLARITY_ID='yig3p9gpcx';   /* Clarity project id */
 window.track=(name,props)=>{try{if(window.clarity){clarity('event',name);if(props)Object.entries(props).forEach(([k,v])=>clarity('set',k,String(v)))}}catch(e){}};
 (function(){const id=window.CLARITY_ID;if(!id||location.protocol==='file:'||/^(localhost|127\.)/.test(location.hostname)||!location.hostname)return;
-  (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)})(window,document,"clarity","script",id)})();
+  (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)})(window,document,"clarity","script",id);
+  /* where did this visit come from? utm_* / ref in the link become Clarity custom tags for the whole session, and are carried to the case pages (which drop the query) via sessionStorage */
+  try{const q=new URLSearchParams(location.search),src={};['utm_source','utm_medium','utm_campaign','utm_content','ref'].forEach(k=>{if(q.get(k))src[k]=q.get(k).slice(0,64)});
+    const saved=JSON.parse(sessionStorage.getItem('yz-src')||'{}'),all=Object.assign(saved,src);if(Object.keys(src).length)sessionStorage.setItem('yz-src',JSON.stringify(all));
+    Object.entries(all).forEach(([k,v])=>clarity('set',k,v))}catch(e){}})();
 </script>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d75c061ca50c43ff856e541819103bd3"}'></script>
 </head>
@@ -693,7 +697,7 @@ warnings:    sub-component in code but not in map
 <footer class="next" id="booted">
   <div class="wrap">
     <div class="k">Next</div>
-    <h2><a href="blueprint.html" aria-label="BluePrint Infinite — next" onclick="track(\'next_case\')">BluePrint Infinite<span class="arr" aria-hidden="true">→</span></a></h2>
+    <h2><a href="blueprint.html" aria-label="BluePrint Infinite — next" onclick="window.track('next_case')">BluePrint Infinite<span class="arr" aria-hidden="true">→</span></a></h2>
     <p>Two call-centre tools became one. A UX Engineer case study at Bell.</p>
     <div class="links">
       <a href="../index.html#work">All work</a>
@@ -721,7 +725,7 @@ addEventListener('scroll',prog,{passive:true});addEventListener('resize',prog);p
   const btn=bar.querySelector('.tocbtn'),menu=bar.querySelector('.tocmenu'),cur=btn.querySelector('.cur'),lbl=btn.querySelector('.lbl'),links=[...menu.querySelectorAll('a')];
   const place=()=>{bar.style.left=(back.offsetLeft+back.offsetWidth+8)+'px';bar.style.top=back.offsetTop+'px'};place();addEventListener('resize',place);
   const open=o=>{menu.hidden=!o;btn.setAttribute('aria-expanded',o)};
-  btn.addEventListener('click',()=>{if(menu.hidden)track('sections_open');open(menu.hidden)});links.forEach(a=>a.addEventListener('click',()=>{track('section_jump',{section:a.getAttribute('href').slice(1)});open(false)}));
+  btn.addEventListener('click',()=>{if(menu.hidden)window.track('sections_open');open(menu.hidden)});links.forEach(a=>a.addEventListener('click',()=>{window.track('section_jump',{section:a.getAttribute('href').slice(1)});open(false)}));
   addEventListener('click',e=>{if(!bar.contains(e.target))open(false)});addEventListener('keydown',e=>{if(e.key==='Escape')open(false)});
   let idx=-1;const track=()=>{const y=innerHeight*.4;let i=0;items.forEach((it,j)=>{if(it.s.getBoundingClientRect().top<=y)i=j});
     if(i!==idx){idx=i;cur.textContent=items[i].n;lbl.textContent=items[i].label;links.forEach((a,j)=>a.classList.toggle('on',j===i))}};
