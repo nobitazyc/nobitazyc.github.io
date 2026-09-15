@@ -132,6 +132,14 @@ h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-h
   figcaption{font-size:12px}
 }
 </style>
+<!-- Analytics: Microsoft Clarity (heatmaps, scroll depth, session recordings, custom events). Paste the Clarity project id below once; nothing loads while it is empty, on localhost, or from a file. -->
+<script>
+window.CLARITY_ID='yig3p9gpcx';   /* Clarity project id */
+window.track=(name,props)=>{try{if(window.clarity){clarity('event',name);if(props)Object.entries(props).forEach(([k,v])=>clarity('set',k,String(v)))}}catch(e){}};
+(function(){const id=window.CLARITY_ID;if(!id||location.protocol==='file:'||/^(localhost|127\.)/.test(location.hostname)||!location.hostname)return;
+  (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)})(window,document,"clarity","script",id)})();
+</script>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d75c061ca50c43ff856e541819103bd3"}'></script>
 </head>
 <body>
 <div class="progress" id="progress"></div>
@@ -208,7 +216,7 @@ h2{font-size:clamp(30px,3.4vw,50px);font-weight:800;letter-spacing:-.04em;line-h
 <footer class="next" id="booted">
   <div class="wrap">
     <div class="k">Next</div>
-    <h2><a href="typography-animations.html" aria-label="Animated typefaces — next">Animated typefaces<span class="arr" aria-hidden="true">→</span></a></h2>
+    <h2><a href="typography-animations.html" aria-label="Animated typefaces — next" onclick="track(\'next_case\')">Animated typefaces<span class="arr" aria-hidden="true">→</span></a></h2>
     <p>Four typefaces animated character by character in After Effects, every letter driven from one controller.</p>
     <div class="links">
       <a href="../index.html#work">All work</a>
@@ -236,7 +244,7 @@ addEventListener('scroll',prog,{passive:true});addEventListener('resize',prog);p
   const btn=bar.querySelector('.tocbtn'),menu=bar.querySelector('.tocmenu'),cur=btn.querySelector('.cur'),lbl=btn.querySelector('.lbl'),links=[...menu.querySelectorAll('a')];
   const place=()=>{bar.style.left=(back.offsetLeft+back.offsetWidth+8)+'px';bar.style.top=back.offsetTop+'px'};place();addEventListener('resize',place);
   const open=o=>{menu.hidden=!o;btn.setAttribute('aria-expanded',o)};
-  btn.addEventListener('click',()=>open(menu.hidden));links.forEach(a=>a.addEventListener('click',()=>open(false)));
+  btn.addEventListener('click',()=>{if(menu.hidden)track('sections_open');open(menu.hidden)});links.forEach(a=>a.addEventListener('click',()=>{track('section_jump',{section:a.getAttribute('href').slice(1)});open(false)}));
   addEventListener('click',e=>{if(!bar.contains(e.target))open(false)});addEventListener('keydown',e=>{if(e.key==='Escape')open(false)});
   let idx=-1;const track=()=>{const y=innerHeight*.4;let i=0;items.forEach((it,j)=>{if(it.s.getBoundingClientRect().top<=y)i=j});
     if(i!==idx){idx=i;cur.textContent=items[i].n;lbl.textContent=items[i].label;links.forEach((a,j)=>a.classList.toggle('on',j===i))}};

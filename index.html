@@ -286,6 +286,13 @@ body{height:780vh;background:#ffffff;font-family:Inter,"Helvetica Neue",Helvetic
 }
 </style>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d75c061ca50c43ff856e541819103bd3"}'></script><!-- End Cloudflare Web Analytics -->
+<!-- Analytics: Microsoft Clarity (heatmaps, scroll depth, session recordings, custom events). Paste the Clarity project id below once; nothing loads while it is empty, on localhost, or from a file. -->
+<script>
+window.CLARITY_ID='yig3p9gpcx';   /* Clarity project id */
+window.track=(name,props)=>{try{if(window.clarity){clarity('event',name);if(props)Object.entries(props).forEach(([k,v])=>clarity('set',k,String(v)))}}catch(e){}};
+(function(){const id=window.CLARITY_ID;if(!id||location.protocol==='file:'||/^(localhost|127\.)/.test(location.hostname)||!location.hostname)return;
+  (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)})(window,document,"clarity","script",id)})();
+</script>
 </head>
 <body>
 <div id="stage">
@@ -535,7 +542,7 @@ function initRig(rig,s){
       if(!reduce){rig.classList.remove('pop');void rig.offsetWidth;rig.classList.add('pop')}
       let j;do{j=Math.floor(Math.random()*RIG_LINES.length)}while(j===lastL);lastL=j;bubble.textContent=RIG_LINES[j];bubble.classList.add('on');
       clearTimeout(revert);revert=setTimeout(()=>{Object.assign(cur,REST);apply();if(!locked())bubble.classList.remove('on')},2600+Math.random()*900)};
-    rig.addEventListener('click',react);rig._react=react;
+    rig.addEventListener('click',()=>{track('character_poke');react()});rig._react=react;
   }
 }
 
@@ -590,7 +597,7 @@ const S=SCENES.map((sc,i)=>{
       const go=n=>{stop();idx=(n+slides.length)%slides.length;track.style.transform=`translateX(${-idx*100}%)`;dots.forEach((d,i)=>d.classList.toggle('on',i===idx));cnt.textContent=`0${idx+1} / 0${slides.length}`};
       f.querySelector('.pv').onclick=e=>{e.stopPropagation();go(idx-1)};f.querySelector('.nx').onclick=e=>{e.stopPropagation();go(idx+1)};
       slides.forEach((sl,i)=>{const cv=sl.querySelector('.cover');cv.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();cv.click()}};cv.onclick=()=>{stop();const v=s.videos[i];const fr=document.createElement('iframe');
-        fr.src=`https://player.vimeo.com/video/${v.id}?${v.h?`h=${v.h}&`:''}autoplay=1&title=0&byline=0&portrait=0&dnt=1`;fr.allow='autoplay; fullscreen; picture-in-picture';fr.setAttribute('allowfullscreen','');fr.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
+        track('video_play',{video:v.title});fr.src=`https://player.vimeo.com/video/${v.id}?${v.h?`h=${v.h}&`:''}autoplay=1&title=0&byline=0&portrait=0&dnt=1`;fr.allow='autoplay; fullscreen; picture-in-picture';fr.setAttribute('allowfullscreen','');fr.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
         sl.appendChild(fr);sl.querySelector('.cover').style.display='none'}});
       d._stop=stop;}
     else if(s.t==='slot'){f.style.borderRadius=U(s.r||'1vw');f.style.border=`2px dashed ${s.c}`;f.style.color=s.c;f.innerHTML=`<span>${s.label}</span>`}
@@ -631,7 +638,7 @@ const S=SCENES.map((sc,i)=>{
 });
 const N=SCENES.length;
 const nav=$('nav');
-SCENES.forEach((sc,i)=>{const b=document.createElement('button');b.innerHTML=`<i>${sc.k}</i>`;b.onclick=()=>{const from=Math.round(cur*(N-1));if(Math.abs(i-from)>1&&!matchMedia('(prefers-reduced-motion: reduce)').matches)startJump(from,i);else scrollTo({top:(i/(N-1))*maxScroll(),behavior:'smooth'})};nav.appendChild(b)});
+SCENES.forEach((sc,i)=>{const b=document.createElement('button');b.innerHTML=`<i>${sc.k}</i>`;b.onclick=()=>{track('nav_dot',{to:IDS[i]});const from=Math.round(cur*(N-1));if(Math.abs(i-from)>1&&!matchMedia('(prefers-reduced-motion: reduce)').matches)startJump(from,i);else scrollTo({top:(i/(N-1))*maxScroll(),behavior:'smooth'})};nav.appendChild(b)});
 const navBtns=[...nav.children];
 for(let k=0;k<N-1;k++){const pth=document.createElementNS('http://www.w3.org/2000/svg','path');wipe.appendChild(pth);restPaths.push(pth)}
 wipeRest.remove();
@@ -783,7 +790,7 @@ function frame(now){
   const te=Math.pow(tt,1.3);                    // progress for the wipe and the incoming scene: stiff at first (the band is hard to get moving), then follows the drag
   const inTrans=f>T0&&f<T1;
   const type=TRANS[bi-1];
-  if(base!==lastHash){lastHash=base;blip();try{history.replaceState(null,'',base?'#'+IDS[base]:location.pathname+location.search)}catch(e){}}
+  if(base!==lastHash){lastHash=base;blip();track('scene_'+IDS[base],{scene:IDS[base],input:lastKind});try{history.replaceState(null,'',base?'#'+IDS[base]:location.pathname+location.search)}catch(e){}}
   const A=S[i],B=S[bi];
 
   /* springs */
@@ -873,7 +880,7 @@ function frame(now){
 /* ---------- easter egg: poke 20 different letters ---------- */
 const egg={count:0,fired:0,need:()=>matchMedia('(pointer: coarse)').matches?8:30, /* touch screens: fewer pokes */
   poke(ch){if(ch._busy)return; /* counts each real pop, not re-entries mid-animation */
-    if(++this.count>=this.need()){this.count=0;this.fired++;this.party();if(typeof badges!=='undefined')badges.award('poet')}},
+    if(++this.count>=this.need()){this.count=0;this.fired++;this.party();track('egg_party');if(typeof badges!=='undefined')badges.award('poet')}},
   party(){const pal=[C.coral,C.yellow,C.blue,C.mint,C.pink,C.lilac,C.cream];
     const box=document.createElement('div');box.className='party';document.body.appendChild(box);
     for(let k=0;k<90;k++){const i=document.createElement('i');const sz=8+Math.random()*22;
@@ -890,7 +897,7 @@ const showToast=msg=>{let t=document.querySelector('.toast');if(!t){t=document.c
 const beep=(f,ms,at=0,type='square',gain=.05)=>{try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.value=f;g.gain.value=gain;o.connect(g);g.connect(audio.destination);const t=audio.currentTime+at;o.start(t);g.gain.setValueAtTime(gain,t);g.gain.exponentialRampToValueAtTime(.0001,t+ms/1000);o.stop(t+ms/1000+.02)}catch(e){}};
 const blip=()=>{if(arcade)beep(660,70)};   /* one blip per page change while the mode is on */
 const say=(line,hold=3200)=>{const b=document.querySelector('.char .bubble');if(!b)return;b.textContent=line;b.classList.add('on');b._lock=performance.now()+hold;clearTimeout(b._h);b._h=setTimeout(()=>{b.classList.remove('on')},hold)};   /* holds the bubble: nothing else may overwrite or hide it meanwhile */
-const setArcade=on=>{if(on===arcade)return;arcade=on;document.documentElement.classList.toggle('arcade',on);
+const setArcade=on=>{if(on===arcade)return;arcade=on;track(on?'arcade_on':'arcade_off');document.documentElement.classList.toggle('arcade',on);
   if(!document.querySelector('.crt')){const c=document.createElement('div');c.className='crt';document.body.appendChild(c)}
   if(on){[523,659,784,1047].forEach((f,i)=>beep(f,90,i*.09));if(egg.party)egg.party();badges.award('gamer');showToast('Arcade mode. Esc, the code again, or three taps to leave.');say('Arcade mode activated.')}   /* party first: it writes its own toast, ours must land last */
   else{beep(392,120,0,'square',.04);beep(262,160,.12,'square',.04);showToast('Back to normal.');say('Arcade mode off.')}};
@@ -928,7 +935,7 @@ scroll ${s.toFixed(3)} / ${N-1}   f ${f.toFixed(3)}   tt ${tt.toFixed(3)}   te $
 edge ${pLag.toFixed(3)}   bulge ${Math.round(bulge)}px   vel ${vel.toFixed(4)}
 input <b>${lastKind}</b>${ges&&!ges.released?'  dragging':''}${follow?'  follow':''}${lock?'  lock '+lock+'ms':''}${arcade?'  arcade':''}
 ${innerWidth}×${innerHeight}  dpr ${devicePixelRatio}  ${matchMedia('(orientation: portrait)').matches?'portrait':'landscape'}`};
-const setBlue=on=>{if(on===blue)return;blue=on;try{getSelection().removeAllRanges()}catch(e){}if(!blueEl){blueEl=document.createElement('div');blueEl.className='blue';blueEl.innerHTML='<div class="pn"></div>';document.body.appendChild(blueEl);blueEl.querySelector('.pn').addEventListener('click',()=>setBlue(false))}
+const setBlue=on=>{if(on===blue)return;blue=on;track(on?'blueprint_on':'blueprint_off');try{getSelection().removeAllRanges()}catch(e){}if(!blueEl){blueEl=document.createElement('div');blueEl.className='blue';blueEl.innerHTML='<div class="pn"></div>';document.body.appendChild(blueEl);blueEl.querySelector('.pn').addEventListener('click',()=>setBlue(false))}
   blueEl.classList.toggle('on',on);if(on){showToast(matchMedia('(pointer: coarse)').matches?'Blueprint: the data behind the page. Tap the panel to close.':'Blueprint: the data behind the page. Press . to close.');say('Peeking under the hood?');badges.award('engineer')}else showToast('Blueprint off.')};
 addEventListener('keydown',e=>{if(e.key==='.'&&!e.metaKey&&!e.ctrlKey)setBlue(!blue);else if(e.key==='Escape'&&blue)setBlue(false)});
 /* phones: hold the brand line for a moment */
@@ -946,10 +953,14 @@ const badges={got:new Set(JSON.parse(localStorage.getItem('yz-badges')||'[]')),e
     t.querySelector('.n').textContent=`${n} / ${BADGES.length}`;t.classList.toggle('all',n===BADGES.length);t.classList.add('on');
     t.querySelector('.list').innerHTML=`<div class="h">${n===BADGES.length?'All found':'Achievements'}</div>`+BADGES.map(b=>{const g=this.got.has(b.id);return `<div class="${g?'got':''}"><b>${g?'★':'☆'} ${b.name}</b><span>${g?b.how:b.hint}</span></div>`}).join('')},
   award(id){if(this.got.has(id))return;this.got.add(id);try{localStorage.setItem('yz-badges',JSON.stringify([...this.got]))}catch(e){}
-    const b=BADGES.find(x=>x.id===id),n=this.got.size;this.render();if(id==='engineer'&&egg.party)egg.party();   /* the other two eggs bring their own party; this one gets it here */
+    const b=BADGES.find(x=>x.id===id),n=this.got.size;this.render();track('badge_'+id,{badges:n});if(n===BADGES.length)track('badges_all');if(id==='engineer'&&egg.party)egg.party();   /* the other two eggs bring their own party; this one gets it here */
     if(n===BADGES.length){setTimeout(()=>{if(egg.party)egg.party();showToast('All three found. You are officially thorough.');say('You found everything. Respect.')},900)}   /* party first: it writes its own toast */
     else setTimeout(()=>showToast(`★ ${b.name} unlocked · ${n} of ${BADGES.length}`),700)}};
 badges.render();   /* shown from the start: three empty slots are the invitation */
+/* analytics: clicks that matter, by delegation (Clarity records every click on its own; these are the ones worth filtering by) */
+addEventListener('click',e=>{const t=e.target.closest?e.target:null;if(!t)return;const a=t.closest('.gal a');if(a)track('case_open',{case:a.getAttribute('href')});
+  if(t.closest('.tcar .ctl button'))track('experience_nav');const l=t.closest('.copy .links a');if(l)track('link_click',{link:l.textContent.trim()});
+  if(t.closest('.trophy'))track('trophy_open')},{passive:true});
 /* random letter pops on the current scene */
 let curBase=0;
 (function tick(){const sc=S[curBase];if(sc&&sc.el.classList.contains('on')&&sc.el._playRandomLetter)sc.el._playRandomLetter();setTimeout(tick,3200+Math.random()*1600)})();

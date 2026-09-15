@@ -32,3 +32,8 @@ Desktop wheel/trackpad = the fullPage.js model, restored 2026-09-11 because Yuco
 ## Working style
 - Yucong tests on device and reports back; don't spend time on Chrome DevTools verification unless asked or debugging something unseen. Run the syntax check instead.
 - Small numeric tweaks are welcome iterations ("make it lazier", "reduce for mobile"): change one constant, say which, keep the other platform untouched.
+
+## Analytics
+- Microsoft Clarity on every page (heatmaps, scroll depth, recordings, custom events) + the existing Cloudflare Web Analytics beacon. The Clarity snippet sits in each `<head>` behind `window.CLARITY_ID` — empty until Yucong pastes the project id (same id on all 5 pages); it never loads on localhost / 127.* / file:.
+- `window.track(name, props)` wraps `clarity('event', name)` and `clarity('set', key, value)` (custom tags). Events: `scene_<id>` (tags scene, input) on every page change, `egg_party`, `arcade_on/off`, `blueprint_on/off`, `badge_<id>` (tag badges), `badges_all`, `character_poke`, `nav_dot` (tag to), `video_play` (tag video), `case_open` (tag case), `experience_nav`, `link_click` (tag link), `trophy_open`; case pages: `sections_open`, `section_jump` (tag section), `next_case`.
+- Keep events in this vocabulary; add new ones through `track()` only. Text is masked by Clarity by default — leave that on.
